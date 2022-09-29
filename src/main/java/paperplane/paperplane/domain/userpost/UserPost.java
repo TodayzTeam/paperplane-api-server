@@ -3,7 +3,6 @@ package paperplane.paperplane.domain.userpost;
 
 import lombok.*;
 import paperplane.paperplane.domain.post.Post;
-import paperplane.paperplane.domain.user.User;
 
 import javax.persistence.*;
 
@@ -21,7 +20,7 @@ public class UserPost {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private paperplane.paperplane.domain.user.User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
