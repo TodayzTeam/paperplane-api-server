@@ -1,8 +1,11 @@
 package paperplane.paperplane.domain.group;
 
 import lombok.*;
+import paperplane.paperplane.domain.usergroup.UserGroup;
+import paperplane.paperplane.domain.userpost.UserPost;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Builder
@@ -20,4 +23,7 @@ public class Group {
 
     @Column
     private String code;
+
+    @OneToMany(mappedBy = "group", cascade = {CascadeType.ALL})
+    private Set<UserGroup> userGroups;
 }

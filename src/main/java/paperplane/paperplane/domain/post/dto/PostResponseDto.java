@@ -5,6 +5,7 @@ import lombok.*;
 import paperplane.paperplane.domain.group.dto.GroupResponseDto;
 import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.postinterest.dto.PostInterestResponseDto;
+import paperplane.paperplane.domain.userpost.UserPost;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

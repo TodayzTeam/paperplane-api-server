@@ -30,6 +30,8 @@ public class PostRequestDto {
         @ApiModelProperty(value = "그룹 코드")
         private String code;
 
+        @ApiModelProperty(value = "회신 여부")
+        private Boolean isReply;
     }
 
 }

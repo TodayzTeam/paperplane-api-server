@@ -37,12 +37,13 @@ public class GroupRequestDto {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Join{
+    public static class GroupCode{
 
         @NotNull
         @ApiModelProperty(value = "그룹 코드", required = true)
         private String code;
 
     }
+
 
 }

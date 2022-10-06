@@ -3,6 +3,7 @@ package paperplane.paperplane.domain.userpost;
 
 import lombok.*;
 import paperplane.paperplane.domain.post.Post;
+import paperplane.paperplane.domain.user.User;
 
 import javax.persistence.*;
 
@@ -18,16 +19,17 @@ public class UserPost {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    //받는 사람
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private paperplane.paperplane.domain.user.User user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
     @Column
-    private Boolean isTempPost;
+    private Boolean isReply;
 
     @Column
     private Boolean isReport;
