@@ -23,7 +23,7 @@ public class Post {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private paperplane.paperplane.domain.user.User user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Group group;

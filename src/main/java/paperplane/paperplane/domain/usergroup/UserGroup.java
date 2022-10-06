@@ -5,6 +5,7 @@ import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.user.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Builder
 @Getter
@@ -24,4 +25,7 @@ public class UserGroup {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
+
+    @Column
+    private LocalDateTime joinDate;
 }

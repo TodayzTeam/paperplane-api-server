@@ -18,4 +18,7 @@ public class Interest {
 
     @Column
     private String keyword;
+
+    @Column
+    private Integer count;
 }
