@@ -7,12 +7,13 @@ import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.postinterest.dto.PostInterestResponseDto;
 import paperplane.paperplane.domain.userpost.UserPost;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PostResponseDto {
+public class PostResponseDto implements Serializable {
 
     @ApiModel(value = "편지 상세 정보")
     @Builder

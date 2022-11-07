@@ -11,3 +11,9 @@ services:
       MYSQL_ROOT_PASSWORD: paperplane
       MYSQL_USER: paperplane
       MYSQL_PASSWORD: paperplane
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+

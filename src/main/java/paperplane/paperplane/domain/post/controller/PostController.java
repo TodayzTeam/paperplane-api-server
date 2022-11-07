@@ -3,8 +3,13 @@ package paperplane.paperplane.domain.post.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +19,7 @@ import paperplane.paperplane.domain.group.dto.GroupRequestDto;
 import paperplane.paperplane.domain.group.dto.GroupResponseDto;
 import paperplane.paperplane.domain.post.dto.PostRequestDto;
 import paperplane.paperplane.domain.post.dto.PostResponseDto;
+import paperplane.paperplane.domain.post.repository.PostRepository;
 import paperplane.paperplane.domain.post.service.PostService;
 import paperplane.paperplane.domain.postinterest.dto.PostInterestResponseDto;
 
@@ -30,14 +36,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-    private Integer id;
-    private String title;
-    private String content;
-    private LocalDateTime date;
-    private Integer reportCount;
-    private Integer likeCount;
-    private GroupResponseDto.Info group;
-    private List<PostInterestResponseDto> interest;
+    private final PostRepository postRepository;
+
     @ApiOperation("편지 송신/회신")
     @PostMapping("/create")
     public ResponseEntity<PostResponseDto.Info> createPost(@Valid PostRequestDto.Create create) throws Exception {
@@ -164,11 +164,18 @@ public class PostController {
     public ResponseEntity<Void> reportPost(@PathVariable Integer postId) throws Exception {
         return ResponseEntity.ok().build();
     }
+
+    @CacheEvict(value = "post-likecount", key = "#id", cacheManager = "cacheManager")
     @ApiOperation("편지 좋아요 누르기")
     @GetMapping("/like/{postId}")
     public ResponseEntity<Void> likePost(@PathVariable Integer postId) throws Exception {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/test/{id}")
+    @Cacheable(value = "test", key = "#id", cacheManager = "cacheManager")
+    public ResponseEntity<Integer> test(@PathVariable Integer id){
+        return ResponseEntity.ok(postRepository.findById(id).get().getLikeCount());
 
+    }
 }
