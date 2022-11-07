@@ -12,6 +12,7 @@ import paperplane.paperplane.domain.group.dto.GroupRequestDto;
 import paperplane.paperplane.domain.group.dto.GroupResponseDto;
 import paperplane.paperplane.domain.group.service.GroupService;
 import paperplane.paperplane.domain.usergroup.UserGroup;
+import paperplane.paperplane.domain.usergroup.dto.UserGroupResponseDto;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -68,6 +69,22 @@ public class GroupController {
                 .id(2)
                 .name("group2")
                 .code("dsjkew3").build());
+
+        return ResponseEntity.ok(simpleList);
+    }
+
+    @ApiOperation("해당 그룹의 그룹원 목록")
+    @GetMapping("users")
+    public ResponseEntity<List<UserGroupResponseDto>> getGroupUserList(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
+        List<UserGroupResponseDto> simpleList = new ArrayList<>();
+        simpleList.add(UserGroupResponseDto.builder()
+                .groupId(1)
+                .groupName("asdfq3")
+                .simpleUser(null).build());
+        simpleList.add(UserGroupResponseDto.builder()
+                .groupId(1)
+                .groupName("asdfq3")
+                .simpleUser(null).build());
 
         return ResponseEntity.ok(simpleList);
     }

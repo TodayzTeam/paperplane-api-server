@@ -31,7 +31,7 @@ public class GroupRequestDto {
         }
     }
 
-    @ApiModel(value = "그룹 참가")
+    @ApiModel(value = "그룹 참가,검색")
     @Builder
     @Getter
     @Setter

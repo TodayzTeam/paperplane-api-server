@@ -46,13 +46,16 @@ public class UserRequestDto {
         }
     }
 
-    @ApiModel(value = "유저 관심사, 이미지 저장")
+    @ApiModel(value = "이름, 유저 관심사, 이미지 저장/수정")
     @Builder
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Profile{
+        @NotNull
+        @ApiModelProperty(value = "이름", required = true)
+        private String name;
 
         @ApiModelProperty(value = "관심사 리스트", required = true)
         private String interest;
@@ -60,4 +63,6 @@ public class UserRequestDto {
         @ApiModelProperty(value = "유저 이미지", required = true)
         private MultipartFile profileImage;
     }
+
+
 }

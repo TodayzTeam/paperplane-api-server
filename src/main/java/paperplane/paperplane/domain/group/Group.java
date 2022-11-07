@@ -9,6 +9,7 @@ import java.util.Set;
 
 @Entity
 @Builder
+@Table(name = "GROUP_TB")
 @Getter
 @Setter
 @NoArgsConstructor
