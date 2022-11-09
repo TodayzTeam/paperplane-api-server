@@ -1,19 +1,32 @@
 version: '3.1'
 services:
+  web:
+    image: sweun2/paperplane-server-api:paperplane
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paperplane
+      SPRING_DATASOURCE_USERNAME: paperplane
+      SPRING_DATASOURCE_PASSWORD: paperplane
+    depends_on:
+      - mysql
+    restart: always
+    ports:
+      - "8080:8080"
   mysql:
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     ports:
-      - "3306:3306"
+      - "8081:3306"
     environment:
       MYSQL_DATABASE: paperplane
       MYSQL_ROOT_PASSWORD: paperplane
       MYSQL_USER: paperplane
       MYSQL_PASSWORD: paperplane
+    depends_on:
+      - redis
   redis:
     image: redis
     restart: always
     ports:
-      - "6379:6379"
+      - "8082:6379"
 

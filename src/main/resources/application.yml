@@ -5,10 +5,10 @@ spring:
       cache-null-values: true
       time-to-live: 600000
   redis:
-    host: 127.0.0.1
+    host: localhost
     port: 6379
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/paperplane
+    url: jdbc:mysql://localhost:3306/paperplane
     username: paperplane
     password: paperplane
     driver-class-name: com.mysql.cj.jdbc.Driver
