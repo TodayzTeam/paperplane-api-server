@@ -43,7 +43,7 @@ jobs:
 
     ## docker compose up
     - name: executing remote ssh commands using password
-      uses: papaerplane-api-server/ssh-action@master
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ubuntu
