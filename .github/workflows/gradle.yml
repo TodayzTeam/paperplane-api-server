@@ -38,12 +38,11 @@ jobs:
     - name: web docker build and push
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-        docker build -t paperplane-server-api:paperplane .
-        docker push paperplane-server-api:paperplane
+        docker build -t sweun2/paperplane-server-api:paperplane .
+        docker push sweun2/paperplane-server-api:paperplane
 
     ## docker compose up
     - name: executing remote ssh commands using password
-      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ubuntu
