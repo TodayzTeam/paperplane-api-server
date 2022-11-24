@@ -27,11 +27,17 @@ public class PostRequestDto {
         @ApiModelProperty(value = "관심사 키워드")
         private String keyword;
 
+        @NotNull
+        @ApiModelProperty(value = "편지 색깔, 'RED','GREEN','BLUE','BLACK' 4색", required = true)
+        private String Color;
+
         @ApiModelProperty(value = "그룹 코드")
         private String code;
 
         @ApiModelProperty(value = "회신 여부")
         private Boolean isReply;
+
+
     }
 
 }

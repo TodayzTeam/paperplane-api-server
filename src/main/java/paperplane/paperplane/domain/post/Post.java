@@ -43,6 +43,9 @@ public class Post {
     @Column
     private Integer likeCount;
 
+    @Column
+    private PostColor postColor;
+
     @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL})
     private Set<PostInterest> postInterests;
 

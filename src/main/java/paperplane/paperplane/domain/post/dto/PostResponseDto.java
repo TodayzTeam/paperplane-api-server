@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import lombok.*;
 import paperplane.paperplane.domain.group.dto.GroupResponseDto;
 import paperplane.paperplane.domain.post.Post;
+import paperplane.paperplane.domain.post.PostColor;
 import paperplane.paperplane.domain.postinterest.dto.PostInterestResponseDto;
 import paperplane.paperplane.domain.userpost.UserPost;
 
@@ -28,6 +29,7 @@ public class PostResponseDto implements Serializable {
         private LocalDateTime date;
         private Integer reportCount;
         private Integer likeCount;
+        private PostColor postColor;
         private GroupResponseDto.Info group;
         private List<PostInterestResponseDto> interest;
 
@@ -39,6 +41,7 @@ public class PostResponseDto implements Serializable {
                     .date(LocalDateTime.now())
                     .reportCount(post.getReportCount())
                     .likeCount(post.getLikeCount())
+                    .postColor(post.getPostColor())
                     .interest(PostInterestResponseDto.of(new ArrayList<>( post.getPostInterests())))
                     .build();
         }
@@ -58,12 +61,14 @@ public class PostResponseDto implements Serializable {
         private String title;
         private String content;
         private Integer likeCount;
+        private PostColor postColor;
 
         public static Simple of(Post post){
             return Simple.builder()
                     .title(post.getTitle())
                     .content(post.getContent())
                     .likeCount(post.getLikeCount())
+                    .postColor(post.getPostColor())
                     .build();
         }
 

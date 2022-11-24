@@ -17,6 +17,7 @@ import paperplane.paperplane.domain.Interest.dto.InterestResponseDto;
 import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.group.dto.GroupRequestDto;
 import paperplane.paperplane.domain.group.dto.GroupResponseDto;
+import paperplane.paperplane.domain.post.PostColor;
 import paperplane.paperplane.domain.post.dto.PostRequestDto;
 import paperplane.paperplane.domain.post.dto.PostResponseDto;
 import paperplane.paperplane.domain.post.repository.PostRepository;
@@ -57,6 +58,7 @@ public class PostController {
                 .date(LocalDateTime.now())
                 .reportCount(0)
                 .likeCount(0)
+                .postColor(PostColor.RED)
                 .group(GroupResponseDto.Info.of(Group.builder()
                         .id(1)
                         .code("12dsa")
@@ -80,11 +82,13 @@ public class PostController {
                 .title("title1")
                 .content("content1")
                 .likeCount(0)
+                .postColor(PostColor.RED)
                 .build());
         simpleList.add(PostResponseDto.Simple.builder()
                 .title("title2")
                 .content("content2")
                 .likeCount(0)
+                .postColor(PostColor.RED)
                 .build());
 
         return ResponseEntity.ok(simpleList);
@@ -97,11 +101,13 @@ public class PostController {
                 .title("title1")
                 .content("content1")
                 .likeCount(0)
+                .postColor(PostColor.RED)
                 .build());
         simpleList.add(PostResponseDto.Simple.builder()
                 .title("title2")
                 .content("content2")
                 .likeCount(0)
+                .postColor(PostColor.RED)
                 .build());
 
         return ResponseEntity.ok(simpleList);
@@ -115,11 +121,13 @@ public class PostController {
                 .title("title1")
                 .content("content1")
                 .likeCount(0)
+                .postColor(PostColor.RED)
                 .build());
         simpleList.add(PostResponseDto.Simple.builder()
                 .title("title2")
                 .content("content2")
                 .likeCount(0)
+                .postColor(PostColor.RED)
                 .build());
 
         return ResponseEntity.ok(simpleList);
@@ -132,11 +140,13 @@ public class PostController {
                 .title("title1")
                 .content("content1")
                 .likeCount(0)
+                .postColor(PostColor.RED)
                 .build());
         simpleList.add(PostResponseDto.Simple.builder()
                 .title("title2")
                 .content("content2")
                 .likeCount(0)
+                .postColor(PostColor.RED)
                 .build());
 
         return ResponseEntity.ok(simpleList);
@@ -149,11 +159,13 @@ public class PostController {
                 .title("title1")
                 .content("content1")
                 .likeCount(0)
+                .postColor(PostColor.RED)
                 .build());
         simpleList.add(PostResponseDto.Simple.builder()
                 .title("title2")
                 .content("content2")
                 .likeCount(0)
+                .postColor(PostColor.RED)
                 .build());
 
         return ResponseEntity.ok(simpleList);
