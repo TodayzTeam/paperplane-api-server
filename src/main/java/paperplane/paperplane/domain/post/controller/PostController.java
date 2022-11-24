@@ -72,9 +72,9 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @ApiOperation("편지 제목으로 검색")
-    @GetMapping("/search/{title}")
-    public ResponseEntity<List<PostResponseDto.Simple>> searchPost(@PathVariable final String title) throws Exception {
+    @ApiOperation("편지 제목, 내용으로 검색")
+    @GetMapping("/search/{word}")
+    public ResponseEntity<List<PostResponseDto.Simple>> searchPost(@PathVariable final String word) throws Exception {
         List<PostResponseDto.Simple> simpleList = new ArrayList<>();
         simpleList.add(PostResponseDto.Simple.builder()
                 .title("title1")
