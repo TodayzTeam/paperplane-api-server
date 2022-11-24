@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import paperplane.paperplane.domain.Interest.Interest;
 import paperplane.paperplane.domain.Interest.dto.InterestRequestDto;
 import paperplane.paperplane.domain.Interest.dto.InterestResponseDto;
 import paperplane.paperplane.domain.Interest.service.InterestService;
@@ -70,4 +71,21 @@ public class InterestController {
                 .build());
         return ResponseEntity.ok(interestResponseDtoList);
     }
+
+
+    @ApiOperation("내 관심사 조회")
+    @GetMapping("/group/{userid}")
+    public ResponseEntity <List<InterestResponseDto.Info>> getMyInterest(@PathVariable Integer userid) throws Exception {
+        List<InterestResponseDto.Info> infoList= new ArrayList<>();
+        infoList.add(InterestResponseDto.Info.of(Interest.builder()
+                .id(1)
+                .keyword("해변")
+                .build()));
+        infoList.add(InterestResponseDto.Info.of(Interest.builder()
+                .id(2)
+                .keyword("바닷가")
+                .build()));
+        return ResponseEntity.ok(infoList);
+    }
+
 }

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.group.dto.GroupRequestDto;
 import paperplane.paperplane.domain.group.dto.GroupResponseDto;
 import paperplane.paperplane.domain.group.service.GroupService;
@@ -57,7 +58,7 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @ApiOperation("그룹 검색")
+    @ApiOperation("그룹을 그룹명으로 검색")
     @GetMapping("search/{name}")
     public ResponseEntity<List<GroupResponseDto.Simple>> resignGroup(@PathVariable String name) throws Exception {
         List<GroupResponseDto.Simple> simpleList = new ArrayList<>();
@@ -74,8 +75,8 @@ public class GroupController {
     }
 
     @ApiOperation("해당 그룹의 그룹원 목록")
-    @GetMapping("users")
-    public ResponseEntity<List<UserGroupResponseDto>> getGroupUserList(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
+    @GetMapping("users/{name}")
+    public ResponseEntity<List<UserGroupResponseDto>> getGroupUserList(@PathVariable String name) throws Exception {
         List<UserGroupResponseDto> simpleList = new ArrayList<>();
         simpleList.add(UserGroupResponseDto.builder()
                 .groupId(1)
@@ -88,5 +89,21 @@ public class GroupController {
 
         return ResponseEntity.ok(simpleList);
     }
+
+    @ApiOperation("내 그룹들 정보 조회")
+    @GetMapping("/group/{userid}")
+    public ResponseEntity <List<GroupResponseDto.Simple>> getMyGroup(@PathVariable Integer userid) throws Exception {
+        List<GroupResponseDto.Simple> simpleList= new ArrayList<>();
+        simpleList.add(GroupResponseDto.Simple.of(Group.builder()
+                .name("group1")
+                .code("abcd")
+                .build()));
+        simpleList.add(GroupResponseDto.Simple.of(Group.builder()
+                .name("group2")
+                .code("efgh")
+                .build()));
+        return ResponseEntity.ok(simpleList);
+    }
+
 
 }

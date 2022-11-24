@@ -59,35 +59,6 @@ public class UserController {
                 .build());
     }
 
-    @ApiOperation("내 그룹 정보 조회")
-    @GetMapping("/group/{id}")
-    public ResponseEntity <List<GroupResponseDto.Simple>> getMyGroup(@PathVariable Integer id) throws Exception {
-        List<GroupResponseDto.Simple> simpleList= new ArrayList<>();
-        simpleList.add(GroupResponseDto.Simple.of(Group.builder()
-                .name("group1")
-                .code("abcd")
-                .build()));
-        simpleList.add(GroupResponseDto.Simple.of(Group.builder()
-                .name("group2")
-                .code("efgh")
-                .build()));
-        return ResponseEntity.ok(simpleList);
-    }
-
-    @ApiOperation("내 관심사 조회")
-    @GetMapping("/group/{id}")
-    public ResponseEntity <List<InterestResponseDto.Info>> getMyInterest(@PathVariable Integer id) throws Exception {
-        List<InterestResponseDto.Info> infoList= new ArrayList<>();
-        infoList.add(InterestResponseDto.Info.of(Interest.builder()
-                .id(1)
-                .keyword("해변")
-                .build()));
-        infoList.add(InterestResponseDto.Info.of(Interest.builder()
-                .id(2)
-                .keyword("바닷가")
-                .build()));
-        return ResponseEntity.ok(infoList);
-    }
     @ApiOperation("내 정보 수정")
     @PostMapping("/update/{id}")
     public ResponseEntity<UserResponseDto.Info> updateProfile(@Valid UserRequestDto.Profile profile, @PathVariable Integer id) throws Exception {

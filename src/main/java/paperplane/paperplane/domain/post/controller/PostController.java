@@ -74,9 +74,9 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @ApiOperation("편지 제목, 내용으로 검색")
+    @ApiOperation("전체 편지 중 제목, 내용으로 검색")
     @GetMapping("/search/{word}")
-    public ResponseEntity<List<PostResponseDto.Simple>> searchPost(@PathVariable final String word) throws Exception {
+    public ResponseEntity<List<PostResponseDto.Simple>> searchAllPost(@PathVariable final String word) throws Exception {
         List<PostResponseDto.Simple> simpleList = new ArrayList<>();
         simpleList.add(PostResponseDto.Simple.builder()
                 .title("title1")
@@ -93,6 +93,27 @@ public class PostController {
 
         return ResponseEntity.ok(simpleList);
     }
+
+    @ApiOperation("유저의 그룹 편지 중 제목, 내용으로 검색 user id/검색어 필요")
+    @GetMapping("/search/{userid}/{word}")
+    public ResponseEntity<List<PostResponseDto.Simple>> searchGroupPost(@PathVariable final Integer userid, final String word) throws Exception {
+        List<PostResponseDto.Simple> simpleList = new ArrayList<>();
+        simpleList.add(PostResponseDto.Simple.builder()
+                .title("title1")
+                .content("content1")
+                .likeCount(0)
+                .postColor(PostColor.RED)
+                .build());
+        simpleList.add(PostResponseDto.Simple.builder()
+                .title("title2")
+                .content("content2")
+                .likeCount(0)
+                .postColor(PostColor.RED)
+                .build());
+
+        return ResponseEntity.ok(simpleList);
+    }
+
     @ApiOperation("인기편지 리스트 8개 전송")
     @GetMapping("/popular")
     public ResponseEntity<List<PostResponseDto.Simple>> popularPost() throws Exception {
