@@ -51,5 +51,5 @@ jobs:
         script: |
           sudo docker rm -f $(docker ps -q)
           sudo docker pull sweun2/paperplane-server-api:paperplane
-          docker-compose up -d
+          docker-compose -f /paperplane-api-server/docker-compose.yml up -d
           docker image prune -f
