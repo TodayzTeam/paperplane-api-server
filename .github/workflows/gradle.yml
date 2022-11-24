@@ -43,13 +43,13 @@ jobs:
 
     ## docker compose up
     - name: executing remote ssh commands using password
-      uses: appleboy/ssh-action@master
+      uses: papaerplane-api-server/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ubuntu
         key: ${{ secrets.KEY }}
         script: |
-          sudo docker rm -f $(docker ps -qa)
-          sudo docker pull paperplane-server-api:paperplane
+          sudo docker rm -f $(docker ps -q)
+          sudo docker pull sweun2/paperplane-server-api:paperplane
           docker-compose up -d
           docker image prune -f
