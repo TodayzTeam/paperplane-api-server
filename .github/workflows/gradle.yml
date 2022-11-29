@@ -34,14 +34,14 @@ jobs:
         arguments: build -x test
 
 
-    ## 웹 이미지 빌드 및 도커허브에 push
+      ## 웹 이미지 빌드 및 도커허브에 push
     - name: web docker build and push
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
         docker build -t sweun2/paperplane-server-api:paperplane .
         docker push sweun2/paperplane-server-api:paperplane
 
-    ## docker compose up
+      ## docker compose up
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
       with:

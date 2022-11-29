@@ -26,7 +26,7 @@ public class SecurityConfig {
         http.httpBasic().disable()
                 .cors().configurationSource(request -> {
                     var cors = new CorsConfiguration();
-                    cors.setAllowedOrigins(of("http://20.38.46.151:3000","http://localhost:3000","http://localhost:8080"));
+                    cors.setAllowedOrigins(of("http://20.38.46.151:3000","http://localhost:3000","http://localhost:8080123123"));
                     cors.setAllowedMethods(of("GET","POST", "PUT", "DELETE", "OPTIONS"));
                     cors.setAllowedHeaders(of("*"));
                     cors.setAllowCredentials(true);
