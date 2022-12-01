@@ -62,6 +62,24 @@ public class UserRequestDto {
 
         @ApiModelProperty(value = "유저 이미지", required = true)
         private MultipartFile profileImage;
+
+        @ApiModelProperty(value = "내가 보낸 편지가 읽었을때 웹 알림 여부", required = false)
+        private Boolean isReadWeb;
+
+        @ApiModelProperty(value = "답장 오는거 확인 웹 알림 여부", required = false)
+        private Boolean isRepliedWeb;
+
+        @ApiModelProperty(value = "인기 편지 등록됬을때 웹 알림 여부", required = false)
+        private Boolean isPopularLetterWeb;
+
+        @ApiModelProperty(value = "내가 보낸 편지가 읽었을때 이메일 알림 여부", required = false)
+        private Boolean isReadEmail;
+
+        @ApiModelProperty(value = "답장 오는거 확인 이메일 알림 여부", required = false)
+        private Boolean isRepliedEmail;
+
+        @ApiModelProperty(value = "인기 편지 등록됬을때 이메일 알림 여부", required = false)
+        private Boolean isPopularLetterEmail;
     }
 
 
