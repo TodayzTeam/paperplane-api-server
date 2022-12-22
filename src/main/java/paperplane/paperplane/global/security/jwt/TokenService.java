@@ -44,6 +44,7 @@ public class TokenService {
                         .signWith(key, SignatureAlgorithm.HS256)
                         .compact(),
                 Jwts.builder()
+                        .setClaims(generateClaims(uid, role))
                         .setIssuedAt(issueDate)
                         .setExpiration(new Date(issueDate.getTime() + REFRESH_EXPIRE))
                         .signWith(key, SignatureAlgorithm.HS256)

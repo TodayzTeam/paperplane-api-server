@@ -24,7 +24,7 @@ public class JwtAuthFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String token = ((HttpServletRequest) request).getHeader("Authorization");
+        String token = ((HttpServletRequest) request).getHeader("accessToken");
 
         if(token != null && tokenService.verifyToken(token)){
             String email = tokenService.getUid(token);

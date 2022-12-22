@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -47,8 +48,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Token token = tokenService.generateToken(email, "USER");
         log.info("{}", token);
 
+        //refreshToken DB에 저장
+        Optional<User> user = userRepository.findByEmail(email);
+        user.get().setRefreshToken(token.getRefreshToken());
+
         response.setContentType("text/html;charset=UTF-8");
-        response.addHeader("Authorization", token.getAccessToken());
+        response.addHeader("accessToken", token.getAccessToken());
         response.addHeader("refreshToken", token.getRefreshToken());
         response.setContentType("application/json;charset=UTF-8");
 
