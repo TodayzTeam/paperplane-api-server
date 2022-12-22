@@ -1,0 +1,33 @@
+spring:
+  profiles:
+    include: oauth
+  cache:
+    type: redis
+    redis:
+      cache-null-values: true
+      time-to-live: 600000
+  redis:
+    host: localhost
+    port: 8082
+  datasource:
+    url: jdbc:mysql://localhost:8081/paperplane_test
+    username: paperplane
+    password: paperplane
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      use-new-id-generator-mappings: false
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+    database: mysql
+    properties:
+      hibernate:
+        format_sql: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+server:
+  error:
+    include-message: always
