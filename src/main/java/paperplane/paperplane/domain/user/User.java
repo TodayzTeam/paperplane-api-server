@@ -2,6 +2,7 @@ package paperplane.paperplane.domain.user;
 
 
 import lombok.*;
+import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.postinterest.PostInterest;
 import paperplane.paperplane.domain.usergroup.UserGroup;
 import paperplane.paperplane.domain.userinterest.UserInterest;
@@ -56,4 +57,7 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     private Set<UserPost> userPosts;
+
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    private Set<Post> Posts;
 }
