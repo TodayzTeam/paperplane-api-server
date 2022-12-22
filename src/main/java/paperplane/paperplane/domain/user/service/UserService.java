@@ -12,6 +12,7 @@ import paperplane.paperplane.domain.user.repository.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Transactional
 @Service
@@ -41,4 +42,15 @@ public class UserService {
         return userRepository.findById(getUserIdInHeader()).get();
     }
 
+    public Optional<User> getUserByEmail(String email) {return userRepository.findByEmail(email);}
+
+    public User getUser(Integer id){
+        return userRepository.findById(id).orElseThrow(()->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "해당하는 회원이 없습니다."));
+    }
+
+    public void deleteUser(User user) {
+        userRepository.delete(userRepository.findById(user.getId()).orElseThrow(()->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "해당하는 회원이 없습니다.")));
+    }
 }

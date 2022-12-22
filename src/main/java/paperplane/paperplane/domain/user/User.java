@@ -31,6 +31,9 @@ public class User {
     private String profileImageUrl;
 
     @Column
+    private String refreshToken;
+
+    @Column
     private Boolean isReadWeb;
 
     @Column

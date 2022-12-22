@@ -13,15 +13,19 @@ import paperplane.paperplane.domain.Interest.dto.InterestResponseDto;
 import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.group.dto.GroupResponseDto;
 import paperplane.paperplane.domain.postinterest.dto.PostInterestResponseDto;
+import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.dto.UserRequestDto;
 import paperplane.paperplane.domain.user.dto.UserResponseDto;
 import paperplane.paperplane.domain.user.service.UserService;
 import paperplane.paperplane.domain.usergroup.UserGroup;
 import paperplane.paperplane.domain.usergroup.dto.UserGroupResponseDto;
+import paperplane.paperplane.global.security.jwt.TokenService;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Api(tags = {"User Controller"})
 @Slf4j
@@ -30,6 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final TokenService tokenService;
 
     @ApiOperation("내 전체 정보 조회")
     @GetMapping("/profile/{id}")
@@ -78,9 +83,20 @@ public class UserController {
                 .build());
     }
 
+    @ApiOperation("로그아웃")
+    @PostMapping("/logout/{id}")
+    public ResponseEntity<Void> logout(@PathVariable Integer id){
+        User user = userService.getUser(id);
+        user.setRefreshToken(null);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @ApiOperation("탈퇴")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> updateProfile(@PathVariable Integer id) throws Exception {
+        userService.deleteUser(userService.getUser(id));
+
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
