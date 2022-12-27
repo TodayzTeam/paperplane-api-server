@@ -49,15 +49,17 @@ public class User {
     @Column
     private Boolean isPopularLetterEmail;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+
+    @OneToMany(cascade = {CascadeType.ALL})
     private Set<UserGroup> userGroups;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    @OneToMany(cascade = {CascadeType.ALL})
     private Set<UserInterest> userInterests;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    @OneToMany(cascade = {CascadeType.ALL})
     private Set<UserPost> userPosts;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    @OneToMany
+    @JoinColumn(name = "user_id")
     private Set<Post> Posts;
 }
