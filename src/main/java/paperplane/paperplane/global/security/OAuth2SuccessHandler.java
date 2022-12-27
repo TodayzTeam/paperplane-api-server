@@ -8,6 +8,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.repository.UserRepository;
+import paperplane.paperplane.domain.user.service.UserService;
 import paperplane.paperplane.global.security.jwt.Token;
 import paperplane.paperplane.global.security.jwt.TokenService;
 
@@ -15,7 +16,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -23,6 +23,7 @@ import java.util.Optional;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final TokenService tokenService;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -31,7 +32,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String email = oAuth2User.getAttribute("email");
 
         //최초 로그인 시 회원가입
-        if(userRepository.findByEmail(email).isEmpty()){
+        User user = userRepository.findByEmail(email).orElseGet(()->
                 userRepository.save(User.builder()
                         .email(email)
                         .name(oAuth2User.getAttribute("name"))
@@ -42,15 +43,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                         .isPopularLetterWeb(false)
                         .isReadWeb(false)
                         .isRepliedWeb(false)
-                        .build());
-        }
+                        .build()));
 
         Token token = tokenService.generateToken(email, "USER");
-        log.info("{}", token);
 
         //refreshToken DB에 저장
-        Optional<User> user = userRepository.findByEmail(email);
-        user.get().setRefreshToken(token.getRefreshToken());
+        user.setRefreshToken(token.getRefreshToken());
+        userRepository.save(user);
 
         response.setContentType("text/html;charset=UTF-8");
         response.addHeader("accessToken", token.getAccessToken());
