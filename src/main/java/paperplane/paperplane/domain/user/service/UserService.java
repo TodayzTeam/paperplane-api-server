@@ -5,14 +5,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import paperplane.paperplane.domain.post.repository.PostRepository;
 import paperplane.paperplane.domain.user.User;
+import paperplane.paperplane.domain.user.dto.UserRequestDto;
 import paperplane.paperplane.domain.user.repository.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Optional;
+import java.util.UUID;
 
 @Transactional
 @Service
@@ -53,4 +59,28 @@ public class UserService {
         userRepository.delete(userRepository.findById(user.getId()).orElseThrow(()->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "해당하는 회원이 없습니다.")));
     }
+
+    public User updateUser(Integer id, UserRequestDto.Profile profile){
+        User user = getUser(id);
+        user.update(profile);
+
+        return user;
+    }
+
+    public String updateProfileImage(Integer id, MultipartFile file) throws IOException {
+        String uploadPath = "C:\\study\\img";
+        String uploadFileName = file.getOriginalFilename();
+
+        uploadFileName = UUID.randomUUID().toString() + "_" + uploadFileName;
+
+        File newFile = new File(uploadPath + uploadFileName);
+        file.transferTo(newFile);
+
+        User user = getUser(id);
+
+        user.setProfileImageUrl(newFile.toString());
+
+        return user.getProfileImageUrl();
+    }
+
 }
