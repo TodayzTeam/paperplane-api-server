@@ -39,38 +39,16 @@ public class PostController {
     private final PostService postService;
     private final PostRepository postRepository;
 
-    @ApiOperation("편지 송신/회신")
+    @ApiOperation("편지 송신/회신, 헤더에 송신자(sender) userId 필요")
     @PostMapping("/create")
-    public ResponseEntity<PostResponseDto.Info> createPost(@Valid PostRequestDto.Create create) throws Exception {
-        List<PostInterestResponseDto> postInterestResponseDtoList= new ArrayList<>();
-        postInterestResponseDtoList.add(PostInterestResponseDto.builder()
-                .id(1)
-                .keyword("관심사1")
-                .build());
-        postInterestResponseDtoList.add(PostInterestResponseDto.builder()
-                .id(2)
-                .keyword("관심사2")
-                .build());
-        return ResponseEntity.ok(PostResponseDto.Info.builder()
-                .id(1)
-                .title("title")
-                .content("content")
-                .date(LocalDateTime.now())
-                .reportCount(0)
-                .likeCount(0)
-                .postColor(PostColor.RED)
-                .group(GroupResponseDto.Info.of(Group.builder()
-                        .id(1)
-                        .code("12dsa")
-                        .name("wwe")
-                        .build()))
-                .interest(postInterestResponseDtoList)
-                .build());
+    public ResponseEntity<Integer> createPost(@Valid PostRequestDto.Create create) throws Exception {
+        return ResponseEntity.ok(postService.newPost(create));
     }
 
     @ApiOperation("편지 삭제")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable final Integer id ) throws Exception {
+        postService.removePost(id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
