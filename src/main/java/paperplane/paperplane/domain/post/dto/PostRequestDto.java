@@ -15,11 +15,12 @@ public class PostRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Create{
-
+        @NotNull
+        @ApiModelProperty(value = "수신자", required = true)
+        private String receiver;
         @NotNull
         @ApiModelProperty(value = "편지 제목", required = true)
         private String title;
-
         @NotNull
         @ApiModelProperty(value = "편지 내용", required = true)
         private String content;
@@ -29,7 +30,7 @@ public class PostRequestDto {
 
         @NotNull
         @ApiModelProperty(value = "편지 색깔, 'RED','GREEN','BLUE','BLACK' 4색", required = true)
-        private String Color;
+        private String color;
 
         @ApiModelProperty(value = "그룹 코드")
         private String code;

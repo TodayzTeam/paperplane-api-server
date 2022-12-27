@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import lombok.*;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.usergroup.dto.UserGroupResponseDto;
-import paperplane.paperplane.domain.userinterest.dto.PostInterestResponseDto;
+import paperplane.paperplane.domain.userinterest.dto.UserInterestResponseDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class UserResponseDto {
         private Boolean isRepliedEmail;
         private Boolean isPopularLetterEmail;
         private List<UserGroupResponseDto> userGroups;
-        private List<PostInterestResponseDto> userInterests;
+        private List<UserInterestResponseDto> userInterests;
 
         public static Info of(User user){
             return Info.builder()
@@ -44,7 +44,7 @@ public class UserResponseDto {
                     .isPopularLetterEmail(user.getIsPopularLetterEmail())
                     .isRepliedEmail(user.getIsRepliedEmail())
                     .userGroups(UserGroupResponseDto.of(new ArrayList<>(user.getUserGroups())))
-                    .userInterests(PostInterestResponseDto.of(new ArrayList<>(user.getUserInterests())))
+                    .userInterests(UserInterestResponseDto.of(new ArrayList<>(user.getUserInterests())))
                     .build();
         }
 
