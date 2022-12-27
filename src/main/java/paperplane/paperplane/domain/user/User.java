@@ -3,6 +3,7 @@ package paperplane.paperplane.domain.user;
 
 import lombok.*;
 import paperplane.paperplane.domain.postinterest.PostInterest;
+import paperplane.paperplane.domain.user.dto.UserRequestDto;
 import paperplane.paperplane.domain.usergroup.UserGroup;
 import paperplane.paperplane.domain.userinterest.UserInterest;
 import paperplane.paperplane.domain.userpost.UserPost;
@@ -59,4 +60,15 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     private Set<UserPost> userPosts;
+
+    public void update(UserRequestDto.Profile profile){
+        this.name = profile.getName();
+        this.isReadWeb = profile.getIsReadWeb();
+        this.isReadEmail = profile.getIsReadEmail();
+        this.isPopularLetterEmail = profile.getIsPopularLetterEmail();
+        this.isRepliedWeb = profile.getIsRepliedWeb();
+        this.isRepliedEmail = profile.getIsRepliedEmail();
+        this.isPopularLetterWeb = profile.getIsPopularLetterWeb();
+    }
+
 }
