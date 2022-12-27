@@ -42,7 +42,7 @@ public class PostController {
     @ApiOperation("편지 송신/회신, 헤더에 송신자(sender) userId 필요")
     @PostMapping("/create")
     public ResponseEntity<Integer> createPost(@Valid PostRequestDto.Create create) throws Exception {
-        return ResponseEntity.ok(postService.newPost(create));
+        return ResponseEntity.ok(postService.addPost(create));
     }
 
     @ApiOperation("편지 삭제")

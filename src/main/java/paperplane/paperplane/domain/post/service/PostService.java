@@ -45,7 +45,7 @@ public class PostService {
     private final PostInterestService postInterestService;
     private final UserService userService;
     private final UserPostService userPostService;
-    public Integer newPost(PostRequestDto.Create data) throws Exception{
+    public Integer addPost(PostRequestDto.Create data) throws Exception{
         //save post
         Post post= Post.builder()
                 .group(groupService.getGroupByCode(data.getCode()))
