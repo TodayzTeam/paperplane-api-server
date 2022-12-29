@@ -2,6 +2,7 @@ package paperplane.paperplane.domain.user;
 
 
 import lombok.*;
+import org.springframework.context.annotation.Primary;
 import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.postinterest.PostInterest;
 import paperplane.paperplane.domain.usergroup.UserGroup;
@@ -51,12 +52,15 @@ public class User {
 
 
     @OneToMany(cascade = {CascadeType.ALL})
+    @JoinColumn(name="usergroup_id")
     private Set<UserGroup> userGroups;
 
     @OneToMany(cascade = {CascadeType.ALL})
+    @JoinColumn(name="userinterest_id")
     private Set<UserInterest> userInterests;
 
     @OneToMany(cascade = {CascadeType.ALL})
+    @JoinColumn(name="userpost_id")
     private Set<UserPost> userPosts;
 
     @OneToMany

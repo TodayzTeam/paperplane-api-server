@@ -3,15 +3,22 @@ package paperplane.paperplane.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import paperplane.paperplane.domain.Interest.Interest;
 import paperplane.paperplane.domain.post.repository.PostRepository;
+import paperplane.paperplane.domain.postinterest.PostInterest;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.repository.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.util.HashSet;
+import java.util.Set;
 
 @Transactional
 @Service
@@ -24,8 +31,6 @@ public class UserService {
 
     private Integer getUserIdInHeader() {
         String userIdString = request.getHeader("userId");
-        log.info("id");
-        log.info(userIdString);
 
         if (userIdString == null)
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
@@ -43,5 +48,16 @@ public class UserService {
 
     public User getUserByEmail(String email){
         return userRepository.findByEmail(email).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 유저를 찾을 수 없습니다."));
+    }
+    public User getRandUser(String randUser) throws Exception{
+        log.info("{}",randUser);
+
+        if(randUser.equals("RAND")){
+            return userRepository.findById(1).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 유저를 찾을 수 없습니다."));
+        }
+        else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"잘못된 수신자그룹입니다.");
+        }
+
     }
 }

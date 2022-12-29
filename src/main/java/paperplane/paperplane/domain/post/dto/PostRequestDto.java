@@ -16,8 +16,8 @@ public class PostRequestDto {
     @AllArgsConstructor
     public static class Create{
         @NotNull
-        @ApiModelProperty(value = "수신자", required = true)
-        private String receiver;
+        @ApiModelProperty(value = "수신자그룹, 'RAND'-지원 , 'GROUP'- 미지원 ", required = true)
+        private String receiveGroup;
         @NotNull
         @ApiModelProperty(value = "편지 제목", required = true)
         private String title;

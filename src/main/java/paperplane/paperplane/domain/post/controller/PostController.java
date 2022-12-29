@@ -3,29 +3,23 @@ package paperplane.paperplane.domain.post.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import paperplane.paperplane.domain.Interest.dto.InterestResponseDto;
-import paperplane.paperplane.domain.group.Group;
-import paperplane.paperplane.domain.group.dto.GroupRequestDto;
-import paperplane.paperplane.domain.group.dto.GroupResponseDto;
 import paperplane.paperplane.domain.post.PostColor;
 import paperplane.paperplane.domain.post.dto.PostRequestDto;
 import paperplane.paperplane.domain.post.dto.PostResponseDto;
 import paperplane.paperplane.domain.post.repository.PostRepository;
 import paperplane.paperplane.domain.post.service.PostService;
-import paperplane.paperplane.domain.postinterest.dto.PostInterestResponseDto;
 
 import javax.validation.Valid;
-import java.awt.print.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,29 +41,16 @@ public class PostController {
 
     @ApiOperation("편지 삭제")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable final Integer id ) throws Exception {
+    public ResponseEntity<Void> deletePost(@PathVariable final Integer id) throws Exception {
         postService.removePost(id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @ApiOperation("전체 편지 중 제목, 내용으로 검색")
     @GetMapping("/search/{word}")
-    public ResponseEntity<List<PostResponseDto.Simple>> searchAllPost(@PathVariable final String word) throws Exception {
-        List<PostResponseDto.Simple> simpleList = new ArrayList<>();
-        simpleList.add(PostResponseDto.Simple.builder()
-                .title("title1")
-                .content("content1")
-                .likeCount(0)
-                .postColor(PostColor.RED)
-                .build());
-        simpleList.add(PostResponseDto.Simple.builder()
-                .title("title2")
-                .content("content2")
-                .likeCount(0)
-                .postColor(PostColor.RED)
-                .build());
-
-        return ResponseEntity.ok(simpleList);
+    public ResponseEntity<List<PostResponseDto.Simple>> searchAllPost(@PathVariable final String word, @RequestParam("page") Integer page) throws Exception {
+        PageRequest pageRequest= PageRequest.of(page,8);
+        return ResponseEntity.ok(postService.SearchPostByWord(word,pageRequest));
     }
 
     @ApiOperation("유저의 그룹 편지 중 제목, 내용으로 검색 user id/검색어 필요")
