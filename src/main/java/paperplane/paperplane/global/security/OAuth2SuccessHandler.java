@@ -56,20 +56,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addHeader("refreshToken", token.getRefreshToken());
         response.setContentType("application/json;charset=UTF-8");
 
-//        String url = makeRedirectUrl(token.getAccessToken());
-//        log.info("{}", url);
-//
-//        if(response.isCommitted()){
-//            logger.debug("Response has already been committed. Unable to redirect to " + url);
-//            return;
-//        }
-//
-//        getRedirectStrategy().sendRedirect(request, response, url);
+        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000");
     }
-//
-//    private String makeRedirectUrl(String token){
-//        return UriComponentsBuilder.fromUriString("http://localhost:8080/oauth2/redirect/" + token)
-//                .build().toUriString();
-//    }
 
 }
