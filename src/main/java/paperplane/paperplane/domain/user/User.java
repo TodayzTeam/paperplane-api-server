@@ -2,6 +2,7 @@ package paperplane.paperplane.domain.user;
 
 
 import lombok.*;
+import org.springframework.context.annotation.Primary;
 import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.postinterest.PostInterest;
 import paperplane.paperplane.domain.user.dto.UserRequestDto;
@@ -53,13 +54,17 @@ public class User {
     @Column
     private Boolean isPopularLetterEmail;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+
+    @OneToMany(cascade = {CascadeType.ALL})
+    @JoinColumn(name="usergroup_id")
     private Set<UserGroup> userGroups;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @JoinColumn(name="userinterest_id")
     private Set<UserInterest> userInterests;
 
     @OneToMany(cascade = {CascadeType.ALL})
+    @JoinColumn(name="userpost_id")
     private Set<UserPost> userPosts;
 
     @OneToMany

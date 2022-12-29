@@ -7,6 +7,7 @@ import paperplane.paperplane.domain.user.User;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 @Builder
@@ -23,7 +24,7 @@ public class UserPost {
     private Integer id;
 
     //받는 사람
-    @ManyToOne (fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User receiver;
 
     @ManyToOne(fetch = FetchType.LAZY)

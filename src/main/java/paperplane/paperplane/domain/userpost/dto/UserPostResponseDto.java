@@ -8,6 +8,7 @@ import paperplane.paperplane.domain.userinterest.dto.UserInterestResponseDto;
 import paperplane.paperplane.domain.userpost.UserPost;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 @Builder
@@ -19,7 +20,7 @@ public class UserPostResponseDto {
 
 
     private Integer id;
-    private User user;
+    private User receiver;
     private Post post;
     private Boolean isReply;
     private Boolean isReport;
@@ -28,7 +29,7 @@ public class UserPostResponseDto {
     public static UserPostResponseDto of(UserPost userPost){
         return UserPostResponseDto.builder()
                 .id(userPost.getId())
-                .user(userPost.getReceiver())
+                .receiver(userPost.getReceiver())
                 .post(userPost.getPost())
                 .isReply(userPost.getIsReply())
                 .isReport(userPost.getIsReport())
