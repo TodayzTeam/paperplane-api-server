@@ -4,6 +4,7 @@ package paperplane.paperplane.domain.user;
 import lombok.*;
 import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.postinterest.PostInterest;
+import paperplane.paperplane.domain.user.dto.UserRequestDto;
 import paperplane.paperplane.domain.usergroup.UserGroup;
 import paperplane.paperplane.domain.userinterest.UserInterest;
 import paperplane.paperplane.domain.userpost.UserPost;
@@ -32,6 +33,9 @@ public class User {
     private String profileImageUrl;
 
     @Column
+    private String refreshToken;
+
+    @Column
     private Boolean isReadWeb;
 
     @Column
@@ -52,10 +56,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     private Set<UserGroup> userGroups;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private Set<UserInterest> userInterests;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    @OneToMany(cascade = {CascadeType.ALL})
     private Set<UserPost> userPosts;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
