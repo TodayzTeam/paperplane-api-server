@@ -28,6 +28,17 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
+        
+    - name: Set Yaml
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: 'src/main/resources/application-oauth.yml'
+      env:
+        spring.security.oauth2.client.registration.kakao.client-id: ${{ secrets.KAKAO_CLIENT_ID }}
+        spring.security.oauth2.client.registration.naver.client-id: ${{ secrets.NAVER_CLIENT_ID }} 
+        spring.security.oauth2.client.registration.naver.client-secret: ${{ secrets.NAVER_CLIENT_SECRET }} 
+        jwt.secret: ${{ secrets.JWT_SECRET }} 
+    
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:

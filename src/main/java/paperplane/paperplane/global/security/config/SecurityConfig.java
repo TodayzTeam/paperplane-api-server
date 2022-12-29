@@ -10,8 +10,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-
-import java.util.List;
+import paperplane.paperplane.domain.user.repository.UserRepository;
+import paperplane.paperplane.global.security.OAuth2SuccessHandler;
+import paperplane.paperplane.global.security.UserOAuth2Service;
+import paperplane.paperplane.global.security.jwt.JwtAuthFilter;
+import paperplane.paperplane.global.security.jwt.TokenService;
 
 import static java.util.List.*;
 
@@ -19,8 +22,11 @@ import static java.util.List.*;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
-    /*private final CustomOAuth2UserService oAuth2UserService;
-    private final OAuth2SuccessHandler successHandler;*/
+    private final UserOAuth2Service userOAuth2Service;
+    private final OAuth2SuccessHandler successHandler;
+    private final TokenService tokenService;
+    private final UserRepository userRepository;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.httpBasic().disable()
@@ -37,19 +43,12 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .anyRequest().permitAll();// 임시 설정
-                //.antMatchers("/token/**").permitAll()
-                //.anyRequest().authenticated()
-
-                /*.and()
-                .addFilterBefore(new JwtAuthFilter(tokenService), UsernamePasswordAuthenticationFilter.class)
-                .oauth2Login()
-                .loginPage("/token/expired")
+                .anyRequest().permitAll()// 임시 설정
+                .and()
+                .oauth2Login().loginPage("/token/expired")
                 .successHandler(successHandler)
-                .userInfoEndpoint().userService(oAuth2UserService);*/
+                .userInfoEndpoint().userService(userOAuth2Service);
 
-        return http.build();
+        return http.addFilterBefore(new JwtAuthFilter(tokenService, userRepository), UsernamePasswordAuthenticationFilter.class).build();
     }
-
-
 }
