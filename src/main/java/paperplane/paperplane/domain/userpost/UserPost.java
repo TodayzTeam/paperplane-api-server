@@ -6,6 +6,8 @@ import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.user.User;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Set;
 
 @Builder
 @Getter
@@ -13,6 +15,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Embeddable
 public class UserPost {
 
     @Id
@@ -20,9 +23,8 @@ public class UserPost {
     private Integer id;
 
     //받는 사람
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToOne (fetch = FetchType.LAZY)
+    private User receiver;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
@@ -33,4 +35,7 @@ public class UserPost {
 
     @Column
     private Boolean isReport;
+
+    @Column
+    private Boolean isRead;
 }

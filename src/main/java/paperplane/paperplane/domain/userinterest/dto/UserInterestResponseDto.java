@@ -11,19 +11,19 @@ import java.util.stream.Collectors;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostInterestResponseDto {
+public class UserInterestResponseDto {
 
     private Integer id;
     private String keyword;
 
-    public static PostInterestResponseDto of(UserInterest userInterest){
-        return PostInterestResponseDto.builder()
+    public static UserInterestResponseDto of(UserInterest userInterest){
+        return UserInterestResponseDto.builder()
                 .id(userInterest.getInterest().getId())
                 .keyword(userInterest.getInterest().getKeyword())
                 .build();
     }
 
-    public static List<PostInterestResponseDto> of(List<UserInterest> userInterests){
-        return userInterests.stream().map(PostInterestResponseDto::of).collect(Collectors.toList());
+    public static List<UserInterestResponseDto> of(List<UserInterest> userInterests){
+        return userInterests.stream().map(UserInterestResponseDto::of).collect(Collectors.toList());
     }
 }

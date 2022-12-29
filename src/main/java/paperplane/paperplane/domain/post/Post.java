@@ -5,6 +5,7 @@ import lombok.*;
 import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.postinterest.PostInterest;
 import paperplane.paperplane.domain.user.User;
+import paperplane.paperplane.domain.userpost.UserPost;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,9 +22,6 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Group group;
@@ -49,4 +47,9 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL})
     private Set<PostInterest> postInterests;
 
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL})
+    private Set<UserPost> userPosts;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User sender;
 }
