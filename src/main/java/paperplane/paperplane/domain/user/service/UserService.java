@@ -15,6 +15,7 @@ import paperplane.paperplane.domain.Interest.Interest;
 
 import paperplane.paperplane.domain.Interest.repository.InterestRepository;
 import paperplane.paperplane.domain.Interest.service.InterestService;
+import paperplane.paperplane.domain.group.service.GroupService;
 import paperplane.paperplane.domain.post.repository.PostRepository;
 import paperplane.paperplane.domain.postinterest.PostInterest;
 import paperplane.paperplane.domain.user.User;
@@ -43,6 +44,7 @@ public class UserService {
   //  private final UserInterestService userInterestService;
   //  private final InterestService interestService;
     private final HttpServletRequest request;
+    private final GroupService groupService;
 
 
     private Integer getUserIdInHeader() {
@@ -65,13 +67,18 @@ public class UserService {
     public User getUserByEmail(String email){
         return userRepository.findByEmail(email).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 유저를 찾을 수 없습니다."));
     }
-    public User getRandUser(String randUser) throws Exception{
-        log.info("{}",randUser);
+    public List<User> getRandUser(String randUser) throws Exception{
 
+        //편지 제약조건에 따라 추후 수정
         if(randUser.equals("RAND")){
-            return userRepository.findById(1).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 유저를 찾을 수 없습니다."));
-        }
-        else{
+
+            List<User> users =userRepository.findRandUserList();
+            log.info("randuser");
+            log.info("{}",users);
+            return users;
+        } else if (randUser.equals(groupService.getGroupByCode(randUser).getCode())) {
+            return groupService.getGroupUserByCode(randUser);
+        } else{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"잘못된 수신자그룹입니다.");
         }
 
@@ -124,7 +131,6 @@ public class UserService {
         String uploadFileName = file.getOriginalFilename();
 
         uploadFileName = UUID.randomUUID().toString() + "_" + uploadFileName;
-
         File newFile = new File(uploadPath + uploadFileName);
         file.transferTo(newFile);
 

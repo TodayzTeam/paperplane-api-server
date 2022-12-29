@@ -25,10 +25,11 @@ public class UserPost {
 
     //받는 사람
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user")
     private User receiver;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post")
     private Post post;
 
     @Column
