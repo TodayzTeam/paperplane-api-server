@@ -62,6 +62,7 @@ public class User {
     @OneToMany(cascade = {CascadeType.ALL})
     private Set<UserPost> userPosts;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    @OneToMany
+    @JoinColumn(name = "user_id")
     private Set<Post> Posts;
 }
