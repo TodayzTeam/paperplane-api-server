@@ -4,7 +4,7 @@ spring:
       client:
         registration:
           kakao:
-            client-id: 9207d780241fc1d40d9c6e3e915efa7d
+            client-id: ${KAKAO_CLIENT_ID}
             redirect-uri: http://localhost:8080/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
             client-authentication-method: POST
@@ -14,8 +14,8 @@ spring:
               - account_email
               - profile_image
           naver:
-            client-id: qWH0F7F5L5lGUDDQ8Hd2
-            client-secret: r6ran__H4M
+            client-id: ${NAVER_CLIENT_ID}
+            client-secret: ${NAVER_CLIENT_SECRET}
             redirect-uri: http://localhost:8080/login/oauth2/code/naver
             authorization-grant-type: authorization_code
             scope:
@@ -35,4 +35,4 @@ spring:
             user-name-attribute: response
 
 jwt:
-  secret: secretKey-test-authorization-jwt-manage-token
+  secret: ${JWT_SECRET}
