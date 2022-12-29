@@ -22,7 +22,6 @@ public class UserRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Join{
-
         @NotNull
         @ApiModelProperty(value = "이름", required = true)
         private String name;

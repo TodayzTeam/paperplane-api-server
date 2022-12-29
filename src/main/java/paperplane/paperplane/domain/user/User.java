@@ -62,16 +62,6 @@ public class User {
     @OneToMany(cascade = {CascadeType.ALL})
     private Set<UserPost> userPosts;
 
-    public void update(UserRequestDto.Profile profile){
-        this.name = profile.getName();
-        this.isReadWeb = profile.getIsReadWeb();
-        this.isReadEmail = profile.getIsReadEmail();
-        this.isPopularLetterEmail = profile.getIsPopularLetterEmail();
-        this.isRepliedWeb = profile.getIsRepliedWeb();
-        this.isRepliedEmail = profile.getIsRepliedEmail();
-        this.isPopularLetterWeb = profile.getIsPopularLetterWeb();
-    }
-
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     private Set<Post> Posts;
 }

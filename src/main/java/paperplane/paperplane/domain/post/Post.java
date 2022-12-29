@@ -52,4 +52,5 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User sender;
+    
 }

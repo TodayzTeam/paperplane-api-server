@@ -47,4 +47,5 @@ public class RedisRepositoryConfig extends CachingConfigurerSupport {
         builder.cacheDefaults(configuration);
         return builder.build();
     }
+
 }
