@@ -40,7 +40,7 @@ public class UserController {
     @ApiOperation("내 전체 정보 조회")
     @GetMapping("/profile/{id}")
     public ResponseEntity<UserResponseDto.Info> getMyProfile(@PathVariable Integer id) throws Exception {
-        User user = userService.getUser(id);
+        User user = userService.getUserById(id);
 
         return ResponseEntity.ok(UserResponseDto.Info.of(user));
     }
@@ -48,7 +48,7 @@ public class UserController {
     @ApiOperation("내 요약 정보 조회")
     @GetMapping("/simple/{id}")
     public ResponseEntity<UserResponseDto.Simple> getMySimple(@PathVariable Integer id) throws Exception {
-        User user = userService.getUser(id);
+        User user = userService.getUserById(id);
 
         return ResponseEntity.ok(UserResponseDto.Simple.of(user));
     }
@@ -70,7 +70,7 @@ public class UserController {
     @ApiOperation("로그아웃")
     @PostMapping("/logout/{id}")
     public ResponseEntity<Void> logout(@PathVariable Integer id){
-        User user = userService.getUser(id);
+        User user = userService.getUserById(id);
         user.setRefreshToken(null);
 
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -79,7 +79,7 @@ public class UserController {
     @ApiOperation("탈퇴")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> updateProfile(@PathVariable Integer id) throws Exception {
-        userService.deleteUser(userService.getUser(id));
+        userService.deleteUser(userService.getUserById(id));
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

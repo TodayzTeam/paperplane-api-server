@@ -3,7 +3,7 @@ HELP.md
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
-application-oauth.yml
+src/main/java/paperplane/paperplane/global/security/application-oauth.yml
 
 ### STS ###
 .apt_generated
