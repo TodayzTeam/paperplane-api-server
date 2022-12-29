@@ -18,7 +18,6 @@ import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.dto.UserRequestDto;
 import paperplane.paperplane.domain.user.repository.UserRepository;
 import paperplane.paperplane.domain.userinterest.UserInterest;
-import paperplane.paperplane.domain.userinterest.service.UserInterestService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
