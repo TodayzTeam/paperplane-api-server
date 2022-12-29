@@ -36,8 +36,8 @@ import java.util.UUID;
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
-    private final UserInterestService userInterestService;
-    private final InterestService interestService;
+  //  private final UserInterestService userInterestService;
+  //  private final InterestService interestService;
     private final HttpServletRequest request;
 
 
