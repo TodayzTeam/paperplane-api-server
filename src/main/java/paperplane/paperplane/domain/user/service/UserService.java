@@ -77,7 +77,7 @@ public class UserService {
 
     }
 
-    public User getUser(Integer id){
+    public User getUserById(Integer id){
         return userRepository.findById(id).orElseThrow(()->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "해당하는 회원이 없습니다."));
     }
@@ -128,7 +128,7 @@ public class UserService {
         File newFile = new File(uploadPath + uploadFileName);
         file.transferTo(newFile);
 
-        User user = BY(id);
+        User user = getUserById(id);
 
         user.setProfileImageUrl(newFile.toString());
 
