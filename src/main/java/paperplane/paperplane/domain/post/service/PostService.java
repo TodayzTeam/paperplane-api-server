@@ -139,5 +139,14 @@ public class PostService {
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
     }
+    public List<PostResponseDto.Simple> getPopularPost(){
+        return PostResponseDto.Simple.of(postRepository.findTop8ByOrderByLikeCountCountDesc());
+    }
+    public List<PostResponseDto.Simple> getSentPost(Pageable pageable){
+        User user=userService.getCurrentUser();
+        Page<Post> postPage =postRepository.findSentPost(user.getId(),pageable);
+        List<Post> post=postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
 
 }
