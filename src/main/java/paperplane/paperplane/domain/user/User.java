@@ -70,4 +70,16 @@ public class User {
     @OneToMany
     @JoinColumn(name = "user_id")
     private Set<Post> Posts;
+
+    public void updateProfile(UserRequestDto.Profile profile){
+        this.name = profile.getName();
+        this.userInterests.clear();
+        this.isReadEmail = profile.getIsReadEmail();
+        this.isReadWeb = profile.getIsReadWeb();
+        this.isPopularLetterEmail = profile.getIsPopularLetterEmail();
+        this.isPopularLetterWeb = profile.getIsPopularLetterWeb();
+        this.isRepliedEmail = profile.getIsRepliedEmail();
+        this.isRepliedWeb = profile.getIsRepliedWeb();
+    }
+
 }

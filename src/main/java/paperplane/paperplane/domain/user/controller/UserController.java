@@ -53,14 +53,14 @@ public class UserController {
         return ResponseEntity.ok(UserResponseDto.Simple.of(user));
     }
 
-    /*@ApiOperation("내 정보 수정")
+    @ApiOperation("내 정보 수정")
     @PutMapping("/update/{id}")
     public ResponseEntity<UserResponseDto.Info> updateProfile(@Valid UserRequestDto.Profile profile, @PathVariable Integer id) throws Exception {
         User user = userService.updateUser(id, profile);
 
         return ResponseEntity.ok(UserResponseDto.Info.of(user));
     }
-*/
+
     @ApiOperation("프로필 이미지 변경")
     @PutMapping("/update/image/{id}")
     public ResponseEntity<String> updateProfileImage(@PathVariable Integer id, @RequestParam MultipartFile file) throws Exception {
