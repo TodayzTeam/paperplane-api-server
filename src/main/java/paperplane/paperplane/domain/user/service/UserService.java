@@ -99,6 +99,7 @@ public class UserService {
                             .build()));
 
             UserInterest userInterest = UserInterest.builder()
+                    .user(user)
                     .interest(interest)
                     .build();
 
