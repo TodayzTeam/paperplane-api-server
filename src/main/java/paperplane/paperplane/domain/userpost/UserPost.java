@@ -35,9 +35,15 @@ public class UserPost {
     @Column
     private Boolean isReply;
 
+    //신고 여부
     @Column
     private Boolean isReport;
 
+    //읽었는지 여부
     @Column
     private Boolean isRead;
+
+    //좋아요 눌렀는지 여부
+    @Column
+    private Boolean isLike;
 }

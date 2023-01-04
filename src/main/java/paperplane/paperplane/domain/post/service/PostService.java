@@ -5,9 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -121,6 +124,7 @@ public class PostService {
                     .isReply(false)
                     .isRead(false)
                     .isReport(false)
+                    .isLike(false)
                     .receiver(user)
                     .build());
         }
@@ -140,7 +144,7 @@ public class PostService {
         return PostResponseDto.Simple.of(post);
     }
     public List<PostResponseDto.Simple> getPopularPost(){
-        return PostResponseDto.Simple.of(postRepository.findTop8ByOrderByLikeCountCountDesc());
+        return PostResponseDto.Simple.of(postRepository.findTop8ByOrderByLikeCountDesc());
     }
     public List<PostResponseDto.Simple> getSentPost(Pageable pageable){
         User user=userService.getCurrentUser();
@@ -148,5 +152,42 @@ public class PostService {
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
     }
+    public List<PostResponseDto.Simple> getReceivedPost(Pageable pageable){
+        User user= userService.getCurrentUser();
+        Page<Post> postPage= postRepository.findReceivedPost(user.getId(),pageable);
+        List<Post> post=postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
 
+    @Cacheable(value = "post-likecount", key = "#id", cacheManager = "cacheManager")
+    public Integer getLikeCountByPostId(Integer id){
+        return getByPostId(id).getLikeCount();
+    }
+
+    @CachePut(value = "post-likecount", key = "#id", cacheManager = "cacheManager")
+    public Integer increasePostLikeCount (Integer id) throws Exception{
+        Post post=getByPostId(id);
+        User user=userService.getCurrentUser();
+        log.info("{}",user.getId());
+        log.info("{}",post.getId());
+        UserPost userPost=userPostService.getByReceiverIdAndPostId(user.getId(),post.getId());
+        log.info("2");
+        userPostService.checkingLike(userPost);
+        post.setLikeCount(post.getLikeCount()+1);
+        postRepository.save(post);
+        return post.getLikeCount();
+    }
+    public Integer increasePostReportCount(Integer id){
+        Post post=getByPostId(id);
+        post.setLikeCount(post.getReportCount()+1);
+        postRepository.save(post);
+        return post.getLikeCount();
+    }
+
+    public List<PostResponseDto.Simple> getLikedPost(Pageable pageable){
+        User user= userService.getCurrentUser();
+        Page<Post> postPage= postRepository.findLikedPost(pageable);
+        List<Post> post=postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
 }

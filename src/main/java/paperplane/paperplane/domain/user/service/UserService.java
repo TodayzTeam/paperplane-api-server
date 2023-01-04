@@ -1,6 +1,7 @@
 package paperplane.paperplane.domain.user.service;
 
 
+import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -16,6 +17,7 @@ import paperplane.paperplane.domain.Interest.Interest;
 import paperplane.paperplane.domain.Interest.repository.InterestRepository;
 import paperplane.paperplane.domain.Interest.service.InterestService;
 import paperplane.paperplane.domain.group.service.GroupService;
+import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.post.repository.PostRepository;
 import paperplane.paperplane.domain.postinterest.PostInterest;
 import paperplane.paperplane.domain.user.User;
@@ -25,15 +27,10 @@ import paperplane.paperplane.domain.userinterest.UserInterest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Transactional
 @Service
@@ -141,4 +138,12 @@ public class UserService {
         return user.getProfileImageUrl();
     }
 
+    public List<Integer> getAllUserId(){
+        List<User> users= userRepository.findAll();
+        List<Integer> idList=new ArrayList<>();
+        for(User user:users){
+            idList.add(user.getId());
+        }
+        return idList;
+    }
 }

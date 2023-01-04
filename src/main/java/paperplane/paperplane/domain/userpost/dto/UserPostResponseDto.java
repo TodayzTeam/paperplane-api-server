@@ -26,6 +26,8 @@ public class UserPostResponseDto {
     private Boolean isReport;
     private Boolean isRead;
 
+    private Boolean isLike;
+
     public static UserPostResponseDto of(UserPost userPost){
         return UserPostResponseDto.builder()
                 .id(userPost.getId())
@@ -33,7 +35,8 @@ public class UserPostResponseDto {
                 .post(userPost.getPost())
                 .isReply(userPost.getIsReply())
                 .isReport(userPost.getIsReport())
-                .isRead(userPost.getIsRead()).build();
+                .isRead(userPost.getIsRead())
+                .isLike(userPost.getIsLike()).build();
     }
 
 
