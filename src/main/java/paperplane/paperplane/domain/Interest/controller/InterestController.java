@@ -27,65 +27,23 @@ import java.util.List;
 public class InterestController {
     private final InterestService interestService;
 
-    @ApiOperation("관심사 db에 생성")
-    @GetMapping("/create")
-    public ResponseEntity<InterestResponseDto.Info> createInterest(@Valid InterestRequestDto.Create create) throws Exception {
-        return ResponseEntity.ok(InterestResponseDto.Info.builder()
-                .id(1)
-                .keyword(create.getKeyword())
-                .build());
-    }
-
-    @ApiOperation("관심사 db에서  삭제")
-    @DeleteMapping("/delete/{interest}")
-    public ResponseEntity<Void> deleteInterest(@PathVariable final String interest) throws Exception {
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
     @ApiOperation("관심사 검색")
     @GetMapping("/search/{interest}")
-    public ResponseEntity<List<InterestResponseDto.Info>> searchInterest(@PathVariable final String interest) throws Exception {
-        List<InterestResponseDto.Info> interestResponseDtoList=new ArrayList<>();
-        interestResponseDtoList.add(InterestResponseDto.Info.builder()
-                .id(1)
-                .keyword("관심사1")
-                .build());
-        interestResponseDtoList.add(InterestResponseDto.Info.builder()
-                .id(2)
-                .keyword("관심사2")
-                .build());
-        return ResponseEntity.ok(interestResponseDtoList);
+    public ResponseEntity<List<InterestResponseDto.Info>> searchInterest(@PathVariable String interest) throws Exception {
+        return ResponseEntity.ok(interestService.searchInterestByKeyword(interest));
     }
 
     @ApiOperation("관심사 추천")
     @GetMapping("/recommend")
     public ResponseEntity<List<InterestResponseDto.Info>> searchInterest() throws Exception {
-        List<InterestResponseDto.Info> interestResponseDtoList=new ArrayList<>();
-        interestResponseDtoList.add(InterestResponseDto.Info.builder()
-                .id(1)
-                .keyword("관심사1")
-                .build());
-        interestResponseDtoList.add(InterestResponseDto.Info.builder()
-                .id(2)
-                .keyword("관심사2")
-                .build());
-        return ResponseEntity.ok(interestResponseDtoList);
+        return ResponseEntity.ok(interestService.recommendInterest());
     }
 
 
-    @ApiOperation("내 관심사 조회")
-    @GetMapping("/group/{userid}")
-    public ResponseEntity <List<InterestResponseDto.Info>> getMyInterest(@PathVariable Integer userid) throws Exception {
-        List<InterestResponseDto.Info> infoList= new ArrayList<>();
-        infoList.add(InterestResponseDto.Info.of(Interest.builder()
-                .id(1)
-                .keyword("해변")
-                .build()));
-        infoList.add(InterestResponseDto.Info.of(Interest.builder()
-                .id(2)
-                .keyword("바닷가")
-                .build()));
-        return ResponseEntity.ok(infoList);
+    @ApiOperation("내 관심사 조회, 헤더에 userId 필요")
+    @GetMapping("/myinterest")
+    public ResponseEntity <List<InterestResponseDto.Info>> MyInterest() throws Exception {
+        return ResponseEntity.ok(interestService.getMyInterest());
     }
 
 }
