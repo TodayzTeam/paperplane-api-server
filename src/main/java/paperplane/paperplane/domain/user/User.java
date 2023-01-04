@@ -55,8 +55,7 @@ public class User {
     private Boolean isPopularLetterEmail;
 
 
-    @OneToMany(cascade = {CascadeType.ALL})
-    @JoinColumn(name="usergroup_id")
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     private Set<UserGroup> userGroups;
 
     @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
