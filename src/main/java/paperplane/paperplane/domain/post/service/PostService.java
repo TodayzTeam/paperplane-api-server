@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import paperplane.paperplane.domain.Interest.Interest;
 import paperplane.paperplane.domain.Interest.repository.InterestRepository;
+import paperplane.paperplane.domain.Interest.service.InterestService;
 import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.group.repository.GroupRepository;
 import paperplane.paperplane.domain.group.service.GroupService;
@@ -46,7 +47,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PostService {
     private final PostRepository postRepository;
-    private final InterestRepository interestRepository;
+    private final InterestService interestService;
     private final GroupService groupService;
     private final PostInterestService postInterestService;
     private final UserService userService;
@@ -88,30 +89,18 @@ public class PostService {
         JSONArray keywordArray= (JSONArray) parser.parse(data.getKeyword()); //keyword parsing objcet
 
         Set<PostInterest> postInterestSet= new HashSet<>();
+        log.info("{}",keywordArray.size());
         for(int i=0;i<keywordArray.size();i++){
-            String keyword= keywordArray.get(i).toString();
-            Interest interest= new Interest();
-
-            if(!keyword.equals("")) {
-                if (interestRepository.findByKeyword(keyword).isPresent()) {
-                    interest = interestRepository.findByKeyword(keyword).get();
-                    interest.setCount(interest.getCount() + 1);
-                    interestRepository.save(interest);
-
-                } else {
-                    interestRepository.save(Interest.builder()
-                            .count(1)
-                            .keyword(keyword)
-                            .build());
-                }
+            if(keywordArray.get(i)!=null) {
+                String keyword = keywordArray.get(i).toString();
+                Interest interest=interestService.addInterest(keyword);
+                PostInterest postInterest =PostInterest.builder()
+                        .post(post)
+                        .interest(interest)
+                        .build();
+                postInterestService.addPostInterest(postInterest);
+                postInterestSet.add(postInterest);
             }
-
-            PostInterest postInterest =PostInterest.builder()
-                    .post(post)
-                    .interest(interest)
-                    .build();
-            postInterestService.addPostInterest(postInterest);
-            postInterestSet.add(postInterest);
         }
 
 
