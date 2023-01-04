@@ -55,19 +55,18 @@ public class User {
     private Boolean isPopularLetterEmail;
 
 
-    @OneToMany(cascade = {CascadeType.ALL})
-    @JoinColumn(name="usergroup_id")
-    private Set<UserGroup> userGroups;
+    @OneToMany(mappedBy = "user",cascade = {CascadeType.ALL})
+    private Set<UserGroup> userGroup;
 
-    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
-    @JoinColumn(name="userinterest_id")
-    private Set<UserInterest> userInterests;
+    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true, mappedBy = "user")
+    private Set<UserInterest> userInterest;
 
-    @OneToMany(cascade = {CascadeType.ALL})
-    @JoinColumn(name="userpost_id")
-    private Set<UserPost> userPosts;
+    @OneToMany(cascade = {CascadeType.ALL},mappedBy = "receiver")
+    private Set<UserPost> userPost;
 
-    @OneToMany
-    @JoinColumn(name = "user_id")
-    private Set<Post> Posts;
+    @OneToMany(mappedBy = "sender")
+    private Set<Post> Post;
+
+    @Column
+    private int randId;
 }
