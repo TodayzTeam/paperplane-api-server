@@ -48,7 +48,7 @@ public class Post implements Serializable {
     @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL})
     private Set<PostInterest> postInterests;
 
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL},orphanRemoval = true)
     private Set<UserPost> userPosts;
 
     @ManyToOne(fetch = FetchType.LAZY)
