@@ -45,6 +45,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                         .isReadWeb(false)
                         .isRepliedWeb(false)
                         .randId((int) (Math.random()*100000000))
+                        .tempPost(0)
                         .build()));
 
         Token token = tokenService.generateToken(email, "USER");

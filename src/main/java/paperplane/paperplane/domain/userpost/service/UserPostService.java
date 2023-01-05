@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import paperplane.paperplane.domain.post.Post;
+import paperplane.paperplane.domain.post.repository.PostRepository;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.service.UserService;
 import paperplane.paperplane.domain.userpost.UserPost;
@@ -22,6 +23,7 @@ import java.util.List;
 public class UserPostService {
     private final UserPostRepository userPostRepository;
     private final UserService userService;
+    private final PostRepository postRepository;
 
     public Integer addUserPost(UserPost userPost){
         return userPostRepository.save(userPost).getId();
@@ -39,14 +41,15 @@ public class UserPostService {
             userPostRepository.save(userPost);
         }
     }
-    public List<UserPostResponseDto> getPostOption(Integer postId){
+    public UserPostResponseDto getPostOption(Integer postId){
         User user= userService.getCurrentUser();
-        List<Post> posts=userPostRepository.test(user.getId(),postId);
-        log.info("{}",posts);
+        List<Post> posts=postRepository.test(user.getId(),postId);
         for(Post post:posts){
             log.info("{}",post.getId());
+            log.info("{}",post.getUserPosts());
+            log.info("{}",post.getDate());
         }
-        List<UserPost> userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId);
+        UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId);
         return UserPostResponseDto.of(userPost);
     }
 }
