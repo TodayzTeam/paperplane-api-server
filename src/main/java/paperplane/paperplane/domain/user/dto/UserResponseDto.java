@@ -43,8 +43,8 @@ public class UserResponseDto {
                     .isReadEmail(user.getIsReadEmail())
                     .isPopularLetterEmail(user.getIsPopularLetterEmail())
                     .isRepliedEmail(user.getIsRepliedEmail())
-                    .userGroups(UserGroupResponseDto.of(new ArrayList<>(user.getUserGroups())))
-                    .userInterests(UserInterestResponseDto.of(new ArrayList<>(user.getUserInterests())))
+                    .userGroups(UserGroupResponseDto.of(new ArrayList<>(user.getUserGroup())))
+                    .userInterests(UserInterestResponseDto.of(new ArrayList<>(user.getUserInterest())))
                     .build();
         }
 

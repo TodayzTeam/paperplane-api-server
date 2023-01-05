@@ -20,11 +20,13 @@ public class InterestResponseDto {
     public static class Info{
         private Integer id;
         private String keyword;
+        private Integer count;
 
         public static Info of(Interest interest){
             return Info.builder()
                     .id(interest.getId())
                     .keyword(interest.getKeyword())
+                    .count(interest.getCount())
                     .build();
         }
 
