@@ -6,4 +6,5 @@ import paperplane.paperplane.domain.userinterest.UserInterest;
 
 @Repository
 public interface UserInterestRepository extends JpaRepository<UserInterest,Integer> {
+
 }

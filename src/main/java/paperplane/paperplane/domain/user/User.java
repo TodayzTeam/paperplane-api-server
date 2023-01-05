@@ -63,7 +63,7 @@ public class User {
 
     @OneToMany(cascade = {CascadeType.ALL},mappedBy = "receiver")
     private Set<UserPost> userPost;
-
+    
     @OneToMany(mappedBy = "sender")
     private Set<Post> Post;
 
@@ -72,4 +72,16 @@ public class User {
 
     @Column
     private Integer tempPost;
+    
+    public void updateProfile(UserRequestDto.Profile profile){
+        this.name = profile.getName();
+        this.userInterest.clear();
+        this.isReadEmail = profile.getIsReadEmail();
+        this.isReadWeb = profile.getIsReadWeb();
+        this.isPopularLetterEmail = profile.getIsPopularLetterEmail();
+        this.isPopularLetterWeb = profile.getIsPopularLetterWeb();
+        this.isRepliedEmail = profile.getIsRepliedEmail();
+        this.isRepliedWeb = profile.getIsRepliedWeb();
+    }
+    
 }
