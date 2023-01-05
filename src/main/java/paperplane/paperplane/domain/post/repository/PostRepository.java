@@ -35,4 +35,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             nativeQuery = true )*/
     @Query(value = "select p from Post p join p.userPosts up on up.isLike=true ")
     Page<Post> findLikedPost(Pageable pageable);
+
+
+    @Query(value = "select * from Post p where p.sender_id=:userId and p.id=:postId",nativeQuery = true)
+    List<Post> test(@Param("userId") Integer userId, @Param("postId") Integer postId);
 }

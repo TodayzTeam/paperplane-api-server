@@ -69,4 +69,7 @@ public class User {
 
     @Column
     private int randId;
+
+    @Column
+    private Integer tempPost;
 }

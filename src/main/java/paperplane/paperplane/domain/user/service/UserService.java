@@ -146,4 +146,8 @@ public class UserService {
         }
         return idList;
     }
+
+    public User saveUser(User user){
+        return userRepository.save(user);
+    }
 }

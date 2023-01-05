@@ -37,16 +37,22 @@ public class PostController {
     private final PostService postService;
     private final UserPostService userPostService;
 
-    @ApiOperation("편지 송신/회신, 헤더에 userId 필요")
+    @ApiOperation("편지 최종 송신, 헤더에 userId 필요")
     @PostMapping("/create")
     public ResponseEntity<Integer> createPost(@Valid PostRequestDto.Create create) throws Exception {
         return ResponseEntity.ok(postService.addPost(create));
     }
 
+    @ApiOperation("편지 중간저장, 헤더에 userId 필요")
+    @PostMapping("/save")
+    public ResponseEntity<Integer> saveTempPost(@Valid PostRequestDto.Create create) throws Exception {
+        return ResponseEntity.ok(postService.interStorePost(create));
+    }
+
     @ApiOperation("편지 삭제")
     @DeleteMapping("/delete/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable final Integer id) throws Exception {
-        postService.removePost(id);
+    public ResponseEntity<Void> deletePost(@PathVariable final Integer postId) throws Exception {
+        postService.removePost(postId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -103,7 +109,7 @@ public class PostController {
         return ResponseEntity.ok(postService.increasePostLikeCount(postId));
     }
 
-    @ApiOperation("유저의 그룹 편지 중 제목, 내용으로 검색 user id/검색어 필요")
+    @ApiOperation("유저의 그룹 편지 중 제목, 내용으로 검색 user id/검색어 필요 // 아직 api 완성안됨- group api 완성되면 진행")
     @GetMapping("/search/{userid}/{word}")
     public ResponseEntity<List<PostResponseDto.Simple>> searchGroupPost(@PathVariable final Integer userid, final String word) throws Exception {
         List<PostResponseDto.Simple> simpleList = new ArrayList<>();
@@ -124,7 +130,18 @@ public class PostController {
     }
     @ApiOperation("편지 읽음,신고,좋아요,응답 여부 확인, 헤더에 userId 필요")
     @GetMapping("/option/{postId}")
-    public ResponseEntity<List<UserPostResponseDto>> postOption(@PathVariable Integer postId) throws Exception {
+    public ResponseEntity<UserPostResponseDto> postOption(@PathVariable Integer postId) throws Exception {
         return ResponseEntity.ok(userPostService.getPostOption(postId));
+    }
+
+    @ApiOperation("임시저장 편지 있는지 여부, 있으면 임시저장 편지 id 반환 없음 0 반환, 헤더에 userId 필요")
+    @GetMapping("/temp")
+    public ResponseEntity<Integer> tempPost() throws Exception {
+        return ResponseEntity.ok(postService.checkingTempPost());
+    }
+    @ApiOperation("편지 자세한 정보 postId 필요")
+    @GetMapping("/info/{postId}")
+    public ResponseEntity<PostResponseDto.Info> postInfo(@PathVariable Integer postId) throws Exception {
+        return ResponseEntity.ok(postService.PostInfoById(postId));
     }
 }
