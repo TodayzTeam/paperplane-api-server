@@ -48,6 +48,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .isPopularLetterWeb(false)
                     .isReadWeb(false)
                     .isRepliedWeb(false)
+                    .randId((int) (Math.random()*100000000))
+                    .tempPost(0)
                     .build());
         } else {
             User user = userOptional.get();
