@@ -27,7 +27,7 @@ public class GroupService {
     public List<User> getGroupUserByCode(String code)throws Exception{
         List<User> userList=groupRepository.findGroupUserByCode(code);
         if (userList.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"해당 코드에 대한 그룹 유저가 존재하지 않습니다");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"해당 코드에 대한 그룹이 존재하지 않습니다");
         }
         return userList;
     }

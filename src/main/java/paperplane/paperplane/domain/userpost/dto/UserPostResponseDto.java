@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 public class UserPostResponseDto {
 
 
-    private Integer id;
     private Boolean isReply;
     private Boolean isReport;
     private Boolean isRead;
@@ -25,7 +24,6 @@ public class UserPostResponseDto {
 
     public static UserPostResponseDto of(UserPost userPost){
         return UserPostResponseDto.builder()
-                .id(userPost.getId())
                 .isReply(userPost.getIsReply())
                 .isReport(userPost.getIsReport())
                 .isRead(userPost.getIsRead())

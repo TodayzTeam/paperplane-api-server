@@ -22,6 +22,8 @@ import paperplane.paperplane.domain.userpost.dto.UserPostResponseDto;
 import paperplane.paperplane.domain.userpost.service.UserPostService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -91,7 +93,7 @@ public class PostController {
         return ResponseEntity.ok(postService.getLikedPost(pageRequest));
     }
 
-    @ApiOperation("편지 신고")
+    @ApiOperation("편지 신고, 헤더에 userId 필요, 5회 누적시 편지 삭제")
     @GetMapping("/report/{postId}")
     public ResponseEntity<Integer> reportPost(@PathVariable Integer postId) throws Exception {
         return ResponseEntity.ok(postService.increasePostReportCount(postId)) ;

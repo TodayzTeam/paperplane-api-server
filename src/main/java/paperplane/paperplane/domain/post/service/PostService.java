@@ -31,12 +31,14 @@ import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.repository.UserRepository;
 import paperplane.paperplane.domain.user.service.UserService;
 import paperplane.paperplane.domain.userpost.UserPost;
+import paperplane.paperplane.domain.userpost.repository.UserPostRepository;
 import paperplane.paperplane.domain.userpost.service.UserPostService;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,6 +55,7 @@ public class PostService {
     private final UserService userService;
     private final UserPostService userPostService;
     private final GroupRepository groupRepository;
+    private final UserPostRepository userPostRepository;
     public Integer addPost(PostRequestDto.Create data) throws Exception{
         Post post= new Post();
         User user= userService.getCurrentUser();
@@ -83,8 +86,14 @@ public class PostService {
         }
         postRepository.save(post);
 
-
-
+        //응답했는지 확인
+        Optional<UserPost> checkReply= userPostRepository.findPostOptionByPostId(user.getId(),post.getId());
+        if (checkReply.isPresent()){
+            if(checkReply.get().getIsReply()){
+                removePost(post.getId());
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 회신한 편지입니다.");
+            }
+        }
 
         //save postInterest
         JSONParser parser=new JSONParser();
@@ -105,13 +114,15 @@ public class PostService {
             }
         }
 
+
+
         //user api 추가 후 변경예정
         List<User> randUser=userService.getRandUser(data.getReceiveGroup());
 
         for(User receive: randUser){
             userPostService.addUserPost(UserPost.builder()
                     .post(post)
-                    .isReply(false)
+                    .isReply(data.getIsReply())
                     .isRead(false)
                     .isReport(false)
                     .isLike(false)
@@ -155,9 +166,6 @@ public class PostService {
         }
         postRepository.save(post);
 
-
-
-
         //save postInterest
         JSONParser parser=new JSONParser();
         JSONArray keywordArray= (JSONArray) parser.parse(data.getKeyword()); //keyword parsing objcet
@@ -184,7 +192,7 @@ public class PostService {
         for(User receive: randUser){
             userPostService.addUserPost(UserPost.builder()
                     .post(post)
-                    .isReply(false)
+                    .isReply(data.getIsReply())
                     .isRead(false)
                     .isReport(false)
                     .isLike(false)
@@ -238,7 +246,6 @@ public class PostService {
         return getByPostId(id).getLikeCount();
     }
 
-    @CachePut(value = "post-likecount", key = "#id", cacheManager = "cacheManager")
     public Integer increasePostLikeCount (Integer id) throws Exception{
         Post post=getByPostId(id);
         User user=userService.getCurrentUser();
@@ -248,10 +255,19 @@ public class PostService {
         postRepository.save(post);
         return post.getLikeCount();
     }
-    public Integer increasePostReportCount(Integer id){
+    public Integer increasePostReportCount(Integer id)throws Exception{
         Post post=getByPostId(id);
-        post.setLikeCount(post.getReportCount()+1);
-        postRepository.save(post);
+        User user=userService.getCurrentUser();
+        UserPost userPost=userPostService.getByReceiverIdAndPostId(user.getId(),post.getId());
+        userPostService.checkingReport(userPost);
+        post.setReportCount(post.getReportCount()+1);
+        if(post.getReportCount()>=5){
+            removePost(post.getId());
+            throw new ResponseStatusException(HttpStatus.OK,"5회 신고 누적으로 편지 삭제");
+        }
+        else {
+            postRepository.save(post);
+        }
         return post.getLikeCount();
     }
 
