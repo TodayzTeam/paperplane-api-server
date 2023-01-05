@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -24,35 +25,35 @@ import java.util.UUID;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final TokenService tokenService;
     private final UserRepository userRepository;
-    private final UserService userService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
         String email = oAuth2User.getAttribute("email");
-
-        //최초 로그인 시 회원가입
-        User user = userRepository.findByEmail(email).orElseGet(()->
-                userRepository.save(User.builder()
-                        .email(email)
-                        .name(oAuth2User.getAttribute("name"))
-                        .profileImageUrl(oAuth2User.getAttribute("picture"))
-                        .isPopularLetterEmail(false)
-                        .isReadEmail(false)
-                        .isRepliedEmail(false)
-                        .isPopularLetterWeb(false)
-                        .isReadWeb(false)
-                        .isRepliedWeb(false)
-                        .randId((int) (Math.random()*100000000))
-                        .tempPost(0)
-                        .build()));
-
         Token token = tokenService.generateToken(email, "USER");
 
-        //refreshToken DB에 저장
-        user.setRefreshToken(token.getRefreshToken());
-        userRepository.save(user);
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        //최초 로그인 시 회원가입
+        if(userOptional.isEmpty()){
+            userRepository.save(User.builder()
+                    .email(email)
+                    .name(oAuth2User.getAttribute("name"))
+                    .refreshToken(token.getRefreshToken())
+                    .profileImageUrl(oAuth2User.getAttribute("picture"))
+                    .isPopularLetterEmail(false)
+                    .isReadEmail(false)
+                    .isRepliedEmail(false)
+                    .isPopularLetterWeb(false)
+                    .isReadWeb(false)
+                    .isRepliedWeb(false)
+                    .build());
+        } else {
+            User user = userOptional.get();
+            user.setRefreshToken(token.getRefreshToken());
+            userRepository.save(user);
+        }
 
         response.setContentType("text/html;charset=UTF-8");
         response.addHeader("accessToken", token.getAccessToken());

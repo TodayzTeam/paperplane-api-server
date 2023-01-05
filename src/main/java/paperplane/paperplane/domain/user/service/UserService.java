@@ -24,6 +24,7 @@ import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.dto.UserRequestDto;
 import paperplane.paperplane.domain.user.repository.UserRepository;
 import paperplane.paperplane.domain.userinterest.UserInterest;
+import paperplane.paperplane.domain.userinterest.service.UserInterestService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -38,8 +39,8 @@ import java.nio.file.Files;
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
-  //  private final UserInterestService userInterestService;
-  //  private final InterestService interestService;
+    private final InterestRepository interestRepository;
+    private final UserInterestService userInterestService;
     private final HttpServletRequest request;
     private final GroupService groupService;
 
@@ -86,22 +87,14 @@ public class UserService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "해당하는 회원이 없습니다."));
     }
 
-   /* public User getUserInfo(Integer id){
-        User user = getUser(id);
-
-        List<UserInterest> userInterests = userInterestService.getUserInterestByUserId(id);
-
-
-    }
-*/
     public void deleteUser(User user) {
         userRepository.delete(userRepository.findById(user.getId()).orElseThrow(()->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "해당하는 회원이 없습니다.")));
     }
 
-    /*public User updateUser(Integer id, UserRequestDto.Profile profile) throws ParseException {
-        User user = getUser(id);
-        user.update(profile);
+    public User updateUser(Integer id, UserRequestDto.Profile profile) throws ParseException {
+        User user = getUserById(id);
+        user.updateProfile(profile);
 
         JSONParser parser = new JSONParser();
         JSONArray keywordArray = (JSONArray) parser.parse(profile.getInterest());
@@ -109,22 +102,26 @@ public class UserService {
         for(int i=0;i<keywordArray.size();i++){
             String keyword = keywordArray.get(i).toString();
 
-            Interest interest = interestService.getInterestByKeyword(keyword);
+            Interest interest = interestRepository.findByKeyword(keyword).orElseGet(()->
+                    interestRepository.save(Interest.builder()
+                            .keyword(keyword)
+                            .count(0)
+                            .build()));
 
             UserInterest userInterest = UserInterest.builder()
+                    .user(user)
                     .interest(interest)
                     .build();
 
             userInterestService.addUserInterest(userInterest);
-            user.getUserInterests().add(userInterest);
+            user.getUserInterest().add(userInterest);
         }
 
         return user;
-    }*/
+    }
 
     public String updateProfileImage(Integer id, MultipartFile file) throws IOException {
-        //String uploadPath = "/home/ubuntu/app/img/";
-        String uploadPath = "C:\\study\\img\\";
+        String uploadPath = "/home/ubuntu/app/img/";
         String uploadFileName = file.getOriginalFilename();
 
         uploadFileName = UUID.randomUUID().toString() + "_" + uploadFileName;
