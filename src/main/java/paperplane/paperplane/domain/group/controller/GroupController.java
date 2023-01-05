@@ -80,12 +80,10 @@ public class GroupController {
         List<UserGroupResponseDto> simpleList = new ArrayList<>();
         simpleList.add(UserGroupResponseDto.builder()
                 .groupId(1)
-                .groupName("asdfq3")
-                .simpleUser(null).build());
+                .groupName("asdfq3").build());
         simpleList.add(UserGroupResponseDto.builder()
                 .groupId(1)
-                .groupName("asdfq3")
-                .simpleUser(null).build());
+                .groupName("asdfq3").build());
 
         return ResponseEntity.ok(simpleList);
     }
