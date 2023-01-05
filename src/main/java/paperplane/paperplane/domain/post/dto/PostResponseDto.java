@@ -65,6 +65,7 @@ public class PostResponseDto implements Serializable {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Simple{
+        private Integer id;
         private String title;
         private String content;
         private Integer likeCount;
@@ -72,6 +73,7 @@ public class PostResponseDto implements Serializable {
 
         public static Simple of(Post post){
             return Simple.builder()
+                    .id(post.getId())
                     .title(post.getTitle())
                     .content(post.getContent())
                     .likeCount(post.getLikeCount())

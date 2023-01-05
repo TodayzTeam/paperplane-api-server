@@ -8,6 +8,7 @@ import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.userpost.UserPost;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -15,9 +16,9 @@ import java.util.Set;
 @Builder
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class Post {
+@NoArgsConstructor
+public class Post implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -52,5 +53,5 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User sender;
-    
+
 }

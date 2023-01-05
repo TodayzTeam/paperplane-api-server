@@ -1,6 +1,7 @@
 package paperplane.paperplane.domain.user.service;
 
 
+import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -15,6 +16,8 @@ import paperplane.paperplane.domain.Interest.Interest;
 
 import paperplane.paperplane.domain.Interest.repository.InterestRepository;
 import paperplane.paperplane.domain.Interest.service.InterestService;
+import paperplane.paperplane.domain.group.service.GroupService;
+import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.post.repository.PostRepository;
 import paperplane.paperplane.domain.postinterest.PostInterest;
 import paperplane.paperplane.domain.user.User;
@@ -25,9 +28,10 @@ import paperplane.paperplane.domain.userinterest.service.UserInterestService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.util.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
+import java.nio.file.Files;
 
 @Transactional
 @Service
@@ -38,6 +42,7 @@ public class UserService {
     private final InterestRepository interestRepository;
     private final UserInterestService userInterestService;
     private final HttpServletRequest request;
+    private final GroupService groupService;
 
 
     private Integer getUserIdInHeader() {
@@ -60,13 +65,18 @@ public class UserService {
     public User getUserByEmail(String email){
         return userRepository.findByEmail(email).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 유저를 찾을 수 없습니다."));
     }
-    public User getRandUser(String randUser) throws Exception{
-        log.info("{}",randUser);
+    public List<User> getRandUser(String randUser) throws Exception{
 
+        //편지 제약조건에 따라 추후 수정
         if(randUser.equals("RAND")){
-            return userRepository.findById(1).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 유저를 찾을 수 없습니다."));
-        }
-        else{
+
+            List<User> users =userRepository.findRandUserList();
+            log.info("randuser");
+            log.info("{}",users);
+            return users;
+        } else if (randUser.equals(groupService.getGroupByCode(randUser).getCode())) {
+            return groupService.getGroupUserByCode(randUser);
+        } else{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"잘못된 수신자그룹입니다.");
         }
 
@@ -104,7 +114,7 @@ public class UserService {
                     .build();
 
             userInterestService.addUserInterest(userInterest);
-            user.getUserInterests().add(userInterest);
+            user.getUserInterest().add(userInterest);
         }
 
         return user;
@@ -115,7 +125,6 @@ public class UserService {
         String uploadFileName = file.getOriginalFilename();
 
         uploadFileName = UUID.randomUUID().toString() + "_" + uploadFileName;
-
         File newFile = new File(uploadPath + uploadFileName);
         file.transferTo(newFile);
 
@@ -126,4 +135,16 @@ public class UserService {
         return user.getProfileImageUrl();
     }
 
+    public List<Integer> getAllUserId(){
+        List<User> users= userRepository.findAll();
+        List<Integer> idList=new ArrayList<>();
+        for(User user:users){
+            idList.add(user.getId());
+        }
+        return idList;
+    }
+
+    public User saveUser(User user){
+        return userRepository.save(user);
+    }
 }

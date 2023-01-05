@@ -17,6 +17,7 @@ import paperplane.paperplane.domain.postinterest.dto.PostInterestResponseDto;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.dto.UserRequestDto;
 import paperplane.paperplane.domain.user.dto.UserResponseDto;
+import paperplane.paperplane.domain.user.repository.UserRepository;
 import paperplane.paperplane.domain.user.service.UserService;
 import paperplane.paperplane.domain.usergroup.UserGroup;
 import paperplane.paperplane.domain.usergroup.dto.UserGroupResponseDto;
@@ -83,4 +84,14 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+
+    @ApiOperation("모든 user Id만 반환")
+    @GetMapping("/allid")
+    public ResponseEntity<List<Integer>> allUserId() throws Exception {
+
+
+        return ResponseEntity.ok(userService.getAllUserId());
+    }
+
 }

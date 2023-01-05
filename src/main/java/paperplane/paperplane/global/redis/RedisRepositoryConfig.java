@@ -1,5 +1,11 @@
 package paperplane.paperplane.global.redis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
@@ -22,13 +28,19 @@ import java.time.Duration;
 @Configuration
 @EnableCaching
 @EnableRedisRepositories
+@AllArgsConstructor
 public class RedisRepositoryConfig extends CachingConfigurerSupport {
     @Value("${spring.redis.port}")
     private Integer port;
 
     @Value("${spring.redis.host}")
     private String host;
-
+    @Bean public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // timestamp 형식 안따르도록 설정
+        mapper.registerModules(new JavaTimeModule(), new Jdk8Module()); // LocalDateTime 매핑을 위해 모듈 활성화
+        return mapper;
+    }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory(){
