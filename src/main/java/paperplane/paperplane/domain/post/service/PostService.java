@@ -55,6 +55,8 @@ public class PostService {
     private final GroupRepository groupRepository;
     public Integer addPost(PostRequestDto.Create data) throws Exception{
         Post post= new Post();
+        User user= userService.getCurrentUser();
+
         if(groupRepository.findByCode(data.getCode()).isPresent()) {
             post= Post.builder()
                     .group(groupService.getGroupByCode(data.getCode()))
@@ -64,7 +66,7 @@ public class PostService {
                     .likeCount(0)
                     .reportCount(0)
                     .postColor(PostColor.valueOf(data.getColor()))
-                    .sender(userService.getCurrentUser())
+                    .sender(user)
                     .build();
         }
         else{
@@ -76,7 +78,79 @@ public class PostService {
                     .likeCount(0)
                     .reportCount(0)
                     .postColor(PostColor.valueOf(data.getColor()))
-                    .sender(userService.getCurrentUser())
+                    .sender(user)
+                    .build();
+        }
+        postRepository.save(post);
+
+
+
+
+        //save postInterest
+        JSONParser parser=new JSONParser();
+        JSONArray keywordArray= (JSONArray) parser.parse(data.getKeyword()); //keyword parsing objcet
+
+        Set<PostInterest> postInterestSet= new HashSet<>();
+        log.info("{}",keywordArray.size());
+        for(int i=0;i<keywordArray.size();i++){
+            if(keywordArray.get(i)!=null) {
+                String keyword = keywordArray.get(i).toString();
+                Interest interest=interestService.addInterest(keyword);
+                PostInterest postInterest =PostInterest.builder()
+                        .post(post)
+                        .interest(interest)
+                        .build();
+                postInterestService.addPostInterest(postInterest);
+                postInterestSet.add(postInterest);
+            }
+        }
+
+        //user api 추가 후 변경예정
+        List<User> randUser=userService.getRandUser(data.getReceiveGroup());
+
+        for(User receive: randUser){
+            userPostService.addUserPost(UserPost.builder()
+                    .post(post)
+                    .isReply(false)
+                    .isRead(false)
+                    .isReport(false)
+                    .isLike(false)
+                    .receiver(receive)
+                    .build());
+        }
+
+        user.setTempPost(0);
+        userService.saveUser(user);
+        //save userPost
+        return post.getId();
+    }
+
+    public Integer interStorePost(PostRequestDto.Create data)throws Exception{
+        Post post= new Post();
+        User user=userService.getCurrentUser();
+
+        if(groupRepository.findByCode(data.getCode()).isPresent()) {
+            post= Post.builder()
+                    .group(groupService.getGroupByCode(data.getCode()))
+                    .title(data.getTitle())
+                    .content(data.getContent())
+                    .date(LocalDateTime.now())
+                    .likeCount(0)
+                    .reportCount(0)
+                    .postColor(PostColor.valueOf(data.getColor()))
+                    .sender(user)
+                    .build();
+        }
+        else{
+            //save post
+            post= Post.builder()
+                    .title(data.getTitle())
+                    .content(data.getContent())
+                    .date(LocalDateTime.now())
+                    .likeCount(0)
+                    .reportCount(0)
+                    .postColor(PostColor.valueOf(data.getColor()))
+                    .sender(user)
                     .build();
         }
         postRepository.save(post);
@@ -107,18 +181,29 @@ public class PostService {
         //user api 추가 후 변경예정
         List<User> randUser=userService.getRandUser(data.getReceiveGroup());
 
-        for(User user: randUser){
+        for(User receive: randUser){
             userPostService.addUserPost(UserPost.builder()
                     .post(post)
                     .isReply(false)
                     .isRead(false)
                     .isReport(false)
                     .isLike(false)
-                    .receiver(user)
+                    .receiver(receive)
                     .build());
         }
+
+        //임시저장값 0으로
+        user.setTempPost(post.getId());
+        userService.saveUser(user);
         //save userPost
-        return 1;
+        return post.getId();
+    }
+    public PostResponseDto.Info PostInfoById(Integer postId){
+        return PostResponseDto.Info.of( getByPostId(postId));
+    }
+    public Integer checkingTempPost(){
+        User user=userService.getCurrentUser();
+            return user.getTempPost();
     }
     public void removePost(Integer id){
          postRepository.delete(getByPostId(id));
@@ -157,10 +242,7 @@ public class PostService {
     public Integer increasePostLikeCount (Integer id) throws Exception{
         Post post=getByPostId(id);
         User user=userService.getCurrentUser();
-        log.info("{}",user.getId());
-        log.info("{}",post.getId());
         UserPost userPost=userPostService.getByReceiverIdAndPostId(user.getId(),post.getId());
-        log.info("2");
         userPostService.checkingLike(userPost);
         post.setLikeCount(post.getLikeCount()+1);
         postRepository.save(post);
@@ -179,4 +261,6 @@ public class PostService {
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
     }
+
+
 }
