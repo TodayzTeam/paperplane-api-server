@@ -18,6 +18,8 @@ import paperplane.paperplane.domain.post.dto.PostRequestDto;
 import paperplane.paperplane.domain.post.dto.PostResponseDto;
 import paperplane.paperplane.domain.post.repository.PostRepository;
 import paperplane.paperplane.domain.post.service.PostService;
+import paperplane.paperplane.domain.userpost.dto.UserPostResponseDto;
+import paperplane.paperplane.domain.userpost.service.UserPostService;
 
 import javax.validation.Valid;
 
@@ -33,7 +35,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-    private final PostRepository postRepository;
+    private final UserPostService userPostService;
 
     @ApiOperation("편지 송신/회신, 헤더에 userId 필요")
     @PostMapping("/create")
@@ -42,7 +44,7 @@ public class PostController {
     }
 
     @ApiOperation("편지 삭제")
-    @DeleteMapping("/delete/{postid}")
+    @DeleteMapping("/delete/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable final Integer id) throws Exception {
         postService.removePost(id);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -119,5 +121,10 @@ public class PostController {
                 .build());
 
         return ResponseEntity.ok(simpleList);
+    }
+    @ApiOperation("편지 읽음,신고,좋아요,응답 여부 확인, 헤더에 userId 필요")
+    @GetMapping("/option/{postId}")
+    public ResponseEntity<List<UserPostResponseDto>> postOption(@PathVariable Integer postId) throws Exception {
+        return ResponseEntity.ok(userPostService.getPostOption(postId));
     }
 }

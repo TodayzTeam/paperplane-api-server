@@ -179,4 +179,6 @@ public class PostService {
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
     }
+
+
 }

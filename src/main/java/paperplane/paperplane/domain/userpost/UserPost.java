@@ -16,7 +16,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Embeddable
 public class UserPost {
 
     @Id
