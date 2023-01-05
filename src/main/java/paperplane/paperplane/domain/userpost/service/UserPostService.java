@@ -30,7 +30,7 @@ public class UserPostService {
     }
 
     public UserPost getByReceiverIdAndPostId(Integer userId,Integer postId){
-        return userPostRepository.findByReceiverIdAndPostId(userId,postId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당 user,post id에 대한 User, Post를 못찾았습니다."));
+        return userPostRepository.findByReceiverIdAndPostId(userId,postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
     }
     public void checkingLike(UserPost userPost)throws Exception{
         if(userPost.getIsLike()){
@@ -41,15 +41,20 @@ public class UserPostService {
             userPostRepository.save(userPost);
         }
     }
-    public UserPostResponseDto getPostOption(Integer postId){
-        User user= userService.getCurrentUser();
-        List<Post> posts=postRepository.test(user.getId(),postId);
-        for(Post post:posts){
-            log.info("{}",post.getId());
-            log.info("{}",post.getUserPosts());
-            log.info("{}",post.getDate());
+    public void checkingReport(UserPost userPost)throws Exception{
+        if(userPost.getIsReport()){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 신고를 했습니다.");
         }
-        UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId);
+        else {
+            userPost.setIsReport(true);
+            userPostRepository.save(userPost);
+        }
+    }
+    public UserPostResponseDto getPostOption(Integer postId){
+        User user= userService.getCurrentUser();/*userPostRepository*/
+        UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
+        log.info("{}",userPost.getId());
+
         return UserPostResponseDto.of(userPost);
     }
 }
