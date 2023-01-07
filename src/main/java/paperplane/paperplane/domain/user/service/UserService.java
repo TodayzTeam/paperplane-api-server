@@ -61,10 +61,6 @@ public class UserService {
         return userRepository.findByEmail(email).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 유저를 찾을 수 없습니다."));
     }
 
-    public User getUserWithUserGroupByEmail(String email){
-        return userRepository.findByEmailFetchUserGroup(email).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 유저를 찾을 수 없습니다."));
-    }
-
     public User getRandUser(String randUser) throws Exception{
         log.info("{}",randUser);
 
