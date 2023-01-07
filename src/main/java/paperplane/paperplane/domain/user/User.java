@@ -54,25 +54,27 @@ public class User {
     @Column
     private Boolean isPopularLetterEmail;
 
+    @OneToMany(mappedBy = "user",cascade = {CascadeType.ALL})
+    private Set<UserGroup> userGroup;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
-    private Set<UserGroup> userGroups;
+    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true, mappedBy = "user")
+    private Set<UserInterest> userInterest;
 
-    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
-    @JoinColumn(name="userinterest_id")
-    private Set<UserInterest> userInterests;
+    @OneToMany(cascade = {CascadeType.ALL},mappedBy = "receiver")
+    private Set<UserPost> userPost;
+    
+    @OneToMany(mappedBy = "sender")
+    private Set<Post> Post;
 
-    @OneToMany(cascade = {CascadeType.ALL})
-    @JoinColumn(name="userpost_id")
-    private Set<UserPost> userPosts;
+    @Column
+    private int randId;
 
-    @OneToMany
-    @JoinColumn(name = "user_id")
-    private Set<Post> Posts;
-
+    @Column
+    private Integer tempPost;
+    
     public void updateProfile(UserRequestDto.Profile profile){
         this.name = profile.getName();
-        this.userInterests.clear();
+        this.userInterest.clear();
         this.isReadEmail = profile.getIsReadEmail();
         this.isReadWeb = profile.getIsReadWeb();
         this.isPopularLetterEmail = profile.getIsPopularLetterEmail();
@@ -80,5 +82,5 @@ public class User {
         this.isRepliedEmail = profile.getIsRepliedEmail();
         this.isRepliedWeb = profile.getIsRepliedWeb();
     }
-
+    
 }

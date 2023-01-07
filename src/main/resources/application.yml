@@ -31,3 +31,5 @@ spring:
 server:
   error:
     include-message: always
+jwt:
+  secret: secretKey-test-authorization-jwt-manage-token

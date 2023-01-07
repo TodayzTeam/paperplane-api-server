@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -47,6 +48,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .isPopularLetterWeb(false)
                     .isReadWeb(false)
                     .isRepliedWeb(false)
+                    .randId((int) (Math.random()*100000000))
+                    .tempPost(0)
                     .build());
         } else {
             User user = userOptional.get();

@@ -16,14 +16,12 @@ public class UserGroupResponseDto {
 
    private Integer groupId;
    private String groupName;
-   private UserResponseDto.Simple simpleUser;
 
 
    public static UserGroupResponseDto of(UserGroup userGroup){
       return UserGroupResponseDto.builder()
               .groupId(userGroup.getGroup().getId())
               .groupName(userGroup.getGroup().getName())
-              .simpleUser(UserResponseDto.Simple.of(userGroup.getUser()))
               .build();
    }
 

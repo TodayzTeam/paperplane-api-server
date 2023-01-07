@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 @Transactional
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class GroupService {
     public Group getGroupByCode(String code){
         return groupRepository.findByCode(code).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 그룹을 찾을 수 없습니다."));
     }
-
+    
     public List<Group> getGroupListByName(String name){
         return groupRepository.findByNameContaining(name);
     }
@@ -66,7 +67,7 @@ public class GroupService {
 
         userGroupRepository.save(userGroup);
         group.setUserGroups(new HashSet<>(Arrays.asList(userGroup)));
-        user.getUserGroups().add(userGroup);
+        user.getUserGroup().add(userGroup);
 
         return group.getId();
     }
@@ -96,7 +97,7 @@ public class GroupService {
 
         userGroupRepository.save(userGroup);
 
-        user.getUserGroups().add(userGroup);
+        user.getUserGroup().add(userGroup);
         group.getUserGroups().add(userGroup);
 
         return group;
@@ -112,5 +113,13 @@ public class GroupService {
 
     public boolean isUserPresent(Authentication authentication){
         return authentication != null;
+    }
+    
+    public List<User> getGroupUserByCode(String code)throws Exception{
+        List<User> userList=groupRepository.findGroupUserByCode(code);
+        if (userList.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"해당 코드에 대한 그룹이 존재하지 않습니다");
+        }
+        return userList;
     }
 }

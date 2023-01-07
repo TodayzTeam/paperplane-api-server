@@ -16,7 +16,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Embeddable
 public class UserPost {
 
     @Id
@@ -25,18 +24,25 @@ public class UserPost {
 
     //받는 사람
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user")
     private User receiver;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post")
     private Post post;
 
     @Column
     private Boolean isReply;
 
+    //신고 여부
     @Column
     private Boolean isReport;
 
+    //읽었는지 여부
     @Column
     private Boolean isRead;
+
+    //좋아요 눌렀는지 여부
+    @Column
+    private Boolean isLike;
 }
