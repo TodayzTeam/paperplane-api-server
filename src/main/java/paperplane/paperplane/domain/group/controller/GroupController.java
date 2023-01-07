@@ -32,9 +32,7 @@ public class GroupController {
     @ApiOperation("그룹 생성")
     @PostMapping("/create")
     public ResponseEntity<Integer> createGroup(Authentication authentication, GroupRequestDto.Create create) throws Exception {
-        String email = ((User)authentication.getPrincipal()).getEmail();
-
-        return ResponseEntity.ok(groupService.createGroup(email, create));
+        return ResponseEntity.ok(groupService.createGroup(authentication, create));
     }
 
     @ApiOperation("그룹 삭제")
@@ -49,9 +47,7 @@ public class GroupController {
     @ApiOperation("그룹 참가")
     @PostMapping("/join")
     public ResponseEntity<GroupResponseDto.Info> joinGroup(@Valid GroupRequestDto.GroupCode groupCode, Authentication authentication) throws Exception {
-        String email = ((User)authentication.getPrincipal()).getEmail();
-
-        return ResponseEntity.ok(GroupResponseDto.Info.of(groupService.joinGroup(groupCode, email)));
+        return ResponseEntity.ok(GroupResponseDto.Info.of(groupService.joinGroup(groupCode, authentication)));
     }
 
     @ApiOperation("그룹 탈퇴")

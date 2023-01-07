@@ -5,13 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.group.dto.GroupRequestDto;
-import paperplane.paperplane.domain.group.dto.GroupResponseDto;
 import paperplane.paperplane.domain.group.repository.GroupRepository;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.service.UserService;
@@ -48,12 +45,15 @@ public class GroupService {
         return userGroupService.getUserGroupByUserId(userId).stream().map(UserGroup::getGroup).collect(Collectors.toList());
     }
 
-    public Integer createGroup(String email, GroupRequestDto.Create create){
+    public Integer createGroup(Authentication authentication, GroupRequestDto.Create create){
+        if(!isUserPresent(authentication)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인하지 않았습니다.");
+        }
         if(checkDuplicateGroup(create.getName())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "중복된 그룹이름입니다.");
         }
-
-        User user = userService.getUserByEmail(email);
+        User authUser = (User) authentication.getPrincipal();
+        User user = userService.getUserByEmail(authUser.getEmail());
         Group group = create.toEntity();
         groupRepository.save(group);
 
@@ -64,9 +64,9 @@ public class GroupService {
                         .userRole(UserRole.OWNER)
                         .build();
 
+        userGroupRepository.save(userGroup);
         group.setUserGroups(new HashSet<>(Arrays.asList(userGroup)));
         user.getUserGroups().add(userGroup);
-        userGroupRepository.save(userGroup);
 
         return group.getId();
     }
@@ -75,12 +75,16 @@ public class GroupService {
 
     }
 
-    public Group joinGroup(GroupRequestDto.GroupCode groupCode, String email){
-        if(userGroupRepository.findByGroupCodeAndUserEmail(groupCode.getCode(), email).isPresent()){
+    public Group joinGroup(GroupRequestDto.GroupCode groupCode, Authentication authentication){
+        if(!isUserPresent(authentication)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인하지 않았습니다.");
+        }
+        User authUser = (User) authentication.getPrincipal();
+        User user = userService.getUserByEmail(authUser.getEmail());
+
+        if(userGroupRepository.findByGroupCodeAndUserEmail(groupCode.getCode(), user.getEmail()).isPresent()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 가입한 그룹입니다.");
         }
-
-        User user = userService.getUserWithUserGroupByEmail(email);
         Group group = getGroupByCode(groupCode.getCode());
 
         UserGroup userGroup = UserGroup.builder()
@@ -106,4 +110,7 @@ public class GroupService {
         return groupRepository.existsByName(name);
     }
 
+    public boolean isUserPresent(Authentication authentication){
+        return authentication != null;
+    }
 }
