@@ -10,7 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GroupRepository extends JpaRepository<Group, Integer> {
-    public Optional<Group> findByCode(String code);
+    Optional<Group> findByCode(String code);
+
+    List<Group> findByNameContaining(String name);
+
+    boolean existsByName(String name);
 
     @Query(value = "select User FROM Group g where g.code = :code", nativeQuery = true)
     public List<User> findGroupUserByCode(@Param("code") String code);

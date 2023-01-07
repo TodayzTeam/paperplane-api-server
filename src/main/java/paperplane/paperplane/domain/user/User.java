@@ -54,7 +54,6 @@ public class User {
     @Column
     private Boolean isPopularLetterEmail;
 
-
     @OneToMany(mappedBy = "user",cascade = {CascadeType.ALL})
     private Set<UserGroup> userGroup;
 

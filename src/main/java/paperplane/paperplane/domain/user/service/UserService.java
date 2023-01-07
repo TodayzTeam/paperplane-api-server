@@ -65,6 +65,7 @@ public class UserService {
     public User getUserByEmail(String email){
         return userRepository.findByEmail(email).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 유저를 찾을 수 없습니다."));
     }
+    
     public List<User> getRandUser(String randUser) throws Exception{
 
         //편지 제약조건에 따라 추후 수정
