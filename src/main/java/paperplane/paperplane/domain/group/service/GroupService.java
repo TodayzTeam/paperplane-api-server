@@ -11,7 +11,7 @@ import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.group.dto.GroupRequestDto;
 import paperplane.paperplane.domain.group.repository.GroupRepository;
 import paperplane.paperplane.domain.user.User;
-import paperplane.paperplane.domain.user.service.UserService;
+import paperplane.paperplane.domain.user.repository.UserRepository;
 import paperplane.paperplane.domain.usergroup.UserGroup;
 import paperplane.paperplane.domain.usergroup.UserRole;
 import paperplane.paperplane.domain.usergroup.repository.UserGroupRepository;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class GroupService {
 
     private final GroupRepository groupRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final UserGroupService userGroupService;
     private final UserGroupRepository userGroupRepository;
 
@@ -54,7 +54,7 @@ public class GroupService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "중복된 그룹이름입니다.");
         }
         User authUser = (User) authentication.getPrincipal();
-        User user = userService.getUserByEmail(authUser.getEmail());
+        User user = userRepository.findByEmail(authUser.getEmail()).get();
         Group group = create.toEntity();
         groupRepository.save(group);
 
@@ -81,7 +81,7 @@ public class GroupService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인하지 않았습니다.");
         }
         User authUser = (User) authentication.getPrincipal();
-        User user = userService.getUserByEmail(authUser.getEmail());
+        User user = userRepository.findByEmail(authUser.getEmail()).get();
 
         if(userGroupRepository.findByGroupCodeAndUserEmail(groupCode.getCode(), user.getEmail()).isPresent()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 가입한 그룹입니다.");
