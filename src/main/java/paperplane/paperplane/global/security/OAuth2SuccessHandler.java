@@ -35,6 +35,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         Optional<User> userOptional = userRepository.findByEmail(email);
 
+        String url = "";
+
         //최초 로그인 시 회원가입
         if(userOptional.isEmpty()){
             userRepository.save(User.builder()
@@ -51,10 +53,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .randId((int) (Math.random()*100000000))
                     .tempPost(0)
                     .build());
+            url = makeRedirectUrl("signup", token.getAccessToken());
         } else {
             User user = userOptional.get();
             user.setRefreshToken(token.getRefreshToken());
             userRepository.save(user);
+            url = makeRedirectUrl("login", token.getAccessToken());
         }
 
         //refresh token -> 쿠키로 전달, access token -> 쿼리 스트링으로 전달
@@ -64,14 +68,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         cookie.setPath("/");
         response.addCookie(cookie);
 
-        String url = makeRedirectUrl(token.getAccessToken());
         log.info("url = {}",  url);
 
         getRedirectStrategy().sendRedirect(request, response, url);
     }
 
-    private String makeRedirectUrl(String token) {
-        return UriComponentsBuilder.fromUriString("http://localhost:3000/login").queryParam("token", token)
+    private String makeRedirectUrl(String path, String token) {
+        return UriComponentsBuilder.fromUriString("http://localhost:3000")
+                .path(path)
+                .queryParam("token", token)
                 .build().toUriString();
     }
 }
