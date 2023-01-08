@@ -34,7 +34,6 @@ public class SecurityConfig {
                     var cors = new CorsConfiguration();
                     cors.setAllowedOrigins(of("http://43.200.226.22:3000","http://localhost:3000","http://localhost:8080"));
                     cors.setAllowedMethods(of("GET","POST", "PUT", "DELETE", "OPTIONS"));
-                    cors.setExposedHeaders(of("*"));
                     cors.setAllowedHeaders(of("*"));
                     cors.setAllowCredentials(true);
                     return cors;
