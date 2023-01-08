@@ -20,7 +20,7 @@ public class UserGroupResponseDto {
 
    public static UserGroupResponseDto of(UserGroup userGroup){
       return UserGroupResponseDto.builder()
-              .groupId(userGroup.getId())
+              .groupId(userGroup.getGroup().getId())
               .groupName(userGroup.getGroup().getName())
               .build();
    }
