@@ -6,18 +6,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.repository.UserRepository;
-import paperplane.paperplane.domain.user.service.UserService;
 import paperplane.paperplane.global.security.jwt.Token;
 import paperplane.paperplane.global.security.jwt.TokenService;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Component
@@ -57,12 +57,21 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             userRepository.save(user);
         }
 
-        response.setContentType("text/html;charset=UTF-8");
-        response.addHeader("accessToken", token.getAccessToken());
-        response.addHeader("refreshToken", token.getRefreshToken());
-        response.setContentType("application/json;charset=UTF-8");
+        //refresh token -> 쿠키로 전달, access token -> 쿼리 스트링으로 전달
+        Cookie cookie = new Cookie("refreshToken", token.getRefreshToken());
+        cookie.setMaxAge(7 * 24 * 60 * 60);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        response.addCookie(cookie);
 
-        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000");
+        String url = makeRedirectUrl(token.getAccessToken());
+        log.info("url = {}",  url);
+
+        getRedirectStrategy().sendRedirect(request, response, url);
     }
 
+    private String makeRedirectUrl(String token) {
+        return UriComponentsBuilder.fromUriString("http://localhost:3000").queryParam("token", token)
+                .build().toUriString();
+    }
 }

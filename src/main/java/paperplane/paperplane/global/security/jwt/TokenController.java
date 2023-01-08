@@ -1,47 +1,49 @@
 package paperplane.paperplane.global.security.jwt;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import paperplane.paperplane.domain.user.User;
-import paperplane.paperplane.domain.user.repository.UserRepository;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
 public class TokenController {
 
     private final TokenService tokenService;
-    private final UserRepository userRepository;
 
     @GetMapping("/token/expired")
     public String auth() {
         throw new RuntimeException();
     }
 
-    //토큰 만료시 재발급
+    //access 토큰 만료시 refresh 토큰을 통해 재발급
     @GetMapping("/token/refresh")
-    public String refreshAuth(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = request.getHeader("refreshToken");
+    public ResponseEntity<String> refreshAuth(HttpServletRequest request, HttpServletResponse response) {
+        Token newToken = tokenService.refresh(request, response);
 
-        if (refreshToken != null && tokenService.verifyToken(refreshToken)) {
-            String email = tokenService.getUid(refreshToken);
-            Token newToken = tokenService.generateToken(email, "USER");
-
-            Optional<User> user = userRepository.findByEmail(email);
-            user.get().setRefreshToken(newToken.getRefreshToken());
-
-            response.addHeader("accessToken", newToken.getAccessToken());
-            response.addHeader("refreshToken", newToken.getRefreshToken());
-            response.setContentType("application/json;charset=UTF-8");
-
-            return "HAPPY NEW TOKEN";
+        //기존 쿠키 제거
+        Cookie[] cookies = request.getCookies();
+        if(cookies != null){
+            for(Cookie cookie : cookies){
+                if(cookie.getName().equals("refreshToken")){
+                    cookie.setMaxAge(0);
+                    response.addCookie(cookie);
+                    break;
+                }
+            }
         }
 
-        throw new RuntimeException();
+        Cookie cookie = new Cookie("refreshToken", newToken.getRefreshToken());
+        cookie.setMaxAge(7 * 24 * 60 * 60);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok(newToken.getAccessToken());
     }
 
 
