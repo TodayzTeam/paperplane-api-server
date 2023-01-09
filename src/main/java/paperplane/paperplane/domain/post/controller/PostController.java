@@ -8,12 +8,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import paperplane.paperplane.domain.post.PostColor;
+import paperplane.paperplane.domain.post.PostDocument;
 import paperplane.paperplane.domain.post.dto.PostRequestDto;
 import paperplane.paperplane.domain.post.dto.PostResponseDto;
 import paperplane.paperplane.domain.post.repository.PostRepository;
@@ -145,5 +148,11 @@ public class PostController {
     @GetMapping("/info/{postId}")
     public ResponseEntity<PostResponseDto.Info> postInfo(@PathVariable Integer postId) throws Exception {
         return ResponseEntity.ok(postService.PostInfoById(postId));
+    }
+    @ApiOperation("음식 검색. 제목과 내용, 카테고리를 이용")
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Page<PostDocument>> searchFood(@ModelAttribute PostRequestDto.Search search, @PageableDefault(size = 8) Pageable pageable) {
+        return ResponseEntity.ok(postService.searchPost(search, pageable));
     }
 }

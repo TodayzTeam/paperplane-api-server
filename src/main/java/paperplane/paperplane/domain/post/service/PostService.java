@@ -3,12 +3,21 @@ package paperplane.paperplane.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHitSupport;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.SearchPage;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
@@ -22,8 +31,10 @@ import paperplane.paperplane.domain.group.repository.GroupRepository;
 import paperplane.paperplane.domain.group.service.GroupService;
 import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.post.PostColor;
+import paperplane.paperplane.domain.post.PostDocument;
 import paperplane.paperplane.domain.post.dto.PostRequestDto;
 import paperplane.paperplane.domain.post.dto.PostResponseDto;
+import paperplane.paperplane.domain.post.repository.PostDocumentRepository;
 import paperplane.paperplane.domain.post.repository.PostRepository;
 import paperplane.paperplane.domain.postinterest.PostInterest;
 import paperplane.paperplane.domain.postinterest.service.PostInterestService;
@@ -56,6 +67,8 @@ public class PostService {
     private final UserPostService userPostService;
     private final GroupRepository groupRepository;
     private final UserPostRepository userPostRepository;
+    private final ElasticsearchOperations elasticsearchOperations;
+    private final PostDocumentRepository postDocumentRepository;
     public Integer addPost(PostRequestDto.Create data) throws Exception{
         Post post= new Post();
         User user= userService.getCurrentUser();
@@ -72,8 +85,7 @@ public class PostService {
                     .sender(user)
                     .build();
         }
-        else{
-            //save post
+        else{//save post
             post= Post.builder()
                     .title(data.getTitle())
                     .content(data.getContent())
@@ -207,7 +219,7 @@ public class PostService {
         return post.getId();
     }
     public PostResponseDto.Info PostInfoById(Integer postId){
-        return PostResponseDto.Info.of( getByPostId(postId));
+        return PostResponseDto.Info.of(getByPostId(postId));
     }
     public Integer checkingTempPost(){
         User user=userService.getCurrentUser();
@@ -278,5 +290,18 @@ public class PostService {
         return PostResponseDto.Simple.of(post);
     }
 
+    public Page<PostDocument> searchPost(PostRequestDto.Search search,Pageable pageable){
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
+
+        if (search.getQuery() != null) {
+            MultiMatchQueryBuilder matchQuery = QueryBuilders.multiMatchQuery(search.getQuery(), "content", "title");
+            queryBuilder = queryBuilder.withQuery(matchQuery);
+        }
+
+        NativeSearchQuery searchQuery = queryBuilder.withPageable(pageable).build();
+        SearchHits<PostDocument> searchHits = elasticsearchOperations.search(searchQuery, PostDocument.class);
+        SearchPage<PostDocument> searchPage = SearchHitSupport.searchPageFor(searchHits, searchQuery.getPageable());
+        return (Page<PostDocument>) SearchHitSupport.unwrapSearchHits(searchPage);
+    }
 
 }

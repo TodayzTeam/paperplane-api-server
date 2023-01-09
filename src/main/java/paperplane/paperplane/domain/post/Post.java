@@ -19,7 +19,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Post implements Serializable {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -45,10 +44,10 @@ public class Post implements Serializable {
     @Column
     private PostColor postColor;
 
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL},fetch = FetchType.LAZY)
     private Set<PostInterest> postInterests;
 
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL},orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL},orphanRemoval = true,fetch = FetchType.LAZY)
     private Set<UserPost> userPosts;
 
     @ManyToOne(fetch = FetchType.LAZY)
