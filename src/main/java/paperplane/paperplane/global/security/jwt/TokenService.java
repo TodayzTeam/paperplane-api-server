@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import paperplane.paperplane.domain.user.User;
-import paperplane.paperplane.domain.user.service.UserService;
+import paperplane.paperplane.domain.user.repository.UserRepository;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
@@ -27,7 +27,7 @@ import java.util.Optional;
 @Service
 public class TokenService {
 
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Value("${jwt.secret}")
     private String SECRET_KEY;
@@ -85,7 +85,8 @@ public class TokenService {
 
         //access token에서 user 가져오기
         String email = getUid(accessToken);
-        User user = userService.getUserByEmail(email);
+        User user = userRepository.findByEmail(email).orElseThrow(()->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "해당하는 회원이 없습니다."));
 
         //refresh token이 유효한지 확인 후 db에 있는 것과 같은지 비교
         if(!verifyToken(refreshToken) || !user.getRefreshToken().equals(refreshToken)){

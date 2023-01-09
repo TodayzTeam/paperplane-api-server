@@ -5,20 +5,19 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.group.dto.GroupRequestDto;
 import paperplane.paperplane.domain.group.dto.GroupResponseDto;
 import paperplane.paperplane.domain.group.service.GroupService;
 import paperplane.paperplane.domain.user.User;
-import paperplane.paperplane.domain.usergroup.UserGroup;
-import paperplane.paperplane.domain.usergroup.dto.UserGroupResponseDto;
+import paperplane.paperplane.domain.user.dto.UserResponseDto;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @Api(tags = {"Group Controller"})
@@ -44,6 +43,12 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @ApiOperation("그룹 요약 정보 조회")
+    @GetMapping("/simple/{id}")
+    public ResponseEntity<GroupResponseDto.Simple> getGroupInfo(@PathVariable Integer id) throws Exception {
+        return ResponseEntity.ok(GroupResponseDto.Simple.of(groupService.getGroupById(id)));
+    }
+
     @ApiOperation("그룹 참가")
     @PostMapping("/join")
     public ResponseEntity<GroupResponseDto.Info> joinGroup(@Valid GroupRequestDto.GroupCode groupCode, Authentication authentication) throws Exception {
@@ -59,14 +64,14 @@ public class GroupController {
     @ApiOperation("그룹을 그룹명으로 검색")
     @GetMapping("search/{name}")
     public ResponseEntity<List<GroupResponseDto.Simple>> findGroup(@PathVariable String name) throws Exception {
-        List<Group> groupList = groupService.getGroupListByName(name);
-        return ResponseEntity.ok(GroupResponseDto.Simple.of(groupList));
+        return ResponseEntity.ok(GroupResponseDto.Simple.of(groupService.getGroupListByName(name)));
     }
 
     @ApiOperation("해당 그룹의 그룹원 목록")
     @GetMapping("users/{name}")
-    public ResponseEntity<List<UserGroupResponseDto>> getGroupUserList(@PathVariable String name) throws Exception {
-        return ResponseEntity.ok(UserGroupResponseDto.of(groupService.getGroupMemberList(name)));
+    public ResponseEntity<PageImpl<UserResponseDto.Simple>> getGroupUserList(@PathVariable String name, @RequestParam("page") Integer page) throws Exception {
+        PageRequest pageRequest = PageRequest.of(page, 6);
+        return ResponseEntity.ok(groupService.getGroupMemberListByName(name, pageRequest));
     }
 
     @ApiOperation("내 그룹들 정보 조회")

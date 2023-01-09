@@ -3,6 +3,9 @@ package paperplane.paperplane.domain.group.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -11,11 +14,11 @@ import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.group.dto.GroupRequestDto;
 import paperplane.paperplane.domain.group.repository.GroupRepository;
 import paperplane.paperplane.domain.user.User;
+import paperplane.paperplane.domain.user.dto.UserResponseDto;
 import paperplane.paperplane.domain.user.repository.UserRepository;
 import paperplane.paperplane.domain.usergroup.UserGroup;
 import paperplane.paperplane.domain.usergroup.UserRole;
 import paperplane.paperplane.domain.usergroup.repository.UserGroupRepository;
-import paperplane.paperplane.domain.usergroup.service.UserGroupService;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -31,11 +34,14 @@ public class GroupService {
 
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
-    private final UserGroupService userGroupService;
     private final UserGroupRepository userGroupRepository;
 
     public Group getGroupByCode(String code){
         return groupRepository.findByCode(code).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 그룹을 찾을 수 없습니다."));
+    }
+
+    public Group getGroupById(Integer id){
+        return groupRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 그룹을 찾을 수 없습니다."));
     }
     
     public List<Group> getGroupListByName(String name){
@@ -43,7 +49,7 @@ public class GroupService {
     }
 
     public List<Group> getMyGroupList(Integer userId){
-        return userGroupService.getUserGroupByUserId(userId).stream().map(UserGroup::getGroup).collect(Collectors.toList());
+        return userGroupRepository.getMyGroupList(userId);
     }
 
     public Integer createGroup(Authentication authentication, GroupRequestDto.Create create){
@@ -103,8 +109,10 @@ public class GroupService {
         return group;
     }
 
-    public ArrayList<UserGroup> getGroupMemberList(String name){
-        return new ArrayList<>(userGroupService.getUserGroupByGroupName(name));
+    public PageImpl<UserResponseDto.Simple> getGroupMemberListByName(String name, Pageable pageable){
+        Page<User> page = groupRepository.getGroupMemberListByName(name, pageable);
+        List<User> groupMemberList = page.stream().collect(Collectors.toList());
+        return new PageImpl<>(UserResponseDto.Simple.of(groupMemberList), pageable, page.getTotalPages());
     }
 
     public boolean checkDuplicateGroup(String name){
