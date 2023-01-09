@@ -14,6 +14,10 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Integer> {
     @Query("select ug.group from UserGroup ug join ug.user ugu where ugu.id = :userId")
     List<Group> getMyGroupList(@Param("userId") Integer userId);
 
+    @Query(value = "select * from UserGroup ug where ug.group_id = :groupId and ug.user = :userId", nativeQuery = true)
+    Optional<UserGroup> findByCodeAndEmail(@io.lettuce.core.dynamic.annotation.Param("groupId") Integer groupId,
+                                           @io.lettuce.core.dynamic.annotation.Param("userId") Integer userId);
+
     @Query("select ug from UserGroup ug join ug.group ugg join ug.user ugu where ugg.code = :code and ugu.email = :email")
     Optional<UserGroup> findByGroupCodeAndUserEmail(@Param("code") String code, @Param("email") String email);
 }

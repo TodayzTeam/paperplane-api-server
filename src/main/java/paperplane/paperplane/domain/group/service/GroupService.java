@@ -52,15 +52,10 @@ public class GroupService {
         return userGroupRepository.getMyGroupList(userId);
     }
 
-    public Integer createGroup(Authentication authentication, GroupRequestDto.Create create){
-        if(!isUserPresent(authentication)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인하지 않았습니다.");
-        }
-        if(checkDuplicateGroup(create.getName())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "중복된 그룹이름입니다.");
-        }
-        User authUser = (User) authentication.getPrincipal();
-        User user = userRepository.findByEmail(authUser.getEmail()).get();
+    public Integer createGroup(GroupRequestDto.Create create, Integer userId){
+        checkDuplicateGroup(create.getName());
+
+        User user = userRepository.findById(userId).get();
         Group group = create.toEntity();
         groupRepository.save(group);
 
@@ -82,17 +77,13 @@ public class GroupService {
 
     }
 
-    public Group joinGroup(GroupRequestDto.GroupCode groupCode, Authentication authentication){
-        if(!isUserPresent(authentication)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "로그인하지 않았습니다.");
-        }
-        User authUser = (User) authentication.getPrincipal();
-        User user = userRepository.findByEmail(authUser.getEmail()).get();
+    public Group joinGroup(GroupRequestDto.GroupCode groupCode, Integer userId){
+        User user = userRepository.findById(userId).get();
+        Group group = getGroupByCode(groupCode.getCode());
 
         if(userGroupRepository.findByGroupCodeAndUserEmail(groupCode.getCode(), user.getEmail()).isPresent()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 가입한 그룹입니다.");
         }
-        Group group = getGroupByCode(groupCode.getCode());
 
         UserGroup userGroup = UserGroup.builder()
                 .group(group)
@@ -109,20 +100,28 @@ public class GroupService {
         return group;
     }
 
+    public void resignGroup(GroupRequestDto.GroupCode groupCode, Integer userId){
+        Group group = getGroupByCode(groupCode.getCode());
+        //그룹에 가입했는지 & 그룹장은 탈퇴 못함(?)
+        Optional<UserGroup> userGroup = userGroupRepository.findByCodeAndEmail(group.getId(), userId);
+        if(userGroup.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가입한 그룹이 아닙니다.");
+        }
+
+    }
+
     public PageImpl<UserResponseDto.Simple> getGroupMemberListByName(String name, Pageable pageable){
         Page<User> page = groupRepository.getGroupMemberListByName(name, pageable);
         List<User> groupMemberList = page.stream().collect(Collectors.toList());
         return new PageImpl<>(UserResponseDto.Simple.of(groupMemberList), pageable, page.getTotalPages());
     }
 
-    public boolean checkDuplicateGroup(String name){
-        return groupRepository.existsByName(name);
+    public void checkDuplicateGroup(String name){
+        if(groupRepository.existsByName(name)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "중복된 그룹이름입니다.");
+        }
     }
 
-    public boolean isUserPresent(Authentication authentication){
-        return authentication != null;
-    }
-    
     public List<User> getGroupUserByCode(String code)throws Exception{
         List<User> userList=groupRepository.findGroupUserByCode(code);
         if (userList.isEmpty()){
