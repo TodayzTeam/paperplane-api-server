@@ -67,8 +67,6 @@ public class GroupService {
                         .build();
 
         userGroupRepository.save(userGroup);
-        group.setUserGroups(new HashSet<>(Arrays.asList(userGroup)));
-        user.getUserGroup().add(userGroup);
 
         return group.getId();
     }
@@ -81,7 +79,7 @@ public class GroupService {
         User user = userRepository.findById(userId).get();
         Group group = getGroupByCode(groupCode.getCode());
 
-        if(userGroupRepository.findByGroupCodeAndUserEmail(groupCode.getCode(), user.getEmail()).isPresent()){
+        if(userGroupRepository.findByCodeAndEmail(group.getId(), userId).isPresent()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 가입한 그룹입니다.");
         }
 
@@ -94,20 +92,21 @@ public class GroupService {
 
         userGroupRepository.save(userGroup);
 
-        user.getUserGroup().add(userGroup);
-        group.getUserGroups().add(userGroup);
-
         return group;
     }
 
     public void resignGroup(GroupRequestDto.GroupCode groupCode, Integer userId){
         Group group = getGroupByCode(groupCode.getCode());
         //그룹에 가입했는지 & 그룹장은 탈퇴 못함(?)
-        Optional<UserGroup> userGroup = userGroupRepository.findByCodeAndEmail(group.getId(), userId);
-        if(userGroup.isEmpty()){
+        Optional<UserGroup> userGroupOptional = userGroupRepository.findByCodeAndEmail(group.getId(), userId);
+        if(userGroupOptional.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가입한 그룹이 아닙니다.");
         }
-
+        UserGroup userGroup = userGroupOptional.get();
+        if(userGroup.getUserRole().equals(UserRole.OWNER)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "그룹장은 탈퇴할 수 없습니다.");
+        }
+        userGroupRepository.delete(userGroup);
     }
 
     public PageImpl<UserResponseDto.Simple> getGroupMemberListByName(String name, Pageable pageable){

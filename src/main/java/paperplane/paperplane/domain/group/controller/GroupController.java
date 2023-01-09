@@ -57,7 +57,7 @@ public class GroupController {
     }
 
     @ApiOperation("그룹 탈퇴")
-    @PatchMapping("/resign")
+    @PostMapping("/resign")
     public ResponseEntity<Void> resignGroup(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
         groupService.resignGroup(groupCode, userService.getLoginUser());
         return ResponseEntity.status(HttpStatus.OK).build();
