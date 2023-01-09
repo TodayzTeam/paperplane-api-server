@@ -25,13 +25,13 @@ import paperplane.paperplane.domain.user.dto.UserRequestDto;
 import paperplane.paperplane.domain.user.repository.UserRepository;
 import paperplane.paperplane.domain.userinterest.UserInterest;
 import paperplane.paperplane.domain.userinterest.service.UserInterestService;
+import paperplane.paperplane.global.security.jwt.TokenService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 @Transactional
 @Service
@@ -43,7 +43,7 @@ public class UserService {
     private final UserInterestService userInterestService;
     private final HttpServletRequest request;
     private final GroupService groupService;
-
+    private final TokenService tokenService;
 
     private Integer getUserIdInHeader() {
         String userIdString = request.getHeader("userId");
@@ -57,7 +57,6 @@ public class UserService {
         }
     }
 
-
     public User getCurrentUser() {
         return userRepository.findById(getUserIdInHeader()).get();
     }
@@ -65,7 +64,15 @@ public class UserService {
     public User getUserByEmail(String email){
         return userRepository.findByEmail(email).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 유저를 찾을 수 없습니다."));
     }
-    
+
+    public User getUserByToken(String token){
+        if(token == null || !tokenService.verifyToken(token)){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "access token이 유효하지 않습니다.");
+        }
+        String email = tokenService.getUid(token);
+        return getUserByEmail(email);
+    }
+
     public List<User> getRandUser(String randUser) throws Exception{
 
         //편지 제약조건에 따라 추후 수정

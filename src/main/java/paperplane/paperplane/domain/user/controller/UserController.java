@@ -9,25 +9,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import paperplane.paperplane.domain.Interest.Interest;
-import paperplane.paperplane.domain.Interest.dto.InterestResponseDto;
-import paperplane.paperplane.domain.group.Group;
-import paperplane.paperplane.domain.group.dto.GroupResponseDto;
-import paperplane.paperplane.domain.postinterest.dto.PostInterestResponseDto;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.dto.UserRequestDto;
 import paperplane.paperplane.domain.user.dto.UserResponseDto;
-import paperplane.paperplane.domain.user.repository.UserRepository;
 import paperplane.paperplane.domain.user.service.UserService;
-import paperplane.paperplane.domain.usergroup.UserGroup;
-import paperplane.paperplane.domain.usergroup.dto.UserGroupResponseDto;
-import paperplane.paperplane.global.security.jwt.TokenService;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Api(tags = {"User Controller"})
 @Slf4j
@@ -36,14 +24,18 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final TokenService tokenService;
 
     @ApiOperation("내 전체 정보 조회")
     @GetMapping("/profile/{id}")
     public ResponseEntity<UserResponseDto.Info> getMyProfile(@PathVariable Integer id) throws Exception {
         User user = userService.getUserById(id);
-
         return ResponseEntity.ok(UserResponseDto.Info.of(user));
+    }
+
+    @ApiOperation("액세스 토큰으로 내 요약 정보 조회")
+    @GetMapping("/token/profile")
+    public ResponseEntity<UserResponseDto.Simple> getMyProfileByToken(@RequestHeader(name = "accessToken") String accessToken){
+        return ResponseEntity.ok(UserResponseDto.Simple.of(userService.getUserByToken(accessToken)));
     }
 
     @ApiOperation("내 요약 정보 조회")
