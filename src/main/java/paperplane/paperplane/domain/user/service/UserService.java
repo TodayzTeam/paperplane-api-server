@@ -9,6 +9,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,6 +34,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -65,19 +68,27 @@ public class UserService {
         return userRepository.findByEmail(email).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 유저를 찾을 수 없습니다."));
     }
 
-    public User getUserByToken(String token){
+    public Integer getLoginUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+        }
+        User user = (User) authentication.getPrincipal();
+        return user.getId();
+    }
+
+    public Integer getUserByToken(String token){
         if(token == null || !tokenService.verifyToken(token)){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "access token이 유효하지 않습니다.");
         }
         String email = tokenService.getUid(token);
-        return getUserByEmail(email);
+        return getUserByEmail(email).getId();
     }
 
     public List<User> getRandUser(String randUser) throws Exception{
 
         //편지 제약조건에 따라 추후 수정
         if(randUser.equals("RAND")){
-
             List<User> users =userRepository.findRandUserList();
             log.info("randuser");
             log.info("{}",users);
@@ -95,6 +106,32 @@ public class UserService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "해당하는 회원이 없습니다."));
     }
 
+    public void addInterest(Integer userId, String keyword) throws ParseException {
+        User user = getUserById(userId);
+
+        JSONParser parser = new JSONParser();
+        JSONArray keywordArray = (JSONArray) parser.parse(keyword);
+        ArrayList array = (ArrayList) keywordArray.stream().distinct().collect(Collectors.toList());
+
+        for(int i = 0; i < array.size(); i++){
+            String kw = array.get(i).toString();
+            if(kw.isEmpty()) continue;
+            //키워드 없으면 추가
+            Interest interest = interestRepository.findByKeyword(kw).orElseGet(()->
+                    interestRepository.save(Interest.builder()
+                            .keyword(kw)
+                            .count(0)
+                            .build()));
+
+            UserInterest userInterest = UserInterest.builder()
+                    .user(user)
+                    .interest(interest)
+                    .build();
+
+            userInterestService.addUserInterest(userInterest);
+        }
+    }
+
     public void deleteUser(User user) {
         userRepository.delete(userRepository.findById(user.getId()).orElseThrow(()->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "해당하는 회원이 없습니다.")));
@@ -106,10 +143,11 @@ public class UserService {
 
         JSONParser parser = new JSONParser();
         JSONArray keywordArray = (JSONArray) parser.parse(profile.getInterest());
+        ArrayList array = (ArrayList) keywordArray.stream().distinct().collect(Collectors.toList());
 
-        for(int i=0;i<keywordArray.size();i++){
-            String keyword = keywordArray.get(i).toString();
-
+        for(int i = 0; i < array.size(); i++){
+            String keyword = array.get(i).toString();
+            if(keyword.isEmpty()) continue;
             Interest interest = interestRepository.findByKeyword(keyword).orElseGet(()->
                     interestRepository.save(Interest.builder()
                             .keyword(keyword)
@@ -122,7 +160,6 @@ public class UserService {
                     .build();
 
             userInterestService.addUserInterest(userInterest);
-            user.getUserInterest().add(userInterest);
         }
 
         return user;
