@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,13 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    @ApiOperation("회원가입 후 관심사 등록")
+    @PostMapping("/interest/{id}")
+    public ResponseEntity<Void> addInterest(@PathVariable Integer id, String keyword) throws ParseException {
+        userService.addInterest(id, keyword);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @ApiOperation("내 전체 정보 조회")
     @GetMapping("/profile/{id}")
     public ResponseEntity<UserResponseDto.Info> getMyProfile(@PathVariable Integer id) throws Exception {
@@ -32,10 +40,10 @@ public class UserController {
         return ResponseEntity.ok(UserResponseDto.Info.of(user));
     }
 
-    @ApiOperation("액세스 토큰으로 내 요약 정보 조회")
-    @GetMapping("/token/profile")
-    public ResponseEntity<UserResponseDto.Simple> getMyProfileByToken(@RequestHeader(name = "accessToken") String accessToken){
-        return ResponseEntity.ok(UserResponseDto.Simple.of(userService.getUserByToken(accessToken)));
+    @ApiOperation("액세스 토큰으로 유저 아이디 반환")
+    @GetMapping("/token")
+    public ResponseEntity<Integer> getMyProfileByToken(@RequestHeader(name = "accessToken") String accessToken){
+        return ResponseEntity.ok(userService.getUserByToken(accessToken));
     }
 
     @ApiOperation("내 요약 정보 조회")

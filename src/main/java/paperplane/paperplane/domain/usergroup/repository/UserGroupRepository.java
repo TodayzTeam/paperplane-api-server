@@ -14,6 +14,7 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Integer> {
     @Query("select ug.group from UserGroup ug join ug.user ugu where ugu.id = :userId")
     List<Group> getMyGroupList(@Param("userId") Integer userId);
 
-    @Query("select ug from UserGroup ug join ug.group ugg join ug.user ugu where ugg.code = :code and ugu.email = :email")
-    Optional<UserGroup> findByGroupCodeAndUserEmail(@Param("code") String code, @Param("email") String email);
+    @Query(value = "select * from UserGroup ug where ug.group_id = :groupId and ug.user = :userId", nativeQuery = true)
+    Optional<UserGroup> findByCodeAndEmail(@Param("groupId") Integer groupId,
+                                           @Param("userId") Integer userId);
 }

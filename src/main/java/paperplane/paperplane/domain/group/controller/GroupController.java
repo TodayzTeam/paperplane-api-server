@@ -16,6 +16,7 @@ import paperplane.paperplane.domain.group.dto.GroupResponseDto;
 import paperplane.paperplane.domain.group.service.GroupService;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.dto.UserResponseDto;
+import paperplane.paperplane.domain.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -27,18 +28,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService groupService;
+    private final UserService userService;
+
     @ApiOperation("그룹 생성")
     @PostMapping("/create")
-    public ResponseEntity<Integer> createGroup(Authentication authentication, GroupRequestDto.Create create) throws Exception {
-        return ResponseEntity.ok(groupService.createGroup(authentication, create));
+    public ResponseEntity<Integer> createGroup(GroupRequestDto.Create create) throws Exception {
+        return ResponseEntity.ok(groupService.createGroup(create, userService.getLoginUser()));
     }
 
     @ApiOperation("그룹 삭제")
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteGroup(@Valid GroupRequestDto.GroupCode groupCode, Authentication authentication) throws Exception {
-        String email = ((User)authentication.getPrincipal()).getEmail();
-        groupService.deleteGroup(groupCode, email);
-
+    public ResponseEntity<Void> deleteGroup(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
+        //  groupService.deleteGroup(groupCode, email);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -50,13 +51,14 @@ public class GroupController {
 
     @ApiOperation("그룹 참가")
     @PostMapping("/join")
-    public ResponseEntity<GroupResponseDto.Info> joinGroup(@Valid GroupRequestDto.GroupCode groupCode, Authentication authentication) throws Exception {
-        return ResponseEntity.ok(GroupResponseDto.Info.of(groupService.joinGroup(groupCode, authentication)));
+    public ResponseEntity<GroupResponseDto.Info> joinGroup(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
+        return ResponseEntity.ok(GroupResponseDto.Info.of(groupService.joinGroup(groupCode, userService.getLoginUser())));
     }
 
     @ApiOperation("그룹 탈퇴")
-    @PatchMapping("/resign")
+    @PostMapping("/resign")
     public ResponseEntity<Void> resignGroup(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
+        groupService.resignGroup(groupCode, userService.getLoginUser());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
