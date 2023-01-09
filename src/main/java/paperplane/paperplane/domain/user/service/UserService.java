@@ -77,7 +77,6 @@ public class UserService {
 
         //편지 제약조건에 따라 추후 수정
         if(randUser.equals("RAND")){
-
             List<User> users =userRepository.findRandUserList();
             log.info("randuser");
             log.info("{}",users);

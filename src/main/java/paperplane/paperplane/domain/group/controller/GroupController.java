@@ -27,7 +27,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService groupService;
-
     @ApiOperation("그룹 생성")
     @PostMapping("/create")
     public ResponseEntity<Integer> createGroup(Authentication authentication, GroupRequestDto.Create create) throws Exception {
@@ -38,7 +37,7 @@ public class GroupController {
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteGroup(@Valid GroupRequestDto.GroupCode groupCode, Authentication authentication) throws Exception {
         String email = ((User)authentication.getPrincipal()).getEmail();
-        //  groupService.deleteGroup(groupCode, email);
+        groupService.deleteGroup(groupCode, email);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
