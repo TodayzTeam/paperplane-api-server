@@ -9,6 +9,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -65,12 +67,21 @@ public class UserService {
         return userRepository.findByEmail(email).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 유저를 찾을 수 없습니다."));
     }
 
-    public User getUserByToken(String token){
+    public Integer getLoginUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+        }
+        User user = (User) authentication.getPrincipal();
+        return user.getId();
+    }
+
+    public Integer getUserByToken(String token){
         if(token == null || !tokenService.verifyToken(token)){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "access token이 유효하지 않습니다.");
         }
         String email = tokenService.getUid(token);
-        return getUserByEmail(email);
+        return getUserByEmail(email).getId();
     }
 
     public List<User> getRandUser(String randUser) throws Exception{

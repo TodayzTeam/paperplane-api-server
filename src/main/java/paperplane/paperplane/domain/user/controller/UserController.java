@@ -34,8 +34,8 @@ public class UserController {
 
     @ApiOperation("액세스 토큰으로 내 요약 정보 조회")
     @GetMapping("/token/profile")
-    public ResponseEntity<UserResponseDto.Simple> getMyProfileByToken(@RequestHeader(name = "accessToken") String accessToken){
-        return ResponseEntity.ok(UserResponseDto.Simple.of(userService.getUserByToken(accessToken)));
+    public ResponseEntity<Integer> getMyProfileByToken(@RequestHeader(name = "accessToken") String accessToken){
+        return ResponseEntity.ok(userService.getUserByToken(accessToken));
     }
 
     @ApiOperation("내 요약 정보 조회")
