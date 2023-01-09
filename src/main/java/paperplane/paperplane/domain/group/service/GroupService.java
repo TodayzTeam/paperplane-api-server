@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import paperplane.paperplane.domain.group.Group;
@@ -97,7 +96,7 @@ public class GroupService {
 
     public void resignGroup(GroupRequestDto.GroupCode groupCode, Integer userId){
         Group group = getGroupByCode(groupCode.getCode());
-        //그룹에 가입했는지 & 그룹장은 탈퇴 못함(?)
+        //그룹에 가입했는지 & 그룹장은 탈퇴 못함
         Optional<UserGroup> userGroupOptional = userGroupRepository.findByCodeAndEmail(group.getId(), userId);
         if(userGroupOptional.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가입한 그룹이 아닙니다.");
