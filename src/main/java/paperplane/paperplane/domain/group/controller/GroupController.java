@@ -40,7 +40,6 @@ public class GroupController {
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteGroup(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
         //  groupService.deleteGroup(groupCode, email);
-
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

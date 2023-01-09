@@ -71,7 +71,8 @@ public class GroupService {
     }
 
     public void deleteGroup(GroupRequestDto.GroupCode groupCode, String email){
-
+        Group group=getGroupByCode(groupCode.getCode());
+        groupRepository.delete(group);
     }
 
     public Group joinGroup(GroupRequestDto.GroupCode groupCode, Integer userId){

@@ -25,6 +25,6 @@ public class Group {
     @Column
     private String code;
 
-    @OneToMany(mappedBy = "group", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST})
     private Set<UserGroup> userGroups;
 }

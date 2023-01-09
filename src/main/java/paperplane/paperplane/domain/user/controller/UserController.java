@@ -89,8 +89,6 @@ public class UserController {
     @ApiOperation("모든 user Id만 반환")
     @GetMapping("/allid")
     public ResponseEntity<List<Integer>> allUserId() throws Exception {
-
-
         return ResponseEntity.ok(userService.getAllUserId());
     }
 
