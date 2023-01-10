@@ -3,6 +3,7 @@ package paperplane.paperplane.domain.post.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import paperplane.paperplane.domain.post.PostColor;
 
 import javax.validation.constraints.NotNull;
 
@@ -37,6 +38,17 @@ public class PostRequestDto {
 
         @ApiModelProperty(value = "회신하는 편지인지 여부")
         private Boolean isReply;
+    }
+
+    @ApiModel(value="post 검색")
+    @Builder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Search {
+        @ApiModelProperty(value = "검색어")
+        private String query;
     }
 
 }
