@@ -2,12 +2,12 @@ package paperplane.paperplane.domain.post.dto;
 
 import io.swagger.annotations.ApiModel;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import paperplane.paperplane.domain.group.dto.GroupResponseDto;
 import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.post.PostColor;
 import paperplane.paperplane.domain.postinterest.dto.PostInterestResponseDto;
-import paperplane.paperplane.domain.user.User;
-import paperplane.paperplane.domain.userpost.UserPost;
+import paperplane.paperplane.domain.user.dto.UserResponseDto;
 import paperplane.paperplane.domain.userpost.dto.UserPostResponseDto;
 
 import java.io.Serializable;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Slf4j
 public class PostResponseDto implements Serializable {
 
     @ApiModel(value = "편지 상세 정보")
@@ -32,25 +32,25 @@ public class PostResponseDto implements Serializable {
         private Integer reportCount;
         private Integer likeCount;
         private PostColor postColor;
-        private GroupResponseDto.Info group;
+        private GroupResponseDto.Simple group;
         private List<PostInterestResponseDto> interest;
-        private User sender;
-        private List<UserPostResponseDto> receivers;
+        private UserResponseDto.Simple sender;
+        private List<UserPostResponseDto.Receivers> receivers;
 
         public static Info of(Post post){
-            return Info.builder()
-                    .id(post.getId())
-                    .title(post.getTitle())
-                    .content(post.getContent())
-                    .date(LocalDateTime.now())
-                    .reportCount(post.getReportCount())
-                    .likeCount(post.getLikeCount())
-                    .postColor(post.getPostColor())
-                    .group(GroupResponseDto.Info.of(post.getGroup()))
-                    .interest(PostInterestResponseDto.of(new ArrayList<>( post.getPostInterests())))
-                    .sender(post.getSender())
-                    .receivers(UserPostResponseDto.of(new ArrayList<>(post.getUserPosts())))
-                    .build();
+                return Info.builder()
+                        .id(post.getId())
+                        .title(post.getTitle())
+                        .content(post.getContent())
+                        .date(post.getDate())
+                        .reportCount(post.getReportCount())
+                        .likeCount(post.getLikeCount())
+                        .postColor(post.getPostColor())
+                        //.group(GroupResponseDto.Simple.of(post.getGroup()))
+                        .interest(PostInterestResponseDto.of(new ArrayList<>(post.getPostInterests())))
+                        .sender(UserResponseDto.Simple.of(post.getSender()))
+                        .receivers(UserPostResponseDto.Receivers.of(new ArrayList<>(post.getUserPosts())))
+                        .build();
         }
 
         public static List<PostResponseDto.Info> of(List<Post> posts){
@@ -86,4 +86,6 @@ public class PostResponseDto implements Serializable {
         }
 
     }
+
+
 }

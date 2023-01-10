@@ -32,7 +32,7 @@ public class SecurityConfig {
         http.httpBasic().disable()
                 .cors().configurationSource(request -> {
                     var cors = new CorsConfiguration();
-                    cors.setAllowedOrigins(of("*"));
+                    cors.setAllowedOriginPatterns(of("*"));
                     cors.setAllowedMethods(of("GET","POST", "PUT", "DELETE", "OPTIONS"));
                     cors.setAllowedHeaders(of("*"));
                     cors.setAllowCredentials(true);

@@ -12,9 +12,12 @@ import java.util.Set;
 @Table(name = "GROUP_TB")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class Group {
+    public Group(){
+        this.id=1;
+        this.code="rand";
+    }
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
