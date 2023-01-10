@@ -23,7 +23,7 @@ public class Post implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Group group;
 
     @Column
@@ -44,13 +44,13 @@ public class Post implements Serializable {
     @Column
     private PostColor postColor;
 
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL},fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL},fetch = FetchType.EAGER)
     private Set<PostInterest> postInterests;
 
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL},orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL},orphanRemoval = true,fetch = FetchType.EAGER)
     private Set<UserPost> userPosts;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private User sender;
 
 }

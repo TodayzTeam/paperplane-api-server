@@ -5,9 +5,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,19 +16,12 @@ import paperplane.paperplane.domain.post.PostColor;
 import paperplane.paperplane.domain.post.PostDocument;
 import paperplane.paperplane.domain.post.dto.PostRequestDto;
 import paperplane.paperplane.domain.post.dto.PostResponseDto;
-import paperplane.paperplane.domain.post.repository.PostRepository;
 import paperplane.paperplane.domain.post.service.PostService;
 import paperplane.paperplane.domain.userpost.dto.UserPostResponseDto;
 import paperplane.paperplane.domain.userpost.service.UserPostService;
-
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Api(tags = {"Post Controller"})
 @Slf4j
@@ -56,7 +46,7 @@ public class PostController {
 
     @ApiOperation("편지 삭제")
     @DeleteMapping("/delete/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable final Integer postId) throws Exception {
+    public ResponseEntity<Void> deletePost(@PathVariable final Integer postId) {
         postService.removePost(postId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -69,7 +59,7 @@ public class PostController {
     }
     @ApiOperation("보낸 편지, 헤더에 userId 필요")
     @GetMapping("/sent")
-    public ResponseEntity<List<PostResponseDto.Simple>> sentPost(@RequestParam("page") Integer page) throws Exception {
+    public ResponseEntity<List<PostResponseDto.Simple>> sentPost(@RequestParam("page") Integer page) {
         PageRequest pageRequest= PageRequest.of(page,8);
         return ResponseEntity.ok(postService.getSentPost(pageRequest));
     }
@@ -77,7 +67,7 @@ public class PostController {
 
     @ApiOperation("인기편지 리스트 8개 전송")
     @GetMapping("/popular")
-    public ResponseEntity<List<PostResponseDto.Simple>> popularPost() throws Exception {
+    public ResponseEntity<List<PostResponseDto.Simple>> popularPost() {
         List<PostResponseDto.Simple> simpleList= postService.getPopularPost();
         return ResponseEntity.ok(postService.getPopularPost());
     }
@@ -135,7 +125,7 @@ public class PostController {
     }
     @ApiOperation("편지 읽음,신고,좋아요,응답 여부 확인, 헤더에 userId 필요")
     @GetMapping("/option/{postId}")
-    public ResponseEntity<UserPostResponseDto> postOption(@PathVariable Integer postId) throws Exception {
+    public ResponseEntity<UserPostResponseDto.Option> postOption(@PathVariable Integer postId) throws Exception {
         return ResponseEntity.ok(userPostService.getPostOption(postId));
     }
 

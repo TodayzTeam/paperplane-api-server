@@ -1,16 +1,13 @@
 package paperplane.paperplane.domain.post.dto;
 
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.group.dto.GroupResponseDto;
 import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.post.PostColor;
 import paperplane.paperplane.domain.postinterest.dto.PostInterestResponseDto;
-import paperplane.paperplane.domain.user.User;
-import paperplane.paperplane.domain.userpost.UserPost;
+import paperplane.paperplane.domain.user.dto.UserResponseDto;
 import paperplane.paperplane.domain.userpost.dto.UserPostResponseDto;
 
 import java.io.Serializable;
@@ -35,10 +32,10 @@ public class PostResponseDto implements Serializable {
         private Integer reportCount;
         private Integer likeCount;
         private PostColor postColor;
-        private String groupName;
+        private GroupResponseDto.Simple group;
         private List<PostInterestResponseDto> interest;
-        private User sender;
-        private List<UserPostResponseDto> receivers;
+        private UserResponseDto.Simple sender;
+        private List<UserPostResponseDto.Receivers> receivers;
 
         public static Info of(Post post){
                 return Info.builder()
@@ -49,10 +46,10 @@ public class PostResponseDto implements Serializable {
                         .reportCount(post.getReportCount())
                         .likeCount(post.getLikeCount())
                         .postColor(post.getPostColor())
-                        .groupName(null)
+                        //.group(GroupResponseDto.Simple.of(post.getGroup()))
                         .interest(PostInterestResponseDto.of(new ArrayList<>(post.getPostInterests())))
-                        .sender(post.getSender())
-                        .receivers(UserPostResponseDto.of(new ArrayList<>(post.getUserPosts())))
+                        .sender(UserResponseDto.Simple.of(post.getSender()))
+                        .receivers(UserPostResponseDto.Receivers.of(new ArrayList<>(post.getUserPosts())))
                         .build();
         }
 
