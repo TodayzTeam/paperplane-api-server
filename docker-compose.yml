@@ -34,7 +34,7 @@ services:
       - "6379:6379"
   elasticsearch:
     container_name: elasticsearch
-    image: elasticsearch:7.17.7
+    image: elasticsearch:7.17.4
     ports:
       - 9200:9200
       - 9300:9300
@@ -49,13 +49,13 @@ services:
     privileged: true
   kibana:
     container_name: kibana
-    image: kibana:7.17.4
+    image: docker.elastic.co/kibana/kibana:7.13.0
     ports:
       - 5601:5601
     networks:
       - default
     environment:
-      ELASTICSEARCH_UTL: http://elasticsearch:9200
+      ELASTICSERCH_UTL: http://elasticsearch:9200
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
       TZ: Asia/Seoul
     restart: always
