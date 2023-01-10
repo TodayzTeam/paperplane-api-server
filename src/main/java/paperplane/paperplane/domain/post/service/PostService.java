@@ -145,10 +145,12 @@ public class PostService {
                         .build());
             }
         }
-
+        //temp post 처리
         user.setTempPost(0);
         userService.saveUser(user);
-        //save userPost
+
+        //es search
+        postDocumentRepository.save(new PostDocument(post));
         return post.getId();
     }
 

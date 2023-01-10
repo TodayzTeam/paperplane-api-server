@@ -125,7 +125,7 @@ public class PostController {
     }
     @ApiOperation("편지 읽음,신고,좋아요,응답 여부 확인, 헤더에 userId 필요")
     @GetMapping("/option/{postId}")
-    public ResponseEntity<UserPostResponseDto.Option> postOption(@PathVariable Integer postId) throws Exception {
+    public ResponseEntity<UserPostResponseDto.Option> postOption(@PathVariable Integer postId) {
         return ResponseEntity.ok(userPostService.getPostOption(postId));
     }
 
@@ -136,10 +136,10 @@ public class PostController {
     }
     @ApiOperation("편지 자세한 정보 postId 필요")
     @GetMapping("/info/{postId}")
-    public ResponseEntity<PostResponseDto.Info> postInfo(@PathVariable Integer postId) throws Exception {
+    public ResponseEntity<PostResponseDto.Info> postInfo(@PathVariable Integer postId) {
         return ResponseEntity.ok(postService.PostInfoById(postId));
     }
-    @ApiOperation("음식 검색. 제목과 내용, 카테고리를 이용")
+    @ApiOperation("음식 검색. 제목과 내용, 카테고리를 이용 -es search")
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Page<PostDocument>> searchFood(@ModelAttribute PostRequestDto.Search search, @PageableDefault(size = 8) Pageable pageable) {
