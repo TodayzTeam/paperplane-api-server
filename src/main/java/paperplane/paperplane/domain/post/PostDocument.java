@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import javax.persistence.Id;
 
 @ApiModel(value = "편지 검색 결과 모델")
-@Document(indexName = "user")
+@Document(indexName = "post")
 @Builder
 @Getter
 @Setter
