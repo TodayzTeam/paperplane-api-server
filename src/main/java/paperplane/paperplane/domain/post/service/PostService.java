@@ -232,7 +232,8 @@ public class PostService {
             return user.getTempPost();
     }
     public void removePost(Integer id){
-         postRepository.delete(getByPostId(id));
+        postRepository.delete(getByPostId(id));
+        postDocumentRepository.delete(postDocumentRepository.findById(id).get());
     }
     public Post getByPostId(Integer id){
         return postRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 편지를 찾을 수 없습니다."));
