@@ -3,10 +3,7 @@ package paperplane.paperplane.domain.user.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-import org.elasticsearch.client.license.LicensesStatus;
 import org.springframework.web.multipart.MultipartFile;
-import paperplane.paperplane.domain.Interest.Interest;
-import paperplane.paperplane.domain.Interest.dto.InterestRequestDto;
 import paperplane.paperplane.domain.user.User;
 
 import javax.persistence.Column;

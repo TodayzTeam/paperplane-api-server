@@ -5,15 +5,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import paperplane.paperplane.domain.post.PostColor;
-import paperplane.paperplane.domain.post.PostDocument;
 import paperplane.paperplane.domain.post.dto.PostRequestDto;
 import paperplane.paperplane.domain.post.dto.PostResponseDto;
 import paperplane.paperplane.domain.post.service.PostService;
@@ -53,7 +49,7 @@ public class PostController {
 
     @ApiOperation("전체 편지 중 제목, 내용으로 검색")
     @GetMapping("/search/{word}")
-    public ResponseEntity<List<PostResponseDto.Simple>> searchAllPost(@PathVariable final String word, @RequestParam("page") Integer page) throws Exception {
+    public ResponseEntity<List<PostResponseDto.Simple>> searchAllPost(@PathVariable final String word, @RequestParam("page") Integer page) {
         PageRequest pageRequest= PageRequest.of(page,8);
         return ResponseEntity.ok(postService.SearchPostByWord(word,pageRequest));
     }
@@ -68,20 +64,19 @@ public class PostController {
     @ApiOperation("인기편지 리스트 8개 전송")
     @GetMapping("/popular")
     public ResponseEntity<List<PostResponseDto.Simple>> popularPost() {
-        List<PostResponseDto.Simple> simpleList= postService.getPopularPost();
         return ResponseEntity.ok(postService.getPopularPost());
     }
 
 
     @ApiOperation("받은 편지, 헤더에 userId 필요")
     @GetMapping("/received")
-    public ResponseEntity<List<PostResponseDto.Simple>> receivedPost(@RequestParam("page") Integer page) throws Exception {
+    public ResponseEntity<List<PostResponseDto.Simple>> receivedPost(@RequestParam("page") Integer page) {
         PageRequest pageRequest= PageRequest.of(page,8);
         return ResponseEntity.ok(postService.getReceivedPost(pageRequest));
     }
     @ApiOperation("좋아요 누른 편지, 헤더에 userId 필요")
     @GetMapping("/liked")
-    public ResponseEntity<List<PostResponseDto.Simple>> likedPostList(@RequestParam("page") Integer page) throws Exception {
+    public ResponseEntity<List<PostResponseDto.Simple>> likedPostList(@RequestParam("page") Integer page){
         PageRequest pageRequest= PageRequest.of(page,8);
         return ResponseEntity.ok(postService.getLikedPost(pageRequest));
     }
@@ -94,7 +89,7 @@ public class PostController {
 
     @ApiOperation("편지 좋아요 개수 새로고침")
     @GetMapping("/like/refresh/{postId}")
-    public ResponseEntity<Integer> refreshPostLikeCount(@PathVariable Integer postId) throws Exception {
+    public ResponseEntity<Integer> refreshPostLikeCount(@PathVariable Integer postId){
         return ResponseEntity.ok(postService.getLikeCountByPostId(postId));
     }
 
@@ -131,7 +126,7 @@ public class PostController {
 
     @ApiOperation("임시저장 편지 있는지 여부, 있으면 임시저장 편지 id 반환 없음 0 반환, 헤더에 userId 필요")
     @GetMapping("/temp")
-    public ResponseEntity<Integer> tempPost() throws Exception {
+    public ResponseEntity<Integer> tempPost(){
         return ResponseEntity.ok(postService.checkingTempPost());
     }
     @ApiOperation("편지 자세한 정보 postId 필요")
@@ -139,10 +134,10 @@ public class PostController {
     public ResponseEntity<PostResponseDto.Info> postInfo(@PathVariable Integer postId) {
         return ResponseEntity.ok(postService.PostInfoById(postId));
     }
-    @ApiOperation("음식 검색. 제목과 내용, 카테고리를 이용 -es search")
+    /*@ApiOperation("음식 검색. 제목과 내용, 카테고리를 이용 -es search")
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Page<PostDocument>> searchFood(@ModelAttribute PostRequestDto.Search search, @PageableDefault(size = 8) Pageable pageable) {
         return ResponseEntity.ok(postService.searchPost(search, pageable));
-    }
+    }*/
 }
