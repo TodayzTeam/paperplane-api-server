@@ -23,7 +23,7 @@ public class UserPost {
     private Integer id;
 
     //받는 사람
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user")
     private User receiver;
 
