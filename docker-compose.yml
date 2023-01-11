@@ -9,8 +9,6 @@ services:
     depends_on:
       - mysql
       - redis
-      - elasticsearch
-      - kibana
     restart: always
     ports:
       - "8080:8080"
