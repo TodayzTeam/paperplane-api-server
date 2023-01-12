@@ -27,7 +27,7 @@ public class UserPostService {
     public UserPost getByReceiverIdAndPostId(Integer userId,Integer postId){
         return userPostRepository.findByReceiverIdAndPostId(userId,postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
     }
-    public void checkingLike(UserPost userPost){
+    public void checkLike(UserPost userPost){
         if(userPost.getIsLike()){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 좋아요를 눌렀습니다.");
         }
@@ -48,8 +48,18 @@ public class UserPostService {
     public UserPostResponseDto.Option getPostOption(Integer postId){
         User user= userService.getCurrentUser();
         UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
-        log.info("{}",userPost.getId());
 
         return UserPostResponseDto.Option.of(userPost);
+    }
+
+    public Boolean checkReply(Integer postId){
+        User user= userService.getCurrentUser();
+        log.info("checkReply");
+        if(userPostRepository.findPostOptionByPostId(user.getId(),postId).isPresent()){
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

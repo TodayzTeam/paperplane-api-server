@@ -13,12 +13,8 @@ import java.util.Set;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class Group {
-    public Group(){
-        this.id=1;
-        this.code="rand";
-    }
-
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 

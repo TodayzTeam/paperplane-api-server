@@ -31,8 +31,8 @@ public class UserPost {
     @JoinColumn(name = "post")
     private Post post;
 
-    @Column
-    private Boolean isReply;
+    @Column// 원본 편지
+    private Integer originId;
 
     //신고 여부
     @Column

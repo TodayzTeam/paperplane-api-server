@@ -1,6 +1,7 @@
 package paperplane.paperplane.domain.post.service;
 
 
+import com.nimbusds.jose.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -28,6 +29,7 @@ import paperplane.paperplane.domain.userpost.UserPost;
 import paperplane.paperplane.domain.userpost.repository.UserPostRepository;
 import paperplane.paperplane.domain.userpost.service.UserPostService;
 
+import javax.persistence.Tuple;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -56,7 +58,101 @@ public class PostService {
 
 
 
-        if(groupRepository.findByCode(data.getCode()).isPresent()) {
+        if(groupService.getGroupByCode(data.getCode())!=null) {
+            post= Post.builder()
+                    .group(groupService.getGroupByCode(data.getCode()))
+                    .title(data.getTitle())
+                    .content(data.getContent())
+                    .date(LocalDateTime.now())
+                    .likeCount(0)
+                    .reportCount(0)
+                    .postColor(PostColor.valueOf(data.getColor()))
+                    .sender(user)
+                    .build();
+        }
+        else{
+            //save post
+            post= Post.builder()
+                    .title(data.getTitle())
+                    .content(data.getContent())
+                    .date(LocalDateTime.now())
+                    .likeCount(0)
+                    .reportCount(0)
+                    .postColor(PostColor.valueOf(data.getColor()))
+                    .sender(user)
+                    .build();
+        }
+        postRepository.save(post);
+
+
+        //user api 추가 후 변경예정
+        List<User> randUser=userService.getRandUser(data.getReceiveGroup());
+        while(randUser.isEmpty()){
+            randUser=userService.getRandUser(data.getReceiveGroup());
+        }
+        for(User receive: randUser){
+            if(data.getIsReply()==null || !data.getIsReply() ) {
+                userPostService.addUserPost(UserPost.builder()
+                        .post(post)
+                        .originId(null)
+                        .isRead(false)
+                        .isReport(false)
+                        .isLike(false)
+                        .receiver(receive)
+                        .build());
+            }else{
+                if(userPostService.checkReply(data.getOriginId())){
+                    postRepository.delete(post);
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신한 편지입니다.");
+                }
+                userPostService.addUserPost(UserPost.builder()
+                        .post(post)
+                        .originId(getByPostId(data.getOriginId()).getId())
+                        .isRead(false)
+                        .isReport(false)
+                        .isLike(false)
+                        .receiver(receive)
+                        .build());
+            }
+        }
+
+        //save Interest
+        if(data.getKeyword()!=null) {
+            JSONParser parser = new JSONParser();
+            JSONArray keywordArray = (JSONArray) parser.parse(data.getKeyword()); //keyword parsing objcet
+
+            Set<PostInterest> postInterestSet = new HashSet<>();
+            for (int i = 0; i < keywordArray.size(); i++) {
+                if (keywordArray.get(i) != null) {
+                    String keyword = keywordArray.get(i).toString();
+                    Interest interest = interestService.addInterest(keyword);
+                    PostInterest postInterest = PostInterest.builder()
+                            .post(post)
+                            .interest(interest)
+                            .build();
+                    postInterestService.addPostInterest(postInterest);
+                    postInterestSet.add(postInterest);
+                }
+            }
+        }
+
+
+        //temp post 처리
+        user.setTempPost(0);
+        userService.saveUser(user);
+
+        //es search
+        //postDocumentRepository.save(new PostDocument(post));
+        return post.getId();
+    }
+
+    public Integer interStorePost(PostRequestDto.Create data)throws Exception{
+        Post post= new Post();
+        User user= userService.getCurrentUser();
+
+
+
+        if(groupService.getGroupByCode(data.getCode())!=null) {
             post= Post.builder()
                     .group(groupService.getGroupByCode(data.getCode()))
                     .title(data.getTitle())
@@ -85,7 +181,7 @@ public class PostService {
         //응답했는지 확인
         Optional<UserPost> checkReply= userPostRepository.findPostOptionByPostId(user.getId(),post.getId());
         if (checkReply.isPresent()){
-            if(checkReply.get().getIsReply()){
+            if(checkReply.get().getOriginId()!=null){
                 removePost(post.getId());
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 회신한 편지입니다.");
             }
@@ -97,7 +193,6 @@ public class PostService {
             JSONArray keywordArray = (JSONArray) parser.parse(data.getKeyword()); //keyword parsing objcet
 
             Set<PostInterest> postInterestSet = new HashSet<>();
-            log.info("{}", keywordArray.size());
             for (int i = 0; i < keywordArray.size(); i++) {
                 if (keywordArray.get(i) != null) {
                     String keyword = keywordArray.get(i).toString();
@@ -119,98 +214,29 @@ public class PostService {
             randUser=userService.getRandUser(data.getReceiveGroup());
         }
         for(User receive: randUser){
-            log.info("{}",data.getIsReply());
-            if(data.getIsReply()==null) {
-            userPostService.addUserPost(UserPost.builder()
-                    .post(post)
-                    .isReply(false)
-                    .isRead(false)
-                    .isReport(false)
-                    .isLike(false)
-                    .receiver(receive)
-                    .build());
-            }else{
+            if(data.getIsReply()==null || !data.getIsReply() ) {
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
-                        .isReply(data.getIsReply())
+                        .originId(null)
+                        .isRead(false)
+                        .isReport(false)
+                        .isLike(false)
+                        .receiver(receive)
+                        .build());
+            }else{
+                if(userPostService.checkReply(data.getOriginId())){
+                    postRepository.delete(post);
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신한 편지입니다.");
+                }
+                userPostService.addUserPost(UserPost.builder()
+                        .post(post)
+                        .originId(getByPostId(data.getOriginId()).getId())
                         .isRead(false)
                         .isReport(false)
                         .isLike(false)
                         .receiver(receive)
                         .build());
             }
-        }
-        //temp post 처리
-        user.setTempPost(0);
-        userService.saveUser(user);
-
-        //es search
-        //postDocumentRepository.save(new PostDocument(post));
-        return post.getId();
-    }
-
-    public Integer interStorePost(PostRequestDto.Create data)throws Exception{
-        Post post= new Post();
-        User user=userService.getCurrentUser();
-
-        if(groupRepository.findByCode(data.getCode()).isPresent()) {
-            post= Post.builder()
-                    .group(groupService.getGroupByCode(data.getCode()))
-                    .title(data.getTitle())
-                    .content(data.getContent())
-                    .date(LocalDateTime.now())
-                    .likeCount(0)
-                    .reportCount(0)
-                    .postColor(PostColor.valueOf(data.getColor()))
-                    .sender(user)
-                    .build();
-        }
-        else{
-            //save post
-            post= Post.builder()
-                    .title(data.getTitle())
-                    .content(data.getContent())
-                    .date(LocalDateTime.now())
-                    .likeCount(0)
-                    .reportCount(0)
-                    .postColor(PostColor.valueOf(data.getColor()))
-                    .sender(user)
-                    .build();
-        }
-        postRepository.save(post);
-
-        //save postInterest
-        JSONParser parser=new JSONParser();
-        JSONArray keywordArray= (JSONArray) parser.parse(data.getKeyword()); //keyword parsing objcet
-
-        Set<PostInterest> postInterestSet= new HashSet<>();
-        log.info("{}",keywordArray.size());
-        for(int i=0;i<keywordArray.size();i++){
-            if(keywordArray.get(i)!=null) {
-                String keyword = keywordArray.get(i).toString();
-                Interest interest=interestService.addInterest(keyword);
-                PostInterest postInterest =PostInterest.builder()
-                        .post(post)
-                        .interest(interest)
-                        .build();
-                postInterestService.addPostInterest(postInterest);
-                postInterestSet.add(postInterest);
-            }
-        }
-
-
-        //user api 추가 후 변경예정
-        List<User> randUser=userService.getRandUser(data.getReceiveGroup());
-
-        for(User receive: randUser){
-            userPostService.addUserPost(UserPost.builder()
-                    .post(post)
-                    .isReply(data.getIsReply())
-                    .isRead(false)
-                    .isReport(false)
-                    .isLike(false)
-                    .receiver(receive)
-                    .build());
         }
 
         //임시저장값 0으로
@@ -219,8 +245,17 @@ public class PostService {
         //save userPost
         return post.getId();
     }
-    public PostResponseDto.Info PostInfoById(Integer postId){
-        return PostResponseDto.Info.of(getByPostId(postId));
+    public List<PostResponseDto.Info> PostInfoById(Integer postId){
+        User user= userService.getCurrentUser();
+        UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
+
+        List<PostResponseDto.Info> infos= new ArrayList<>();
+        infos.add(PostResponseDto.Info.of(userPost.getPost()));
+
+        if(userPost.getOriginId()!=null) {
+            infos.add(PostResponseDto.Info.of(getByPostId(userPost.getOriginId())));
+        }
+        return infos;
     }
     public Integer checkingTempPost(){
         User user=userService.getCurrentUser();
@@ -264,7 +299,7 @@ public class PostService {
         Post post=getByPostId(id);
         User user=userService.getCurrentUser();
         UserPost userPost=userPostService.getByReceiverIdAndPostId(user.getId(),post.getId());
-        userPostService.checkingLike(userPost);
+        userPostService.checkLike(userPost);
         post.setLikeCount(post.getLikeCount()+1);
         postRepository.save(post);
         return post.getLikeCount();
@@ -287,7 +322,14 @@ public class PostService {
 
     public List<PostResponseDto.Simple> getLikedPost(Pageable pageable){
         User user= userService.getCurrentUser();
-        Page<Post> postPage= postRepository.findLikedPost(pageable);
+        Page<Post> postPage= postRepository.findLikedPost(user.getId(),pageable);
+        List<Post> post=postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
+
+    public List<PostResponseDto.Simple> searchGroupPostByWord(Integer groupId,String word,Pageable pageable){
+        User user=userService.getCurrentUser();
+        Page<Post> postPage =postRepository.findGroupPostByWord(groupId,word,pageable);
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
     }

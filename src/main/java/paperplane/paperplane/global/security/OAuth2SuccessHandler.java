@@ -8,6 +8,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
+import paperplane.paperplane.domain.group.service.GroupService;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.repository.UserRepository;
 import paperplane.paperplane.global.security.jwt.Token;
@@ -26,6 +27,7 @@ import java.util.Optional;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final TokenService tokenService;
     private final UserRepository userRepository;
+    private final GroupService groupService;
 
     @Transactional
     @Override

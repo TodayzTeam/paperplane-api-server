@@ -99,24 +99,11 @@ public class PostController {
         return ResponseEntity.ok(postService.increasePostLikeCount(postId));
     }
 
-    @ApiOperation("유저의 그룹 편지 중 제목, 내용으로 검색 user id/검색어 필요 // 아직 api 완성안됨- group api 완성되면 진행")
-    @GetMapping("/search/{userid}/{word}")
-    public ResponseEntity<List<PostResponseDto.Simple>> searchGroupPost(@PathVariable final Integer userid, final String word) throws Exception {
-        List<PostResponseDto.Simple> simpleList = new ArrayList<>();
-        simpleList.add(PostResponseDto.Simple.builder()
-                .title("title1")
-                .content("content1")
-                .likeCount(0)
-                .postColor(PostColor.RED)
-                .build());
-        simpleList.add(PostResponseDto.Simple.builder()
-                .title("title2")
-                .content("content2")
-                .likeCount(0)
-                .postColor(PostColor.RED)
-                .build());
-
-        return ResponseEntity.ok(simpleList);
+    @ApiOperation("유저의 그룹 편지 중 제목, 내용으로 검색. 그룹id,검색어 필요,헤더에 userId 필요")
+    @GetMapping("/search/{groupId}/{word}")
+    public ResponseEntity<List<PostResponseDto.Simple>> searchGroupPost(@PathVariable final Integer groupId,@PathVariable final String word, @RequestParam("page") Integer page) throws Exception {
+        PageRequest pageRequest= PageRequest.of(page,8);
+        return ResponseEntity.ok(postService.searchGroupPostByWord(groupId,word,pageRequest));
     }
     @ApiOperation("편지 읽음,신고,좋아요,응답 여부 확인, 헤더에 userId 필요")
     @GetMapping("/option/{postId}")
@@ -131,7 +118,7 @@ public class PostController {
     }
     @ApiOperation("편지 자세한 정보 postId 필요")
     @GetMapping("/info/{postId}")
-    public ResponseEntity<PostResponseDto.Info> postInfo(@PathVariable Integer postId) {
+    public ResponseEntity<List<PostResponseDto.Info>> postInfo(@PathVariable Integer postId) {
         return ResponseEntity.ok(postService.PostInfoById(postId));
     }
     /*@ApiOperation("음식 검색. 제목과 내용, 카테고리를 이용 -es search")
