@@ -115,7 +115,11 @@ public class PostService {
 
         //user api 추가 후 변경예정
         List<User> randUser=userService.getRandUser(data.getReceiveGroup());
+        while(randUser.isEmpty()){
+            randUser=userService.getRandUser(data.getReceiveGroup());
+        }
         for(User receive: randUser){
+            log.info("{}",data.getIsReply());
             if(data.getIsReply()==null) {
             userPostService.addUserPost(UserPost.builder()
                     .post(post)

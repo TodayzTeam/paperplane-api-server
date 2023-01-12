@@ -52,5 +52,4 @@ public class Post implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private User sender;
-
 }
