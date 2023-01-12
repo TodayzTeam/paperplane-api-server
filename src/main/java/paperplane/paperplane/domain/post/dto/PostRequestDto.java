@@ -36,8 +36,12 @@ public class PostRequestDto {
         @ApiModelProperty(value = "그룹 코드")
         private String code;
 
+        @NotNull
         @ApiModelProperty(value = "회신하는 편지인지 여부")
         private Boolean isReply;
+
+        @ApiModelProperty(value = "회신하는 편지인 경우 원본 편지 Id 필요")
+        private Integer originId;
     }
 
     @ApiModel(value="post 검색")

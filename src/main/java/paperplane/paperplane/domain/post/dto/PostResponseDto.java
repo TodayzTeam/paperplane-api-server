@@ -36,6 +36,7 @@ public class PostResponseDto implements Serializable {
         private List<PostInterestResponseDto> interest;
         private UserResponseDto.Simple sender;
         private List<UserPostResponseDto.Receivers> receivers;
+        //원본편지 id,title,content,날짜,isreply
 
         public static Info of(Post post){
                 return Info.builder()
@@ -70,6 +71,7 @@ public class PostResponseDto implements Serializable {
         private String content;
         private Integer likeCount;
         private PostColor postColor;
+        private LocalDateTime date;
 
         public static Simple of(Post post){
             return Simple.builder()
@@ -78,6 +80,7 @@ public class PostResponseDto implements Serializable {
                     .content(post.getContent())
                     .likeCount(post.getLikeCount())
                     .postColor(post.getPostColor())
+                    .date(post.getDate())
                     .build();
         }
 
