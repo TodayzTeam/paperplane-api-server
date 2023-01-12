@@ -16,14 +16,12 @@ public class UserPostResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Option {
-        private Boolean isReply;
         private Boolean isReport;
         private Boolean isRead;
         private Boolean isLike;
 
         public static UserPostResponseDto.Option of(UserPost userPost) {
             return UserPostResponseDto.Option.builder()
-                    .isReply(userPost.getIsReply())
                     .isReport(userPost.getIsReport())
                     .isRead(userPost.getIsRead())
                     .isLike(userPost.getIsLike()).build();

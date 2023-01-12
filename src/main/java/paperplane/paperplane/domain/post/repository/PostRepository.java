@@ -1,6 +1,7 @@
 package paperplane.paperplane.domain.post.repository;
 
 import io.lettuce.core.dynamic.annotation.Param;
+import io.swagger.models.auth.In;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,25 +19,19 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Page<Post> findAllByWord(@Param("word") String word, Pageable pageable);
     List<Post> findTop8ByOrderByLikeCountDesc();
 
-    /*@Query(value = "select * FROM Post p left join (SELECT * from User u where u.id =:id) as u",
-    countQuery = "select * FROM Post p left join (SELECT * from User u where u.id =:id) as u",
-    nativeQuery = true)*/
-    @Query(value = "select p from Post p join p.sender s on s.id=:id")
-    Page<Post> findSentPost(@Param("id")Integer id,Pageable pageable);
+    @Query(value = "select p from Post p inner join p.sender  s on s.id=:userId inner join p.userPosts up on up.isReport=false ")
+    Page<Post> findSentPost(@Param("userId")Integer userId,Pageable pageable);
 
-    /*@Query(value = "SELECT * from Post as p join p.userPosts as up join up.receiver as r on r.id = :id",
-    countQuery = "SELECT * from Post as p join p.userPosts as up join up.receiver as r on r.id = :id",
-    nativeQuery = true)*/
-    @Query(value = "select p from Post p join p.userPosts up on up.receiver.id=:id ")
-    Page<Post> findReceivedPost(@Param("id") Integer id, Pageable pageable);
 
-    /*@Query(value = "SELECT * from Post as p join p.userPosts as up on up.isLike=TRUE  ",
-            countQuery = "SELECT * from Post as p join p.userPosts as up on up.isLike=TRUE  ",
-            nativeQuery = true )*/
-    @Query(value = "select p from Post p join p.userPosts up on up.isLike=true ")
-    Page<Post> findLikedPost(Pageable pageable);
+    @Query(value = "select p from Post p inner join p.userPosts up on (up.receiver.id=:userId and up.isReport=false)")
+    Page<Post> findReceivedPost(@Param("userId") Integer userId, Pageable pageable);
 
+    @Query(value = "select p from Post p inner join p.userPosts up on (up.receiver.id=:userId and up.isReport=false AND up.isLike=true )")
+    Page<Post> findLikedPost(@Param("userId") Integer userId, Pageable pageable);
 
     @Query(value = "select * from Post p where p.sender_id=:userId and p.id=:postId",nativeQuery = true)
     List<Post> test(@Param("userId") Integer userId, @Param("postId") Integer postId);
+
+    @Query(value = "SELECT p FROM Post p inner join Group g on g.id=:groupId inner join p.userPosts up on up.isReport=false where((p.content like CONCAT('%',:word,'%')) or (p.title like CONCAT('%',:word,'%')) ) ")
+    Page<Post> findGroupPostByWord(@Param("groupId")Integer groupId,@Param("word") String word, Pageable pageable);
 }
