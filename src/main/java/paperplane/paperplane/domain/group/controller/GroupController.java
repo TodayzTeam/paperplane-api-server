@@ -28,12 +28,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService groupService;
-    private final UserService userService;
 
     @ApiOperation("그룹 생성")
     @PostMapping("/create")
     public ResponseEntity<Integer> createGroup(GroupRequestDto.Create create) throws Exception {
-        return ResponseEntity.ok(groupService.createGroup(create, userService.getLoginUser()));
+        return ResponseEntity.ok(groupService.createGroup(create));
     }
 
     @ApiOperation("그룹 삭제")
@@ -44,21 +43,21 @@ public class GroupController {
     }
 
     @ApiOperation("그룹 요약 정보 조회")
-    @GetMapping("/simple/{id}")
-    public ResponseEntity<GroupResponseDto.Simple> getGroupInfo(@PathVariable Integer id) throws Exception {
-        return ResponseEntity.ok(GroupResponseDto.Simple.of(groupService.getGroupById(id)));
+    @GetMapping("/simple/{groupId}")
+    public ResponseEntity<GroupResponseDto.Simple> getGroupInfo(@PathVariable Integer groupId) throws Exception {
+        return ResponseEntity.ok(GroupResponseDto.Simple.of(groupService.getGroupById(groupId)));
     }
 
     @ApiOperation("그룹 참가")
     @PostMapping("/join")
     public ResponseEntity<GroupResponseDto.Info> joinGroup(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
-        return ResponseEntity.ok(GroupResponseDto.Info.of(groupService.joinGroup(groupCode, userService.getLoginUser())));
+        return ResponseEntity.ok(GroupResponseDto.Info.of(groupService.joinGroup(groupCode)));
     }
 
     @ApiOperation("그룹 탈퇴")
     @PostMapping("/resign")
     public ResponseEntity<Void> resignGroup(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
-        groupService.resignGroup(groupCode, userService.getLoginUser());
+        groupService.resignGroup(groupCode);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -70,9 +69,8 @@ public class GroupController {
 
     @ApiOperation("해당 그룹의 그룹원 목록")
     @GetMapping("users/{name}")
-    public ResponseEntity<PageImpl<UserResponseDto.Simple>> getGroupUserList(@PathVariable String name, @RequestParam("page") Integer page) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page, 6);
-        return ResponseEntity.ok(groupService.getGroupMemberListByName(name, pageRequest));
+    public ResponseEntity<List<UserResponseDto.Simple>> getGroupUserList(@PathVariable String name) throws Exception {
+        return ResponseEntity.ok(UserResponseDto.Simple.of(groupService.getGroupMemberListByName(name)));
     }
 
     @ApiOperation("내 그룹들 정보 조회")
