@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import paperplane.paperplane.domain.group.Group;
@@ -15,6 +17,7 @@ import paperplane.paperplane.domain.group.repository.GroupRepository;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.dto.UserResponseDto;
 import paperplane.paperplane.domain.user.repository.UserRepository;
+import paperplane.paperplane.domain.user.service.UserService;
 import paperplane.paperplane.domain.usergroup.UserGroup;
 import paperplane.paperplane.domain.usergroup.UserRole;
 import paperplane.paperplane.domain.usergroup.repository.UserGroupRepository;
@@ -51,9 +54,16 @@ public class GroupService {
         return userGroupRepository.getMyGroupList(userId);
     }
 
-    public Integer createGroup(GroupRequestDto.Create create, Integer userId){
+    public Integer getLoginUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        return user.getId();
+    }
+
+    public Integer createGroup(GroupRequestDto.Create create){
         checkDuplicateGroup(create.getName());
 
+        Integer userId = getLoginUser();
         User user = userRepository.findById(userId).get();
         Group group = create.toEntity();
         groupRepository.save(group);
@@ -75,7 +85,8 @@ public class GroupService {
         groupRepository.delete(group);
     }
 
-    public Group joinGroup(GroupRequestDto.GroupCode groupCode, Integer userId){
+    public Group joinGroup(GroupRequestDto.GroupCode groupCode){
+        Integer userId = getLoginUser();
         User user = userRepository.findById(userId).get();
         Group group = getGroupByCode(groupCode.getCode());
 
@@ -95,13 +106,16 @@ public class GroupService {
         return group;
     }
 
-    public void resignGroup(GroupRequestDto.GroupCode groupCode, Integer userId){
+    public void resignGroup(GroupRequestDto.GroupCode groupCode){
         Group group = getGroupByCode(groupCode.getCode());
+        Integer userId = getLoginUser();
+
         //그룹에 가입했는지 & 그룹장은 탈퇴 못함
         Optional<UserGroup> userGroupOptional = userGroupRepository.findByCodeAndEmail(group.getId(), userId);
         if(userGroupOptional.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가입한 그룹이 아닙니다.");
         }
+
         UserGroup userGroup = userGroupOptional.get();
         if(userGroup.getUserRole().equals(UserRole.OWNER)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "그룹장은 탈퇴할 수 없습니다.");
@@ -109,10 +123,8 @@ public class GroupService {
         userGroupRepository.delete(userGroup);
     }
 
-    public PageImpl<UserResponseDto.Simple> getGroupMemberListByName(String name, Pageable pageable){
-        Page<User> page = groupRepository.getGroupMemberListByName(name, pageable);
-        List<User> groupMemberList = page.stream().collect(Collectors.toList());
-        return new PageImpl<>(UserResponseDto.Simple.of(groupMemberList), pageable, page.getTotalPages());
+    public List<User> getGroupMemberListByName(String name){
+        return groupRepository.getGroupMemberListByName(name);
     }
 
     public void checkDuplicateGroup(String name){

@@ -19,7 +19,7 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
     boolean existsByName(String name);
 
     @Query(value = "select gu.user from Group g join g.userGroups gu where g.name = :name")
-    Page<User> getGroupMemberListByName(@org.springframework.data.repository.query.Param("name") String name, Pageable pageable);
+    List<User> getGroupMemberListByName(@org.springframework.data.repository.query.Param("name") String name);
 
     @Query(value = "select User FROM Group g where g.code = :code", nativeQuery = true)
     public List<User> findGroupUserByCode(@Param("code") String code);
