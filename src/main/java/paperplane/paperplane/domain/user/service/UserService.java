@@ -70,9 +70,6 @@ public class UserService {
 
     public Integer getLoginUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
-        }
         User user = (User) authentication.getPrincipal();
         return user.getId();
     }
@@ -106,7 +103,8 @@ public class UserService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "해당하는 회원이 없습니다."));
     }
 
-    public void addInterest(Integer userId, String keyword) throws ParseException {
+    public void addInterest(String keyword) throws ParseException {
+        Integer userId = getLoginUser();
         User user = getUserById(userId);
 
         JSONParser parser = new JSONParser();
@@ -132,13 +130,21 @@ public class UserService {
         }
     }
 
-    public void deleteUser(User user) {
-        userRepository.delete(userRepository.findById(user.getId()).orElseThrow(()->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "해당하는 회원이 없습니다.")));
+    public void logout(){
+        Integer userId = getLoginUser();
+        User user = getUserById(userId);
+        user.setRefreshToken(null);
     }
 
-    public User updateUser(Integer id, UserRequestDto.Profile profile) throws ParseException {
-        User user = getUserById(id);
+    public void deleteUser() {
+        Integer userId = getLoginUser();
+        User user = getUserById(userId);
+        userRepository.delete(user);
+    }
+
+    public User updateUser(UserRequestDto.Profile profile) throws ParseException {
+        Integer userId = getLoginUser();
+        User user = getUserById(userId);
         user.updateProfile(profile);
 
         JSONParser parser = new JSONParser();
@@ -165,7 +171,8 @@ public class UserService {
         return user;
     }
 
-    public String updateProfileImage(Integer id, MultipartFile file) throws IOException {
+    public String updateProfileImage(MultipartFile file) throws IOException {
+        Integer userId = getLoginUser();
         String uploadPath = "/home/ubuntu/app/img/";
         String uploadFileName = file.getOriginalFilename();
 
@@ -173,8 +180,7 @@ public class UserService {
         File newFile = new File(uploadPath + uploadFileName);
         file.transferTo(newFile);
 
-        User user = getUserById(id);
-
+        User user = getUserById(userId);
         user.setProfileImageUrl(newFile.toString());
 
         return user.getProfileImageUrl();

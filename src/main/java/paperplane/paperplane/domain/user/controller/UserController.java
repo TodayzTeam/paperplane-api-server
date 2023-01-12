@@ -27,64 +27,52 @@ public class UserController {
     private final UserService userService;
 
     @ApiOperation("회원가입 후 관심사 등록")
-    @PostMapping("/interest/{id}")
-    public ResponseEntity<Void> addInterest(@PathVariable Integer id, String keyword) throws ParseException {
-        userService.addInterest(id, keyword);
+    @PostMapping("/interest")
+    public ResponseEntity<Void> addInterest(String keyword) throws ParseException {
+        userService.addInterest(keyword);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @ApiOperation("내 전체 정보 조회")
-    @GetMapping("/profile/{id}")
-    public ResponseEntity<UserResponseDto.Info> getMyProfile(@PathVariable Integer id) throws Exception {
-        User user = userService.getUserById(id);
+    @GetMapping("/profile")
+    public ResponseEntity<UserResponseDto.Info> getMyProfile() throws Exception {
+        User user = userService.getUserById(userService.getLoginUser());
         return ResponseEntity.ok(UserResponseDto.Info.of(user));
     }
 
-    @ApiOperation("액세스 토큰으로 유저 아이디 반환")
-    @GetMapping("/token")
-    public ResponseEntity<Integer> getMyProfileByToken(@RequestHeader(name = "accessToken") String accessToken){
-        return ResponseEntity.ok(userService.getUserByToken(accessToken));
-    }
-
     @ApiOperation("내 요약 정보 조회")
-    @GetMapping("/simple/{id}")
-    public ResponseEntity<UserResponseDto.Simple> getMySimple(@PathVariable Integer id) throws Exception {
-        User user = userService.getUserById(id);
-
+    @GetMapping("/simple")
+    public ResponseEntity<UserResponseDto.Simple> getMySimple() throws Exception {
+        User user = userService.getUserById(userService.getLoginUser());
         return ResponseEntity.ok(UserResponseDto.Simple.of(user));
     }
 
     @ApiOperation("내 정보 수정")
-    @PutMapping("/update/{id}")
-    public ResponseEntity<UserResponseDto.Info> updateProfile(@Valid UserRequestDto.Profile profile, @PathVariable Integer id) throws Exception {
-        User user = userService.updateUser(id, profile);
-
+    @PutMapping("/update")
+    public ResponseEntity<UserResponseDto.Info> updateProfile(@Valid UserRequestDto.Profile profile) throws Exception {
+        User user = userService.updateUser(profile);
         return ResponseEntity.ok(UserResponseDto.Info.of(user));
     }
 
     @ApiOperation("프로필 이미지 변경")
-    @PutMapping("/update/image/{id}")
-    public ResponseEntity<String> updateProfileImage(@PathVariable Integer id, @RequestParam MultipartFile file) throws Exception {
-        return ResponseEntity.ok(userService.updateProfileImage(id, file));
+    @PutMapping("/update/image")
+    public ResponseEntity<String> updateProfileImage(@RequestParam MultipartFile file) throws Exception {
+        return ResponseEntity.ok(userService.updateProfileImage(file));
     }
 
     @ApiOperation("로그아웃")
-    @PostMapping("/logout/{id}")
-    public ResponseEntity<Void> logout(@PathVariable Integer id){
-        User user = userService.getUserById(id);
-        user.setRefreshToken(null);
-
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(){
+        userService.logout();
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @ApiOperation("탈퇴")
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> updateProfile(@PathVariable Integer id) throws Exception {
-        userService.deleteUser(userService.getUserById(id));
-
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> updateProfile() throws Exception {
+        userService.deleteUser();
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
 
     @ApiOperation("모든 user Id만 반환")
     @GetMapping("/allid")

@@ -60,12 +60,14 @@ public class UserResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Simple{
+        private Integer id;
         private String name;
         private String email;
         private String profileImageUrl;
 
         public static Simple of(User user){
             return Simple.builder()
+                    .id(user.getId())
                     .name(user.getName())
                     .email(user.getEmail())
                     .profileImageUrl(user.getProfileImageUrl())
