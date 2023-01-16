@@ -72,8 +72,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         cookie.setPath("/");
         response.addCookie(cookie);
 
-        log.info("url = {}",  url);
-
         getRedirectStrategy().sendRedirect(request, response, url);
     }
 
