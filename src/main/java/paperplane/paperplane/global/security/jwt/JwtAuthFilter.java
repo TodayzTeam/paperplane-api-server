@@ -7,7 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 import paperplane.paperplane.domain.user.User;
-import paperplane.paperplane.domain.user.repository.UserRepository;
+import paperplane.paperplane.domain.user.service.UserService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -20,7 +20,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends GenericFilterBean {
     private final TokenService tokenService;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -28,9 +28,12 @@ public class JwtAuthFilter extends GenericFilterBean {
 
         if(token != null && tokenService.verifyToken(token)){
             String email = tokenService.getUid(token);
+            User user =  userService.getUserByEmail(email);
 
-            Authentication auth = getAuthentication(userRepository.findByEmail(email).get());
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            if(user.getRefreshToken() != null) {
+                Authentication auth = getAuthentication(user);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
         }
 
         chain.doFilter(request, response);
