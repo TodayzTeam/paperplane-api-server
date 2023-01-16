@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers( "/token/**", "/post/popular","/v3/api-docs",
+                .antMatchers( "/token/**", "/post/popular","/v2/api-docs",
                         "/swagger*/**","/oauth2/**").permitAll()
                 .anyRequest().authenticated()
 //                .anyRequest().permitAll()// 임시 설정
