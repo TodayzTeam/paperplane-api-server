@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import paperplane.paperplane.domain.Interest.Interest;
 import paperplane.paperplane.domain.Interest.service.InterestService;
+import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.group.repository.GroupRepository;
 import paperplane.paperplane.domain.group.service.GroupService;
 import paperplane.paperplane.domain.post.Post;
@@ -248,7 +249,25 @@ public class PostService {
         UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
 
         List<PostResponseDto.Info> infos= new ArrayList<>();
-        infos.add(PostResponseDto.Info.of(userPost.getPost()));
+        Post post=userPost.getPost();
+
+        if(post.getGroup()==null){
+            infos.add(PostResponseDto.Info.of(Post.builder()
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .postInterests(post.getPostInterests())
+                    .postColor(post.getPostColor())
+                    .likeCount(post.getLikeCount())
+                    .sender(post.getSender())
+                    .reportCount(post.getReportCount())
+                    .date(post.getDate())
+                    .content(post.getContent())
+                    .userPosts(post.getUserPosts())
+                    .group(new Group())
+                    .build()));
+        }else {
+            infos.add(PostResponseDto.Info.of(post));
+        }
 
         if(userPost.getOriginId()!=null) {
             infos.add(PostResponseDto.Info.of(getByPostId(userPost.getOriginId())));
