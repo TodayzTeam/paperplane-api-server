@@ -57,8 +57,7 @@ public class PostService {
         User user= userService.getCurrentUser();
 
 
-
-        if(groupService.getGroupByCode(data.getCode())!=null) {
+        if(groupRepository.findByCode(data.getCode()).isPresent()) {
             post= Post.builder()
                     .group(groupService.getGroupByCode(data.getCode()))
                     .title(data.getTitle())
@@ -152,7 +151,7 @@ public class PostService {
 
 
 
-        if(groupService.getGroupByCode(data.getCode())!=null) {
+        if(groupRepository.findByCode(data.getCode()).isPresent()) {
             post= Post.builder()
                     .group(groupService.getGroupByCode(data.getCode()))
                     .title(data.getTitle())
