@@ -47,7 +47,7 @@ public class PostResponseDto implements Serializable {
                         .reportCount(post.getReportCount())
                         .likeCount(post.getLikeCount())
                         .postColor(post.getPostColor())
-                        //.group(GroupResponseDto.Simple.of(post.getGroup()))
+                        .group(GroupResponseDto.Simple.of(post.getGroup()))
                         .interest(PostInterestResponseDto.of(new ArrayList<>(post.getPostInterests())))
                         .sender(UserResponseDto.Simple.of(post.getSender()))
                         .receivers(UserPostResponseDto.Receivers.of(new ArrayList<>(post.getUserPosts())))
