@@ -54,8 +54,7 @@ public class PostService {
     //private final PostDocumentRepository postDocumentRepository;
     public Integer addPost(PostRequestDto.Create data) throws Exception{
         Post post= new Post();
-        User user= userService.getCurrentUser();
-
+        User user= userService.getUserById(userService.getLoginUser());
 
         if(groupRepository.findByCode(data.getCode()).isPresent()) {
             post= Post.builder()
@@ -147,7 +146,7 @@ public class PostService {
 
     public Integer interStorePost(PostRequestDto.Create data)throws Exception{
         Post post= new Post();
-        User user= userService.getCurrentUser();
+        User user= userService.getUserById(userService.getLoginUser());
 
 
 
@@ -245,7 +244,7 @@ public class PostService {
         return post.getId();
     }
     public List<PostResponseDto.Info> PostInfoById(Integer postId){
-        User user= userService.getCurrentUser();
+        User user= userService.getUserById(userService.getLoginUser());
         UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
 
         List<PostResponseDto.Info> infos= new ArrayList<>();
@@ -257,8 +256,8 @@ public class PostService {
         return infos;
     }
     public Integer checkingTempPost(){
-        User user=userService.getCurrentUser();
-            return user.getTempPost();
+        User user= userService.getUserById(userService.getLoginUser());
+        return user.getTempPost();
     }
     public void removePost(Integer id){
         postRepository.delete(getByPostId(id));
@@ -277,13 +276,13 @@ public class PostService {
         return PostResponseDto.Simple.of(postRepository.findTop8ByOrderByLikeCountDesc());
     }
     public List<PostResponseDto.Simple> getSentPost(Pageable pageable){
-        User user=userService.getCurrentUser();
+        User user= userService.getUserById(userService.getLoginUser());
         Page<Post> postPage =postRepository.findSentPost(user.getId(),pageable);
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
     }
     public List<PostResponseDto.Simple> getReceivedPost(Pageable pageable){
-        User user= userService.getCurrentUser();
+        User user= userService.getUserById(userService.getLoginUser());
         Page<Post> postPage= postRepository.findReceivedPost(user.getId(),pageable);
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
@@ -296,7 +295,7 @@ public class PostService {
 
     public Integer increasePostLikeCount (Integer id) throws Exception{
         Post post=getByPostId(id);
-        User user=userService.getCurrentUser();
+        User user= userService.getUserById(userService.getLoginUser());
         UserPost userPost=userPostService.getByReceiverIdAndPostId(user.getId(),post.getId());
         userPostService.checkLike(userPost);
         post.setLikeCount(post.getLikeCount()+1);
@@ -305,7 +304,7 @@ public class PostService {
     }
     public Integer increasePostReportCount(Integer id)throws Exception{
         Post post=getByPostId(id);
-        User user=userService.getCurrentUser();
+        User user= userService.getUserById(userService.getLoginUser());
         UserPost userPost=userPostService.getByReceiverIdAndPostId(user.getId(),post.getId());
         userPostService.checkingReport(userPost);
         post.setReportCount(post.getReportCount()+1);
@@ -320,14 +319,14 @@ public class PostService {
     }
 
     public List<PostResponseDto.Simple> getLikedPost(Pageable pageable){
-        User user= userService.getCurrentUser();
+        User user= userService.getUserById(userService.getLoginUser());
         Page<Post> postPage= postRepository.findLikedPost(user.getId(),pageable);
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
     }
 
     public List<PostResponseDto.Simple> searchGroupPostByWord(Integer groupId,String word,Pageable pageable){
-        User user=userService.getCurrentUser();
+        User user= userService.getUserById(userService.getLoginUser());
         Page<Post> postPage =postRepository.findGroupPostByWord(groupId,word,pageable);
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);

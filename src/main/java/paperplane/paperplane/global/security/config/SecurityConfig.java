@@ -43,9 +43,9 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-//                .antMatchers("/", "/token/**", "/post/popular").permitAll()
-//                .anyRequest().authenticated()
-                .anyRequest().permitAll()// 임시 설정
+                .antMatchers( "/token/**", "/post/popular").permitAll()
+                .anyRequest().authenticated()
+//                .anyRequest().permitAll()// 임시 설정
                 .and()
                 .oauth2Login().loginPage("/token/expired")
                 .successHandler(successHandler)
