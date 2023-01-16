@@ -28,13 +28,14 @@ public class PostController {
     private final PostService postService;
     private final UserPostService userPostService;
 
-    @ApiOperation("편지 최종 송신, 헤더에 userId 필요")
+    @ApiOperation("편지 최종 송신")
     @PostMapping("/create")
     public ResponseEntity<Integer> createPost(@Valid PostRequestDto.Create create) throws Exception {
         return ResponseEntity.ok(postService.addPost(create));
     }
 
-    @ApiOperation("편지 중간저장, 헤더에 userId 필요")
+    @ApiOperation("편지 중간저장")
+
     @PostMapping("/save")
     public ResponseEntity<Integer> saveTempPost(@Valid PostRequestDto.Create create) throws Exception {
         return ResponseEntity.ok(postService.interStorePost(create));
@@ -53,7 +54,7 @@ public class PostController {
         PageRequest pageRequest= PageRequest.of(page,8);
         return ResponseEntity.ok(postService.SearchPostByWord(word,pageRequest));
     }
-    @ApiOperation("보낸 편지, 헤더에 userId 필요")
+    @ApiOperation("보낸 편지")
     @GetMapping("/sent")
     public ResponseEntity<List<PostResponseDto.Simple>> sentPost(@RequestParam("page") Integer page) {
         PageRequest pageRequest= PageRequest.of(page,8);
@@ -68,20 +69,20 @@ public class PostController {
     }
 
 
-    @ApiOperation("받은 편지, 헤더에 userId 필요")
+    @ApiOperation("받은 편지, 헤더에")
     @GetMapping("/received")
     public ResponseEntity<List<PostResponseDto.Simple>> receivedPost(@RequestParam("page") Integer page) {
         PageRequest pageRequest= PageRequest.of(page,8);
         return ResponseEntity.ok(postService.getReceivedPost(pageRequest));
     }
-    @ApiOperation("좋아요 누른 편지, 헤더에 userId 필요")
+    @ApiOperation("좋아요 누른 편지")
     @GetMapping("/liked")
     public ResponseEntity<List<PostResponseDto.Simple>> likedPostList(@RequestParam("page") Integer page){
         PageRequest pageRequest= PageRequest.of(page,8);
         return ResponseEntity.ok(postService.getLikedPost(pageRequest));
     }
 
-    @ApiOperation("편지 신고, 헤더에 userId 필요, 5회 누적시 편지 삭제")
+    @ApiOperation("편지 신고, 5회 누적시 편지 삭제")
     @GetMapping("/report/{postId}")
     public ResponseEntity<Integer> reportPost(@PathVariable Integer postId) throws Exception {
         return ResponseEntity.ok(postService.increasePostReportCount(postId)) ;
@@ -93,25 +94,25 @@ public class PostController {
         return ResponseEntity.ok(postService.getLikeCountByPostId(postId));
     }
 
-    @ApiOperation("편지 좋아요 누르기, 헤더에 userId 필요")
+    @ApiOperation("편지 좋아요 누르기, 헤더에")
     @GetMapping("/like/push/{postId}")
     public ResponseEntity<Integer> likePost(@PathVariable Integer postId) throws Exception {
         return ResponseEntity.ok(postService.increasePostLikeCount(postId));
     }
 
-    @ApiOperation("유저의 그룹 편지 중 제목, 내용으로 검색. 그룹id,검색어 필요,헤더에 userId 필요")
+    @ApiOperation("유저의 그룹 편지 중 제목, 내용으로 검색. 그룹id,검색어 필요")
     @GetMapping("/search/{groupId}/{word}")
     public ResponseEntity<List<PostResponseDto.Simple>> searchGroupPost(@PathVariable final Integer groupId,@PathVariable final String word, @RequestParam("page") Integer page) throws Exception {
         PageRequest pageRequest= PageRequest.of(page,8);
         return ResponseEntity.ok(postService.searchGroupPostByWord(groupId,word,pageRequest));
     }
-    @ApiOperation("편지 읽음,신고,좋아요,응답 여부 확인, 헤더에 userId 필요")
+    @ApiOperation("편지 읽음,신고,좋아요,응답 여부 확인")
     @GetMapping("/option/{postId}")
     public ResponseEntity<UserPostResponseDto.Option> postOption(@PathVariable Integer postId) {
         return ResponseEntity.ok(userPostService.getPostOption(postId));
     }
 
-    @ApiOperation("임시저장 편지 있는지 여부, 있으면 임시저장 편지 id 반환 없음 0 반환, 헤더에 userId 필요")
+    @ApiOperation("임시저장 편지 있는지 여부, 있으면 임시저장 편지 id 반환 없음 0 반환")
     @GetMapping("/temp")
     public ResponseEntity<Integer> tempPost(){
         return ResponseEntity.ok(postService.checkingTempPost());

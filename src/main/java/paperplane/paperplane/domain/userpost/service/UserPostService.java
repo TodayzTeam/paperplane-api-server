@@ -46,14 +46,14 @@ public class UserPostService {
         }
     }
     public UserPostResponseDto.Option getPostOption(Integer postId){
-        User user= userService.getCurrentUser();
+        User user= userService.getUserById(userService.getLoginUser());
         UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
 
         return UserPostResponseDto.Option.of(userPost);
     }
 
     public Boolean checkReply(Integer postId){
-        User user= userService.getCurrentUser();
+        User user= userService.getUserById(userService.getLoginUser());
         log.info("checkReply");
         if(userPostRepository.findPostOptionByPostId(user.getId(),postId).isPresent()){
             return true;

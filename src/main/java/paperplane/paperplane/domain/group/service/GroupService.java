@@ -50,7 +50,11 @@ public class GroupService {
         return groupRepository.findByNameContaining(name);
     }
 
-    public List<Group> getMyGroupList(Integer userId){
+    public List<Group> getMyGroupList()throws Exception{
+        Integer userId=getLoginUser();
+        if(getLoginUser()==null){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"다시 로그인하세요");
+        }
         return userGroupRepository.getMyGroupList(userId);
     }
 
@@ -80,9 +84,22 @@ public class GroupService {
         return group.getId();
     }
 
-    public void deleteGroup(GroupRequestDto.GroupCode groupCode, String email){
+    public void deleteGroup(GroupRequestDto.GroupCode groupCode)throws Exception{
+        Integer userId= getLoginUser();
+        User user=userRepository.findById(getLoginUser()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당 유저를 찾을 수 없습니다."));
         Group group=getGroupByCode(groupCode.getCode());
-        groupRepository.delete(group);
+        if(userGroupRepository.findByCodeAndEmail(group.getId(), userId).isPresent()){
+            UserGroup userGroup=userGroupRepository.findByCodeAndEmail(group.getId(), userId).get();
+            if(userGroup.getUserRole()==UserRole.OWNER){
+                groupRepository.delete(group);
+            }
+            else{
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"그룹장이 아닙니다.");
+            }
+        }
+        else{
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"그룹에서 해당 유저를 찾을 수 없습니다.");
+        }
     }
 
     public Group joinGroup(GroupRequestDto.GroupCode groupCode){

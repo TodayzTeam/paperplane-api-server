@@ -38,7 +38,7 @@ public class GroupController {
     @ApiOperation("그룹 삭제")
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteGroup(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
-        //  groupService.deleteGroup(groupCode, email);
+        groupService.deleteGroup(groupCode);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -74,8 +74,8 @@ public class GroupController {
     }
 
     @ApiOperation("내 그룹들 정보 조회")
-    @GetMapping("/{userId}")
-    public ResponseEntity <List<GroupResponseDto.Simple>> getMyGroup(@PathVariable Integer userId) throws Exception {
-        return ResponseEntity.ok(GroupResponseDto.Simple.of(groupService.getMyGroupList(userId)));
+    @GetMapping("/mygroup")
+    public ResponseEntity <List<GroupResponseDto.Simple>> getMyGroup() throws Exception {
+        return ResponseEntity.ok(GroupResponseDto.Simple.of(groupService.getMyGroupList()));
     }
 }
