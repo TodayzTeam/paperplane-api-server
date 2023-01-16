@@ -52,7 +52,7 @@ public class InterestService {
     }
 
     public List<InterestResponseDto.Info> getMyInterest(){
-        User user=userService.getCurrentUser();
+        User user= userService.getUserById(userService.getLoginUser());
         return InterestResponseDto.Info.of(interestRepository.findMyInterest(user.getId()));
     }
     public List<InterestResponseDto.Info> recommendInterest(){
