@@ -294,7 +294,24 @@ public class PostService {
         }
 
         if(userPost.getOriginId()!=null && !userPost.getOriginId().equals(post.getId())) {
-            infos.add(PostResponseDto.Info.of(getByPostId(userPost.getOriginId())));
+            post=getByPostId(userPost.getOriginId());
+            if(post.getGroup()==null){
+                infos.add(PostResponseDto.Info.of(Post.builder()
+                        .id(post.getId())
+                        .title(post.getTitle())
+                        .postInterests(post.getPostInterests())
+                        .postColor(post.getPostColor())
+                        .likeCount(post.getLikeCount())
+                        .sender(post.getSender())
+                        .reportCount(post.getReportCount())
+                        .date(post.getDate())
+                        .content(post.getContent())
+                        .userPosts(post.getUserPosts())
+                        .group(new Group())
+                        .build()));
+            }else {
+                infos.add(PostResponseDto.Info.of(post));
+            }
         }
         return infos;
     }

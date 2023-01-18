@@ -88,9 +88,9 @@ public class UserService {
         //편지 제약조건에 따라 추후 수정
         if(randUser.equals("RAND")){
             List<User> users =userRepository.findRandUserList();
-            for(User user:users)
-                log.info("{}",user);
-
+            while (users.isEmpty()){
+                users =userRepository.findRandUserList();
+            }
             return users;
         } else if (randUser.equals(groupService.getGroupByCode(randUser).getCode())) {
             return groupService.getGroupUserByCode(randUser);
