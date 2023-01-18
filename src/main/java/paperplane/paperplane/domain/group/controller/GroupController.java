@@ -61,10 +61,10 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @ApiOperation("그룹을 그룹명으로 검색")
-    @GetMapping("search/{name}")
-    public ResponseEntity<List<GroupResponseDto.Simple>> findGroup(@PathVariable String name) throws Exception {
-        return ResponseEntity.ok(GroupResponseDto.Simple.of(groupService.getGroupListByName(name)));
+    @ApiOperation("그룹을 그룹코드로 검색")
+    @GetMapping("search/{code}")
+    public ResponseEntity<GroupResponseDto.Simple> findGroup(@PathVariable String code) throws Exception {
+        return ResponseEntity.ok(GroupResponseDto.Simple.of(groupService.getGroupByCode(code)));
     }
 
     @ApiOperation("해당 그룹의 그룹원 목록")

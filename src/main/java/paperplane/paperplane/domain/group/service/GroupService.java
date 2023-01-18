@@ -45,10 +45,6 @@ public class GroupService {
     public Group getGroupById(Integer id){
         return groupRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 그룹을 찾을 수 없습니다."));
     }
-    
-    public List<Group> getGroupListByName(String name){
-        return groupRepository.findByNameContaining(name);
-    }
 
     public List<Group> getMyGroupList()throws Exception{
         Integer userId=getLoginUser();
