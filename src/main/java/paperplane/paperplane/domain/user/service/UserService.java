@@ -70,6 +70,9 @@ public class UserService {
 
     public Integer getLoginUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication.getPrincipal().equals("anonymousUser")){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"다시 로그인하세요");
+        }
         User user = (User) authentication.getPrincipal();
         return user.getId();
     }

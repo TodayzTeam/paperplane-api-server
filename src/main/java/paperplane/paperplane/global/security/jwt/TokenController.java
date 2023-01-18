@@ -1,9 +1,11 @@
 package paperplane.paperplane.global.security.jwt;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +19,7 @@ public class TokenController {
 
     @GetMapping("/token/expired")
     public String auth() {
-        throw new RuntimeException();
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "access token이 만료되었습니다.");
     }
 
     //access 토큰 만료시 refresh 토큰을 통해 재발급
