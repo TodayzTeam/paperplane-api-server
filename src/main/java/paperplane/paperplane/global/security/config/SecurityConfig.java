@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers( "/token/**", "/post/popular","/v2/api-docs",
-                        "/swagger*/**","/oauth2/**","/login/**").permitAll()
+                        "/swagger*/**","/oauth2/**","/").permitAll()
                 .anyRequest().authenticated()
 //                .anyRequest().permitAll()// 임시 설정
                 .and()
