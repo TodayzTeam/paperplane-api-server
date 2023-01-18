@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
 //                .anyRequest().permitAll()// 임시 설정
                 .and()
-                .oauth2Login().loginPage("/token/expired")
+                .oauth2Login().loginPage("/")
                 .successHandler(successHandler)
                 .userInfoEndpoint().userService(userOAuth2Service);
 
