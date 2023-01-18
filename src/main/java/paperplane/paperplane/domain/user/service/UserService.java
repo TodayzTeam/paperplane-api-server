@@ -83,10 +83,14 @@ public class UserService {
     }
 
     public List<User> getRandUser(String randUser) throws Exception{
+        log.info("{}",randUser);
 
         //편지 제약조건에 따라 추후 수정
         if(randUser.equals("RAND")){
             List<User> users =userRepository.findRandUserList();
+            for(User user:users)
+                log.info("{}",user);
+
             return users;
         } else if (randUser.equals(groupService.getGroupByCode(randUser).getCode())) {
             return groupService.getGroupUserByCode(randUser);

@@ -14,6 +14,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
 
-    @Query(value = "SELECT * FROM User u where u.randId>FLOOR((RAND()*100000000)) ORDER BY u.randId limit 5", nativeQuery = true)
+    @Query(value = "SELECT distinct * FROM User u where u.randId>FLOOR((RAND()*100000000)) ORDER BY u.randId limit 5 ", nativeQuery = true)
     List<User>findRandUserList();
 }

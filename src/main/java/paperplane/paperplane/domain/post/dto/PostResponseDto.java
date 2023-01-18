@@ -36,7 +36,7 @@ public class PostResponseDto implements Serializable {
         private List<PostInterestResponseDto> interest;
         private UserResponseDto.Simple sender;
         private List<UserPostResponseDto.Receivers> receivers;
-        //원본편지 id,title,content,날짜,isreply
+
 
         public static Info of(Post post){
                 return Info.builder()

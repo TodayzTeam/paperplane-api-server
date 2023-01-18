@@ -57,9 +57,9 @@ public class PostService {
         Post post= new Post();
         User user= userService.getUserById(userService.getLoginUser());
 
-        if(groupRepository.findByCode(data.getCode()).isPresent()) {
+        if(groupRepository.findByCode(data.getGroupCode()).isPresent()) {
             post= Post.builder()
-                    .group(groupService.getGroupByCode(data.getCode()))
+                    .group(groupService.getGroupByCode(data.getGroupCode()))
                     .title(data.getTitle())
                     .content(data.getContent())
                     .date(LocalDateTime.now())
@@ -85,7 +85,17 @@ public class PostService {
 
 
         //user api 추가 후 변경예정
-        List<User> randUser=userService.getRandUser(data.getReceiveGroup());
+        List<User> randUser= new ArrayList<>();
+        //user api 추가 후 변경예정
+        if(Objects.equals(data.getReceiveGroup(), "RAND")) {
+            randUser = userService.getRandUser(data.getReceiveGroup());
+        } else if (Objects.equals(data.getReceiveGroup(),"GROUP")) {
+            if(data.getGroupCode()==null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"group code를 넣어주세요");
+            }
+            randUser = userService.getRandUser(data.getGroupCode());
+        }else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"잘못된 receiveGROUP 입니다.");
+
         while(randUser.isEmpty()){
             randUser=userService.getRandUser(data.getReceiveGroup());
         }
@@ -100,7 +110,10 @@ public class PostService {
                         .receiver(receive)
                         .build());
             }else{
-                if(userPostService.checkReply(data.getOriginId())){
+                if(data.getOriginId()==null){
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"originId -원본편지의 id를 추가 필요");
+                }
+                if(!userPostService.checkReply(data.getOriginId())){
                     postRepository.delete(post);
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신한 편지입니다.");
                 }
@@ -151,9 +164,9 @@ public class PostService {
 
 
 
-        if(groupRepository.findByCode(data.getCode()).isPresent()) {
+        if(groupRepository.findByCode(data.getGroupCode()).isPresent()) {
             post= Post.builder()
-                    .group(groupService.getGroupByCode(data.getCode()))
+                    .group(groupService.getGroupByCode(data.getGroupCode()))
                     .title(data.getTitle())
                     .content(data.getContent())
                     .date(LocalDateTime.now())
@@ -206,9 +219,17 @@ public class PostService {
             }
         }
 
-
+        List<User> randUser= new ArrayList<>();
         //user api 추가 후 변경예정
-        List<User> randUser=userService.getRandUser(data.getReceiveGroup());
+        if(Objects.equals(data.getReceiveGroup(), "RAND")) {
+             randUser = userService.getRandUser(data.getReceiveGroup());
+        } else if (Objects.equals(data.getReceiveGroup(),"GROUP")) {
+            if(data.getGroupCode()==null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"group code를 넣어주세요");
+            }
+             randUser = userService.getRandUser(data.getGroupCode());
+        }else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"잘못된 receiveGROUP 입니다.");
+
         while(randUser.isEmpty()){
             randUser=userService.getRandUser(data.getReceiveGroup());
         }
@@ -223,7 +244,10 @@ public class PostService {
                         .receiver(receive)
                         .build());
             }else{
-                if(userPostService.checkReply(data.getOriginId())){
+                if(data.getOriginId()==null){
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"originId -원본편지의 id를 추가 필요");
+                }
+                if(!userPostService.checkReply(data.getOriginId())){
                     postRepository.delete(post);
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신한 편지입니다.");
                 }
@@ -246,7 +270,7 @@ public class PostService {
     }
     public List<PostResponseDto.Info> PostInfoById(Integer postId){
         User user= userService.getUserById(userService.getLoginUser());
-        UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
+        UserPost userPost=userPostRepository.findByReceiverIdAndPostId(user.getId(),postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
 
         List<PostResponseDto.Info> infos= new ArrayList<>();
         Post post=userPost.getPost();
@@ -269,7 +293,7 @@ public class PostService {
             infos.add(PostResponseDto.Info.of(post));
         }
 
-        if(userPost.getOriginId()!=null) {
+        if(userPost.getOriginId()!=null && !userPost.getOriginId().equals(post.getId())) {
             infos.add(PostResponseDto.Info.of(getByPostId(userPost.getOriginId())));
         }
         return infos;

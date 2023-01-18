@@ -151,7 +151,10 @@ public class GroupService {
     }
 
     public List<User> getGroupUserByCode(String code)throws Exception{
-        List<User> userList=groupRepository.findGroupUserByCode(code);
+        Group group = getGroupByCode(code);
+        Integer userId = getLoginUser();
+
+        List<User> userList=groupRepository.findGroupUser(userId,group.getId());
         if (userList.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"해당 코드에 대한 그룹이 존재하지 않습니다");
         }
