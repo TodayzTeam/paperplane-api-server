@@ -45,10 +45,10 @@ public class SecurityConfig {
                 .authorizeRequests()
 //                .antMatchers( "/token/**", "/post/popular","/v2/api-docs",
 //                        "/swagger*/**","/oauth2/**","/").permitAll()
-                //.anyRequest().authenticated()
+//                .anyRequest().authenticated()
                 .anyRequest().permitAll()// 임시 설정
                 .and()
-                .oauth2Login().loginPage("/")
+                .oauth2Login().loginPage("/token/expired")
                 .successHandler(successHandler)
                 .userInfoEndpoint().userService(userOAuth2Service);
 
