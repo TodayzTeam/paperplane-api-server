@@ -14,8 +14,6 @@ import java.util.Optional;
 public interface GroupRepository extends JpaRepository<Group, Integer> {
     Optional<Group> findByCode(String code);
 
-    List<Group> findByNameContaining(String name);
-
     boolean existsByName(String name);
 
     @Query(value = "select gu.user from Group g join g.userGroups gu where g.name = :name")
