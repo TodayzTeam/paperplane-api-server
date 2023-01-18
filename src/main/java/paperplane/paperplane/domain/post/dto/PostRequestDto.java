@@ -34,7 +34,7 @@ public class PostRequestDto {
         private String color;
 
         @ApiModelProperty(value = "그룹 코드")
-        private String code;
+        private String groupCode;
 
         @NotNull
         @ApiModelProperty(value = "회신하는 편지인지 여부")

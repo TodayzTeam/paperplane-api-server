@@ -25,7 +25,7 @@ public class UserPostService {
     }
 
     public UserPost getByReceiverIdAndPostId(Integer userId,Integer postId){
-        return userPostRepository.findByReceiverIdAndPostId(userId,postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
+        return userPostRepository.findPostOptionByPostId(userId,postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
     }
     public void checkLike(UserPost userPost){
         if(userPost.getIsLike()){
@@ -52,14 +52,20 @@ public class UserPostService {
         return UserPostResponseDto.Option.of(userPost);
     }
 
-    public Boolean checkReply(Integer postId){
+    public Boolean checkReply(Integer postId)throws Exception{
         User user= userService.getUserById(userService.getLoginUser());
         log.info("checkReply");
+        log.info("{}",user.getId());
+        log.info("{}",postId);
+        log.info("{}",userPostRepository.countUserPostBySenderIdAndOriginId(user.getId(),postId)!=null);
+        if (userPostRepository.countUserPostBySenderIdAndOriginId(user.getId(),postId)!=null){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신을 했습니다.");
+        }
         if(userPostRepository.findPostOptionByPostId(user.getId(),postId).isPresent()){
-            return true;
+            if (userPostRepository.findPostOptionByPostId(user.getId(),postId).get().getOriginId()!=null){
+                return false;
+            }
         }
-        else {
-            return false;
-        }
+        return true;
     }
 }
