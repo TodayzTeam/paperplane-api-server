@@ -103,7 +103,7 @@ public class GroupService {
         UserGroup userGroup = userGroupRepository.findByCodeAndEmail(group.getId(), userId).orElseThrow(()->
                 new ResponseStatusException(HttpStatus.BAD_REQUEST, "가입한 그룹이 아닙니다."));
 
-        List<UserGroup> userGroups = userGroupRepository.findTop2ByGroup_IdOrderByJoinDate(group.getId());
+        List<UserGroup> userGroups = userGroupRepository.findTop2ByGroup_Id(group.getId());
 
         //마지막 사람이 탈퇴 시 자동으로 그룹 삭제됨
         if(userGroups.size() == 1){

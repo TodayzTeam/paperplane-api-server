@@ -16,15 +16,11 @@ public class UserGroupResponseDto {
 
    private Integer groupId;
    private String groupName;
-   private Integer userId;
-   private String userName;
 
    public static UserGroupResponseDto of(UserGroup userGroup){
       return UserGroupResponseDto.builder()
               .groupId(userGroup.getGroup().getId())
               .groupName(userGroup.getGroup().getName())
-              .userId(userGroup.getUser().getId())
-              .userName(userGroup.getUser().getName())
               .build();
    }
 
