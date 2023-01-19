@@ -10,6 +10,7 @@ import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.user.User;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
@@ -32,8 +33,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "select * from Post p where p.sender_id=:userId and p.id=:postId",nativeQuery = true)
     List<Post> test(@Param("userId") Integer userId, @Param("postId") Integer postId);
 
-    @Query(value = "select p from Post p join Group g on g.id = :groupId")
-    Page<Post> findGroupPost(@org.springframework.data.repository.query.Param("groupId") Integer groupId, Pageable pageable);
+    @Query(value = "select p from Post p join Group g on g.id = :groupId where p.date >= :joinDate ")
+    List<Post> findGroupPost(@org.springframework.data.repository.query.Param("groupId") Integer groupId, @org.springframework.data.repository.query.Param("joinDate")LocalDateTime joinDate);
 
     @Query(value = "SELECT p FROM Post p inner join Group g on g.id=:groupId inner join p.userPosts up on up.isReport=false where((p.content like CONCAT('%',:word,'%')) or (p.title like CONCAT('%',:word,'%')) ) ")
     Page<Post> findGroupPostByWord(@Param("groupId")Integer groupId,@Param("word") String word, Pageable pageable);

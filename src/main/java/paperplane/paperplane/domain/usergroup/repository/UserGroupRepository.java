@@ -17,6 +17,6 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Integer> {
     List<UserGroup> findTop2ByGroup_Id(Integer groupId);
 
     @Query(value = "select * from UserGroup ug where ug.group_id = :groupId and ug.user = :userId", nativeQuery = true)
-    Optional<UserGroup> findByCodeAndEmail(@Param("groupId") Integer groupId,
+    Optional<UserGroup> findByCodeAndUserId(@Param("groupId") Integer groupId,
                                            @Param("userId") Integer userId);
 }
