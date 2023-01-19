@@ -80,7 +80,7 @@ public class GroupService {
         User user = userRepository.findById(userId).get();
         Group group = getGroupByCode(groupCode.getCode());
 
-        if(userGroupRepository.findByCodeAndEmail(group.getId(), userId).isPresent()){
+        if(userGroupRepository.findByCodeAndUserId(group.getId(), userId).isPresent()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 가입한 그룹입니다.");
         }
 
@@ -100,7 +100,7 @@ public class GroupService {
         Integer userId = getLoginUser();
 
         //그룹에 가입했는지 확인
-        UserGroup userGroup = userGroupRepository.findByCodeAndEmail(group.getId(), userId).orElseThrow(()->
+        UserGroup userGroup = userGroupRepository.findByCodeAndUserId(group.getId(), userId).orElseThrow(()->
                 new ResponseStatusException(HttpStatus.BAD_REQUEST, "가입한 그룹이 아닙니다."));
 
         List<UserGroup> userGroups = userGroupRepository.findTop2ByGroup_Id(group.getId());
