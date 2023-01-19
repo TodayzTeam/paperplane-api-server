@@ -109,9 +109,8 @@ public class PostController {
 
     @ApiOperation("그룹 편지 리스트")
     @GetMapping("/list/{groupId}")
-    public ResponseEntity<List<PostResponseDto.Simple>> getGroupPost(@PathVariable final Integer groupId, @RequestParam("page") Integer page) throws Exception {
-        PageRequest pageRequest = PageRequest.of(page,8);
-        return ResponseEntity.ok(postService.getGroupPost(groupId,pageRequest));
+    public ResponseEntity<List<PostResponseDto.Simple>> getGroupPost(@PathVariable final Integer groupId) throws Exception {
+        return ResponseEntity.ok(postService.getGroupPost(groupId));
     }
 
     @ApiOperation("편지 읽음,신고,좋아요,응답 여부 확인")

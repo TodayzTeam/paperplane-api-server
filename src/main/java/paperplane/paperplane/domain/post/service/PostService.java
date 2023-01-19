@@ -26,6 +26,8 @@ import paperplane.paperplane.domain.postinterest.PostInterest;
 import paperplane.paperplane.domain.postinterest.service.PostInterestService;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.service.UserService;
+import paperplane.paperplane.domain.usergroup.UserGroup;
+import paperplane.paperplane.domain.usergroup.repository.UserGroupRepository;
 import paperplane.paperplane.domain.userpost.UserPost;
 import paperplane.paperplane.domain.userpost.repository.UserPostRepository;
 import paperplane.paperplane.domain.userpost.service.UserPostService;
@@ -50,6 +52,7 @@ public class PostService {
     private final UserPostService userPostService;
     private final GroupRepository groupRepository;
     private final UserPostRepository userPostRepository;
+    private final UserGroupRepository userGroupRepository;
     //private final ElasticsearchOperations elasticsearchOperations;
 
     //private final PostDocumentRepository postDocumentRepository;
@@ -392,10 +395,22 @@ public class PostService {
         return PostResponseDto.Simple.of(post);
     }
 
-    public List<PostResponseDto.Simple> getGroupPost(Integer groupId, Pageable pageable){
-        Page<Post> groupPost = postRepository.findGroupPost(groupId, pageable);
-        List<Post> posts = groupPost.stream().collect(Collectors.toList());
-        return PostResponseDto.Simple.of(posts);
+    public List<PostResponseDto.Simple> getGroupPost(Integer groupId){
+        //가입했는지 확인
+        User user = userService.getUserById(userService.getLoginUser());
+        Optional<UserGroup> userGroupOptional = userGroupRepository.findByCodeAndUserId(groupId, user.getId());
+
+        if(userGroupOptional.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가입하지 않은 그룹입니다.");
+        }
+
+        //가입 이전에 써진 편지는 볼 수 없음
+        UserGroup userGroup = userGroupOptional.get();
+        LocalDateTime joinDate = userGroup.getJoinDate();
+
+        List<Post> groupPost = postRepository.findGroupPost(groupId, joinDate);
+
+        return PostResponseDto.Simple.of(groupPost);
     }
 
     /*public Page<PostDocument> searchPost(PostRequestDto.Search search,Pageable pageable){
