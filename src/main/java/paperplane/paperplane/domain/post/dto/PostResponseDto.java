@@ -90,5 +90,4 @@ public class PostResponseDto implements Serializable {
 
     }
 
-
 }

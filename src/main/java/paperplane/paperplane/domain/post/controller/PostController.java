@@ -13,6 +13,7 @@ import paperplane.paperplane.domain.post.PostColor;
 import paperplane.paperplane.domain.post.dto.PostRequestDto;
 import paperplane.paperplane.domain.post.dto.PostResponseDto;
 import paperplane.paperplane.domain.post.service.PostService;
+import paperplane.paperplane.domain.userpost.dto.UserPostRequestDto;
 import paperplane.paperplane.domain.userpost.dto.UserPostResponseDto;
 import paperplane.paperplane.domain.userpost.service.UserPostService;
 import javax.validation.Valid;
@@ -107,9 +108,9 @@ public class PostController {
         return ResponseEntity.ok(postService.searchGroupPostByWord(groupId,word,pageRequest));
     }
     @ApiOperation("편지 읽음,신고,좋아요,응답 여부 확인")
-    @GetMapping("/option/{postId}")
-    public ResponseEntity<UserPostResponseDto.Option> postOption(@PathVariable Integer postId) {
-        return ResponseEntity.ok(userPostService.getPostOption(postId));
+    @PostMapping("/option")
+    public ResponseEntity<List<UserPostResponseDto.Option>> postOption(@Valid UserPostRequestDto userPostRequestDto) {
+        return ResponseEntity.ok(userPostService.getPostOption(userPostRequestDto));
     }
 
     @ApiOperation("임시저장 편지 있는지 여부, 있으면 임시저장 편지 id 반환 없음 0 반환")
