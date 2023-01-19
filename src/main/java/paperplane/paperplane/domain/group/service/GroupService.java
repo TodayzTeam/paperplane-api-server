@@ -149,8 +149,8 @@ public class GroupService {
         userGroupRepository.delete(userGroup);
     }
 
-    public List<User> getGroupMemberListByName(String name){
-        return groupRepository.getGroupMemberListByName(name);
+    public List<User> getGroupMemberListByGroupId(Integer groupId){
+        return groupRepository.getGroupMemberListByGroupId(groupId);
     }
 
     public void checkDuplicateGroup(String name){

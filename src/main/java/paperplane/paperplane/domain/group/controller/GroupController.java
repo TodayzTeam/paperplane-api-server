@@ -74,9 +74,9 @@ public class GroupController {
     }
 
     @ApiOperation("해당 그룹의 그룹원 목록")
-    @GetMapping("users/{name}")
-    public ResponseEntity<List<UserResponseDto.Simple>> getGroupUserList(@PathVariable String name) throws Exception {
-        return ResponseEntity.ok(UserResponseDto.Simple.of(groupService.getGroupMemberListByName(name)));
+    @GetMapping("users/{groupId}")
+    public ResponseEntity<List<UserResponseDto.Simple>> getGroupUserList(@PathVariable Integer groupId) throws Exception {
+        return ResponseEntity.ok(UserResponseDto.Simple.of(groupService.getGroupMemberListByGroupId(groupId)));
     }
 
     @ApiOperation("내 그룹들 정보 조회")
