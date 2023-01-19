@@ -29,6 +29,4 @@ public class UserGroup {
     @Column
     private LocalDateTime joinDate;
 
-    @Column
-    private  UserRole userRole;
 }
