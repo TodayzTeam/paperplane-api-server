@@ -31,8 +31,6 @@ public class UserPost {
     @JoinColumn(name = "post")
     private Post post;
 
-    @Column// 원본 편지
-    private Integer originId;
 
     //신고 여부
     @Column
@@ -45,4 +43,7 @@ public class UserPost {
     //좋아요 눌렀는지 여부
     @Column
     private Boolean isLike;
+
+    @Column
+    private Boolean isReply;
 }

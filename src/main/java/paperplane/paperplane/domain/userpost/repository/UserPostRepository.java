@@ -21,6 +21,6 @@ public interface UserPostRepository extends JpaRepository<UserPost,Integer> {
     @Query(value = "select up from  UserPost  up join Post p on up.post=p where (p.id=:postId and p.sender.id=:userId)")
     Optional<UserPost> findPostOptionByPostId(@Param("userId") Integer userId, @Param("postId") Integer postId);
 
-    @Query(value = "select count(*)from  UserPost  up join Post p on up.post=p where (up.originId=:originId and p.sender.id=:userId) group by up.originId,p.sender.id")
+    @Query(value = "select count(*)from  UserPost  up join Post p on up.post=p where (p.originId=:originId and p.sender.id=:userId) group by p.originId,p.sender.id")
     Integer countUserPostBySenderIdAndOriginId(@Param("userId") Integer userId, @Param("originId") Integer originId);
 }
