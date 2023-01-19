@@ -44,8 +44,14 @@ public class GroupController {
 
     @ApiOperation("그룹 요약 정보 조회")
     @GetMapping("/simple/{groupId}")
-    public ResponseEntity<GroupResponseDto.Simple> getGroupInfo(@PathVariable Integer groupId) throws Exception {
+    public ResponseEntity<GroupResponseDto.Simple> getGroupSimpleInfo(@PathVariable Integer groupId) throws Exception {
         return ResponseEntity.ok(GroupResponseDto.Simple.of(groupService.getGroupById(groupId)));
+    }
+
+    @ApiOperation("그룹 상세 정보 조회")
+    @GetMapping("/info/{groupId}")
+    public ResponseEntity<GroupResponseDto.Info> getGroupInfo(@PathVariable Integer groupId) throws Exception {
+        return ResponseEntity.ok(GroupResponseDto.Info.of(groupService.getGroupById(groupId)));
     }
 
     @ApiOperation("그룹 참가")

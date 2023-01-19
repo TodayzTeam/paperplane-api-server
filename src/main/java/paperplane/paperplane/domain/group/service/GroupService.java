@@ -126,15 +126,25 @@ public class GroupService {
         Group group = getGroupByCode(groupCode.getCode());
         Integer userId = getLoginUser();
 
-        //그룹에 가입했는지 & 그룹장은 탈퇴 못함
+        //그룹에 가입했는지 확인
         Optional<UserGroup> userGroupOptional = userGroupRepository.findByCodeAndEmail(group.getId(), userId);
         if(userGroupOptional.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가입한 그룹이 아닙니다.");
         }
 
+        List<UserGroup> userGroups = userGroupRepository.findTop2ByGroup_IdOrderByJoinDate(group.getId());
         UserGroup userGroup = userGroupOptional.get();
+
+        //마지막 사람이 탈퇴 시 자동으로 그룹 삭제됨
+        if(userGroups.size() == 1){
+            userGroupRepository.delete(userGroup);
+            groupRepository.delete(group);
+            return;
+        }
+
+        //그룹장 탈퇴 시 위임
         if(userGroup.getUserRole().equals(UserRole.OWNER)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "그룹장은 탈퇴할 수 없습니다.");
+            userGroups.get(1).setUserRole(UserRole.OWNER);
         }
         userGroupRepository.delete(userGroup);
     }
