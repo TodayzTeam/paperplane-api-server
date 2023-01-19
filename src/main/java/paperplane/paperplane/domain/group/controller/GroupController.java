@@ -41,12 +41,6 @@ public class GroupController {
         return ResponseEntity.ok(GroupResponseDto.Simple.of(groupService.getGroupById(groupId)));
     }
 
-    @ApiOperation("그룹 상세 정보 조회")
-    @GetMapping("/info/{groupId}")
-    public ResponseEntity<GroupResponseDto.Info> getGroupInfo(@PathVariable Integer groupId) throws Exception {
-        return ResponseEntity.ok(GroupResponseDto.Info.of(groupService.getGroupById(groupId)));
-    }
-
     @ApiOperation("그룹 참가")
     @PostMapping("/join")
     public ResponseEntity<GroupResponseDto.Info> joinGroup(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
