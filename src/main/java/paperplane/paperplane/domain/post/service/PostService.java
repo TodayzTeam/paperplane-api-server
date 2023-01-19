@@ -100,16 +100,7 @@ public class PostService {
             randUser=userService.getRandUser(data.getReceiveGroup());
         }
         for(User receive: randUser){
-            if(data.getIsReply()==null || !data.getIsReply() ) {
-                userPostService.addUserPost(UserPost.builder()
-                        .post(post)
-                        .originId(null)
-                        .isRead(false)
-                        .isReport(false)
-                        .isLike(false)
-                        .receiver(receive)
-                        .build());
-            }else{
+            if(data.getIsReply() ) {
                 if(data.getOriginId()==null){
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"originId -원본편지의 id를 추가 필요");
                 }
@@ -117,9 +108,20 @@ public class PostService {
                     postRepository.delete(post);
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신한 편지입니다.");
                 }
+                post.setOriginId(getByPostId(data.getOriginId()).getId());
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
-                        .originId(getByPostId(data.getOriginId()).getId())
+                        .isReply(true)
+                        .isRead(false)
+                        .isReport(false)
+                        .isLike(false)
+                        .receiver(receive)
+                        .build());
+
+            }else{
+                userPostService.addUserPost(UserPost.builder()
+                        .post(post)
+                        .isReply(false)
                         .isRead(false)
                         .isReport(false)
                         .isLike(false)
@@ -152,6 +154,7 @@ public class PostService {
         //temp post 처리
         user.setTempPost(0);
         userService.saveUser(user);
+        postRepository.save(post);
 
         //es search
         //postDocumentRepository.save(new PostDocument(post));
@@ -161,8 +164,6 @@ public class PostService {
     public Integer interStorePost(PostRequestDto.Create data)throws Exception{
         Post post= new Post();
         User user= userService.getUserById(userService.getLoginUser());
-
-
 
         if(groupRepository.findByCode(data.getGroupCode()).isPresent()) {
             post= Post.builder()
@@ -190,12 +191,49 @@ public class PostService {
         }
         postRepository.save(post);
 
-        //응답했는지 확인
-        Optional<UserPost> checkReply= userPostRepository.findPostOptionByPostId(user.getId(),post.getId());
-        if (checkReply.isPresent()){
-            if(checkReply.get().getOriginId()!=null){
-                removePost(post.getId());
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 회신한 편지입니다.");
+
+        //user api 추가 후 변경예정
+        List<User> randUser= new ArrayList<>();
+        //user api 추가 후 변경예정
+        if(Objects.equals(data.getReceiveGroup(), "RAND")) {
+            randUser = userService.getRandUser(data.getReceiveGroup());
+        } else if (Objects.equals(data.getReceiveGroup(),"GROUP")) {
+            if(data.getGroupCode()==null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"group code를 넣어주세요");
+            }
+            randUser = userService.getRandUser(data.getGroupCode());
+        }else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"잘못된 receiveGROUP 입니다.");
+
+        while(randUser.isEmpty()){
+            randUser=userService.getRandUser(data.getReceiveGroup());
+        }
+        for(User receive: randUser){
+            if(data.getIsReply()==null || !data.getIsReply() ) {
+                userPostService.addUserPost(UserPost.builder()
+                        .post(post)
+                        .isReply(false)
+                        .isRead(false)
+                        .isReport(false)
+                        .isLike(false)
+                        .receiver(receive)
+                        .build());
+            }else{
+                if(data.getOriginId()==null){
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"originId -원본편지의 id를 추가 필요");
+                }
+                if(!userPostService.checkReply(data.getOriginId())){
+                    postRepository.delete(post);
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신한 편지입니다.");
+                }
+                post.setOriginId(getByPostId(data.getOriginId()).getId());
+                userPostService.addUserPost(UserPost.builder()
+                        .post(post)
+                        .isReply(true)
+                        .isRead(false)
+                        .isReport(false)
+                        .isLike(false)
+                        .receiver(receive)
+                        .build());
             }
         }
 
@@ -219,53 +257,11 @@ public class PostService {
             }
         }
 
-        List<User> randUser= new ArrayList<>();
-        //user api 추가 후 변경예정
-        if(Objects.equals(data.getReceiveGroup(), "RAND")) {
-             randUser = userService.getRandUser(data.getReceiveGroup());
-        } else if (Objects.equals(data.getReceiveGroup(),"GROUP")) {
-            if(data.getGroupCode()==null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"group code를 넣어주세요");
-            }
-             randUser = userService.getRandUser(data.getGroupCode());
-        }else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"잘못된 receiveGROUP 입니다.");
-
-        while(randUser.isEmpty()){
-            randUser=userService.getRandUser(data.getReceiveGroup());
-        }
-        for(User receive: randUser){
-            if(data.getIsReply()==null || !data.getIsReply() ) {
-                userPostService.addUserPost(UserPost.builder()
-                        .post(post)
-                        .originId(null)
-                        .isRead(false)
-                        .isReport(false)
-                        .isLike(false)
-                        .receiver(receive)
-                        .build());
-            }else{
-                if(data.getOriginId()==null){
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"originId -원본편지의 id를 추가 필요");
-                }
-                if(!userPostService.checkReply(data.getOriginId())){
-                    postRepository.delete(post);
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신한 편지입니다.");
-                }
-                userPostService.addUserPost(UserPost.builder()
-                        .post(post)
-                        .originId(getByPostId(data.getOriginId()).getId())
-                        .isRead(false)
-                        .isReport(false)
-                        .isLike(false)
-                        .receiver(receive)
-                        .build());
-            }
-        }
-
-        //임시저장값 0으로
+        //temp post 처리
         user.setTempPost(post.getId());
         userService.saveUser(user);
-        //save userPost
+        postRepository.save(post);
+
         return post.getId();
     }
     public List<PostResponseDto.Info> PostInfoById(Integer postId){
@@ -293,8 +289,8 @@ public class PostService {
             infos.add(PostResponseDto.Info.of(post));
         }
 
-        if(userPost.getOriginId()!=null && !userPost.getOriginId().equals(post.getId())) {
-            post=getByPostId(userPost.getOriginId());
+        if(userPost.getIsReply()!=null&& userPost.getIsReply()) {
+            post=getByPostId(getByPostId(postId).getOriginId());
             if(post.getGroup()==null){
                 infos.add(PostResponseDto.Info.of(Post.builder()
                         .id(post.getId())
@@ -390,6 +386,12 @@ public class PostService {
         Page<Post> postPage =postRepository.findGroupPostByWord(groupId,word,pageable);
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
+    }
+
+    public List<PostResponseDto.Simple> getGroupPost(Integer groupId, Pageable pageable){
+        Page<Post> groupPost = postRepository.findGroupPost(groupId, pageable);
+        List<Post> posts = groupPost.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(posts);
     }
 
     /*public Page<PostDocument> searchPost(PostRequestDto.Search search,Pageable pageable){

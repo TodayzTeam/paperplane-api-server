@@ -35,16 +35,9 @@ public class GroupController {
         return ResponseEntity.ok(groupService.createGroup(create));
     }
 
-    @ApiOperation("그룹 삭제")
-    @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteGroup(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
-        groupService.deleteGroup(groupCode);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
     @ApiOperation("그룹 요약 정보 조회")
     @GetMapping("/simple/{groupId}")
-    public ResponseEntity<GroupResponseDto.Simple> getGroupInfo(@PathVariable Integer groupId) throws Exception {
+    public ResponseEntity<GroupResponseDto.Simple> getGroupSimpleInfo(@PathVariable Integer groupId) throws Exception {
         return ResponseEntity.ok(GroupResponseDto.Simple.of(groupService.getGroupById(groupId)));
     }
 
@@ -68,9 +61,9 @@ public class GroupController {
     }
 
     @ApiOperation("해당 그룹의 그룹원 목록")
-    @GetMapping("users/{name}")
-    public ResponseEntity<List<UserResponseDto.Simple>> getGroupUserList(@PathVariable String name) throws Exception {
-        return ResponseEntity.ok(UserResponseDto.Simple.of(groupService.getGroupMemberListByName(name)));
+    @GetMapping("users/{groupId}")
+    public ResponseEntity<List<UserResponseDto.Simple>> getGroupUserList(@PathVariable Integer groupId) throws Exception {
+        return ResponseEntity.ok(UserResponseDto.Simple.of(groupService.getGroupMemberListByGroupId(groupId)));
     }
 
     @ApiOperation("내 그룹들 정보 조회")
