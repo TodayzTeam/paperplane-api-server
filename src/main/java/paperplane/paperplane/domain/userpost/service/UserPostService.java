@@ -54,15 +54,12 @@ public class UserPostService {
 
     public Boolean checkReply(Integer postId)throws Exception{
         User user= userService.getUserById(userService.getLoginUser());
-        log.info("checkReply");
-        log.info("{}",user.getId());
-        log.info("{}",postId);
-        log.info("{}",userPostRepository.countUserPostBySenderIdAndOriginId(user.getId(),postId)!=null);
         if (userPostRepository.countUserPostBySenderIdAndOriginId(user.getId(),postId)!=null){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신을 했습니다.");
         }
         if(userPostRepository.findPostOptionByPostId(user.getId(),postId).isPresent()){
-            if (userPostRepository.findPostOptionByPostId(user.getId(),postId).get().getOriginId()!=null){
+            UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId).get();
+            if (userPost.getIsReply()){
                 return false;
             }
         }

@@ -52,4 +52,7 @@ public class Post implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private User sender;
+
+    @Column// 원본 편지
+    private Integer originId;
 }
