@@ -392,6 +392,12 @@ public class PostService {
         return PostResponseDto.Simple.of(post);
     }
 
+    public List<PostResponseDto.Simple> getGroupPost(Integer groupId, Pageable pageable){
+        Page<Post> groupPost = postRepository.findGroupPost(groupId, pageable);
+        List<Post> posts = groupPost.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(posts);
+    }
+
     /*public Page<PostDocument> searchPost(PostRequestDto.Search search,Pageable pageable){
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
 

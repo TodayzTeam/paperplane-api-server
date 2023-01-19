@@ -17,7 +17,6 @@ public class UserGroupResponseDto {
    private Integer groupId;
    private String groupName;
 
-
    public static UserGroupResponseDto of(UserGroup userGroup){
       return UserGroupResponseDto.builder()
               .groupId(userGroup.getGroup().getId())

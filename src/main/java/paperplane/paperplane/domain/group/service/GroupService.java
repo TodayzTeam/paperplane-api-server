@@ -3,9 +3,6 @@ package paperplane.paperplane.domain.group.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,17 +12,13 @@ import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.group.dto.GroupRequestDto;
 import paperplane.paperplane.domain.group.repository.GroupRepository;
 import paperplane.paperplane.domain.user.User;
-import paperplane.paperplane.domain.user.dto.UserResponseDto;
 import paperplane.paperplane.domain.user.repository.UserRepository;
-import paperplane.paperplane.domain.user.service.UserService;
 import paperplane.paperplane.domain.usergroup.UserGroup;
-import paperplane.paperplane.domain.usergroup.UserRole;
 import paperplane.paperplane.domain.usergroup.repository.UserGroupRepository;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Transactional
@@ -75,30 +68,11 @@ public class GroupService {
                         .user(user)
                         .group(group)
                         .joinDate(LocalDateTime.now())
-                        .userRole(UserRole.OWNER)
                         .build();
 
         userGroupRepository.save(userGroup);
 
         return group.getId();
-    }
-
-    public void deleteGroup(GroupRequestDto.GroupCode groupCode)throws Exception{
-        Integer userId= getLoginUser();
-        User user=userRepository.findById(getLoginUser()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"해당 유저를 찾을 수 없습니다."));
-        Group group=getGroupByCode(groupCode.getCode());
-        if(userGroupRepository.findByCodeAndEmail(group.getId(), userId).isPresent()){
-            UserGroup userGroup=userGroupRepository.findByCodeAndEmail(group.getId(), userId).get();
-            if(userGroup.getUserRole()==UserRole.OWNER){
-                groupRepository.delete(group);
-            }
-            else{
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"그룹장이 아닙니다.");
-            }
-        }
-        else{
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"그룹에서 해당 유저를 찾을 수 없습니다.");
-        }
     }
 
     public Group joinGroup(GroupRequestDto.GroupCode groupCode){
@@ -114,7 +88,6 @@ public class GroupService {
                 .group(group)
                 .user(user)
                 .joinDate(LocalDateTime.now())
-                .userRole(UserRole.READER)
                 .build();
 
         userGroupRepository.save(userGroup);
@@ -126,21 +99,22 @@ public class GroupService {
         Group group = getGroupByCode(groupCode.getCode());
         Integer userId = getLoginUser();
 
-        //그룹에 가입했는지 & 그룹장은 탈퇴 못함
-        Optional<UserGroup> userGroupOptional = userGroupRepository.findByCodeAndEmail(group.getId(), userId);
-        if(userGroupOptional.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가입한 그룹이 아닙니다.");
+        //그룹에 가입했는지 확인
+        UserGroup userGroup = userGroupRepository.findByCodeAndEmail(group.getId(), userId).orElseThrow(()->
+                new ResponseStatusException(HttpStatus.BAD_REQUEST, "가입한 그룹이 아닙니다."));
+
+        List<UserGroup> userGroups = userGroupRepository.findTop2ByGroup_Id(group.getId());
+
+        //마지막 사람이 탈퇴 시 자동으로 그룹 삭제됨
+        if(userGroups.size() == 1){
+            groupRepository.delete(group);
         }
 
-        UserGroup userGroup = userGroupOptional.get();
-        if(userGroup.getUserRole().equals(UserRole.OWNER)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "그룹장은 탈퇴할 수 없습니다.");
-        }
         userGroupRepository.delete(userGroup);
     }
 
-    public List<User> getGroupMemberListByName(String name){
-        return groupRepository.getGroupMemberListByName(name);
+    public List<User> getGroupMemberListByGroupId(Integer groupId){
+        return groupRepository.getGroupMemberListByGroupId(groupId);
     }
 
     public void checkDuplicateGroup(String name){
