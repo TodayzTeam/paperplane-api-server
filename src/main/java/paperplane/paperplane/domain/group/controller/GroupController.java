@@ -35,13 +35,6 @@ public class GroupController {
         return ResponseEntity.ok(groupService.createGroup(create));
     }
 
-    @ApiOperation("그룹 삭제")
-    @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteGroup(@Valid GroupRequestDto.GroupCode groupCode) throws Exception {
-        groupService.deleteGroup(groupCode);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
     @ApiOperation("그룹 요약 정보 조회")
     @GetMapping("/simple/{groupId}")
     public ResponseEntity<GroupResponseDto.Simple> getGroupSimpleInfo(@PathVariable Integer groupId) throws Exception {
