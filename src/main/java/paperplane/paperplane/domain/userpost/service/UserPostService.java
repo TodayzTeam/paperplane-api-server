@@ -8,9 +8,12 @@ import org.springframework.web.server.ResponseStatusException;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.service.UserService;
 import paperplane.paperplane.domain.userpost.UserPost;
+import paperplane.paperplane.domain.userpost.dto.UserPostRequestDto;
 import paperplane.paperplane.domain.userpost.dto.UserPostResponseDto;
 import paperplane.paperplane.domain.userpost.repository.UserPostRepository;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,11 +48,17 @@ public class UserPostService {
             userPostRepository.save(userPost);
         }
     }
-    public UserPostResponseDto.Option getPostOption(Integer postId){
+    public List<UserPostResponseDto.Option> getPostOption(UserPostRequestDto userPostRequestDto){
+        List<Integer> postIdList= userPostRequestDto.getPostIdList();
         User user= userService.getUserById(userService.getLoginUser());
-        UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
 
-        return UserPostResponseDto.Option.of(userPost);
+        List<UserPostResponseDto.Option> options=new ArrayList<>();
+        for(Integer postId: postIdList){
+            UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
+            options.add(UserPostResponseDto.Option.of(userPost));
+        }
+
+        return options;
     }
 
     public Boolean checkReply(Integer postId)throws Exception{

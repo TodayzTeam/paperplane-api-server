@@ -309,6 +309,8 @@ public class PostService {
                 infos.add(PostResponseDto.Info.of(post));
             }
         }
+        userPost.setIsRead(true);
+        userPostRepository.save(userPost);
         return infos;
     }
     public Integer checkingTempPost(){
