@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import paperplane.paperplane.domain.group.Group;
 import paperplane.paperplane.domain.group.dto.GroupRequestDto;
 import paperplane.paperplane.domain.group.repository.GroupRepository;
+import paperplane.paperplane.domain.post.repository.PostRepository;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.repository.UserRepository;
 import paperplane.paperplane.domain.usergroup.UserGroup;
@@ -30,6 +31,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final UserGroupRepository userGroupRepository;
+    private final PostRepository postRepository;
 
     public Group getGroupByCode(String code){
         return groupRepository.findByCode(code).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"해당하는 그룹을 찾을 수 없습니다."));
@@ -105,8 +107,9 @@ public class GroupService {
 
         List<UserGroup> userGroups = userGroupRepository.findTop2ByGroup_Id(group.getId());
 
-        //마지막 사람이 탈퇴 시 자동으로 그룹 삭제됨
+        //마지막 사람이 탈퇴 시 자동으로 그룹 삭제
         if(userGroups.size() == 1){
+            postRepository.deleteByGroup_Id(group.getId());
             groupRepository.delete(group);
         }
 
