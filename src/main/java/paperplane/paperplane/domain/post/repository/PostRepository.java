@@ -20,6 +20,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Page<Post> findAllByWord(@Param("word") String word, Pageable pageable);
     List<Post> findTop8ByOrderByLikeCountDesc();
 
+    void deleteByGroup_Id(Integer groupId);
+
     @Query(value = "select p from Post p inner join p.sender  s on s.id=:userId inner join p.userPosts up on up.isReport=false ")
     Page<Post> findSentPost(@Param("userId")Integer userId,Pageable pageable);
 
