@@ -13,7 +13,8 @@ import java.util.Optional;
 @Repository
 public interface UserPostRepository extends JpaRepository<UserPost,Integer> {
     @Query(value = "select up from UserPost up where  (up.post.id=:postId and up.receiver.id=:userId)")
-    Optional<UserPost> findByReceiverIdAndPostId(@Param("userId")Integer userId, @Param("postId") Integer postId);
+    Optional<UserPost> findByReceiverIdAndPostId(@org.springframework.data.repository.query.Param("userId")Integer userId,
+                                                 @org.springframework.data.repository.query.Param("postId") Integer postId);
 
     //@Query(value = "select up from UserPost up left join Post p on p.id=:postId where p.sender.id=:userId")
 
