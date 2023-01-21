@@ -363,6 +363,17 @@ public class PostService {
         postRepository.save(post);
         return post.getLikeCount();
     }
+
+    public Integer decreasePostLikeCount (Integer id) throws Exception{
+        Post post = getByPostId(id);
+        User user = userService.getUserById(userService.getLoginUser());
+        UserPost userPost=userPostService.getByReceiverIdAndPostId(user.getId(),post.getId());
+        userPostService.cancelLike(userPost);
+        post.setLikeCount(post.getLikeCount()-1);
+        postRepository.save(post);
+        return post.getLikeCount();
+    }
+
     public Integer increasePostReportCount(Integer id)throws Exception{
         Post post=getByPostId(id);
         User user= userService.getUserById(userService.getLoginUser());
