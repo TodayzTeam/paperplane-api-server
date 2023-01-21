@@ -28,7 +28,7 @@ public class UserPostService {
     }
 
     public UserPost getByReceiverIdAndPostId(Integer userId,Integer postId){
-        return userPostRepository.findPostOptionByPostId(userId,postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
+        return userPostRepository.findByReceiverIdAndPostId(userId,postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
     }
     public void checkLike(UserPost userPost){
         if(userPost.getIsLike()){
@@ -39,6 +39,15 @@ public class UserPostService {
             userPostRepository.save(userPost);
         }
     }
+
+    public void cancelLike(UserPost userPost){
+        if(!userPost.getIsLike()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"좋아요를 누른 상태가 아닙니다.");
+        }
+        userPost.setIsLike(false);
+        userPostRepository.save(userPost);
+    }
+
     public void checkingReport(UserPost userPost){
         if(userPost.getIsReport()){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 신고를 했습니다.");
@@ -54,7 +63,7 @@ public class UserPostService {
 
         List<UserPostResponseDto.Option> options=new ArrayList<>();
         for(Integer postId: postIdList){
-            UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
+            UserPost userPost = getByReceiverIdAndPostId(user.getId(), postId);
             options.add(UserPostResponseDto.Option.of(userPost));
         }
 
