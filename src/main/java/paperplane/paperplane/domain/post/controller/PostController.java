@@ -101,6 +101,12 @@ public class PostController {
         return ResponseEntity.ok(postService.increasePostLikeCount(postId));
     }
 
+    @ApiOperation("편지 좋아요 취소")
+    @GetMapping("/like/cancel/{postId}")
+    public ResponseEntity<Integer> likeCancelPost(@PathVariable Integer postId) throws Exception {
+        return ResponseEntity.ok(postService.decreasePostLikeCount(postId));
+    }
+
     @ApiOperation("유저의 그룹 편지 중 제목, 내용으로 검색. 그룹id,검색어 필요")
     @GetMapping("/search/{groupId}/{word}")
     public ResponseEntity<List<PostResponseDto.Simple>> searchGroupPost(@PathVariable final Integer groupId,@PathVariable final String word, @RequestParam("page") Integer page) throws Exception {
