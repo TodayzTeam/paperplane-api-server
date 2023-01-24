@@ -126,6 +126,18 @@ public class GroupService {
         }
     }
 
+    public List<User> getGroupUserByCodeExceptMe(String code)throws Exception{
+        Group group = getGroupByCode(code);
+        Integer userId = getLoginUser();
+        List<User> userList = groupRepository.findGroupUserExceptMe(userId,group.getId());
+
+        if (userList.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"편지를 받을 그룹원이 없습니다.");
+        }
+
+        return userList;
+    }
+
     public List<User> getGroupUserByCode(String code)throws Exception{
         Group group = getGroupByCode(code);
         Integer userId = getLoginUser();

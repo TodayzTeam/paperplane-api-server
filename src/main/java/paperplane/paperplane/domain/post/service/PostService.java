@@ -355,6 +355,20 @@ public class PostService {
         return PostResponseDto.Simple.of(post);
     }
 
+    public List<PostResponseDto.Simple> getReceivedUnreadPost(Pageable pageable){
+        User user= userService.getUserById(userService.getLoginUser());
+        Page<Post> postPage= postRepository.findReceivedUnreadPost(user.getId(),pageable);
+        List<Post> post=postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
+
+    public List<PostResponseDto.Simple> getReceivedReadPost(Pageable pageable){
+        User user= userService.getUserById(userService.getLoginUser());
+        Page<Post> postPage= postRepository.findReceivedReadPost(user.getId(),pageable);
+        List<Post> post=postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
+
     @Cacheable(value = "post-likecount", key = "#id", cacheManager = "cacheManager")
     public Integer getLikeCountByPostId(Integer id){
         return getByPostId(id).getLikeCount();
