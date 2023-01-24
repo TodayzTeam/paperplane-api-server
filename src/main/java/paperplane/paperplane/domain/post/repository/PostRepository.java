@@ -2,6 +2,8 @@ package paperplane.paperplane.domain.post.repository;
 
 import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.models.auth.In;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,6 +27,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "select p from Post p inner join p.sender  s on s.id=:userId inner join p.userPosts up on up.isReport=false ")
     Page<Post> findSentPost(@Param("userId")Integer userId,Pageable pageable);
 
+
     @Query(value = "select p from Post p where p.sender.id = :userId and p.group is null")
     Page<Post> findSentRandomPost(@org.springframework.data.repository.query.Param("userId")Integer userId,Pageable pageable);
 
@@ -40,11 +43,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "select p from Post p join p.userPosts up on (up.receiver.id = :userId and up.isReport = false and up.isRead = false)")
     Page<Post> findReceivedUnreadPost(@org.springframework.data.repository.query.Param("userId") Integer userId, Pageable pageable);
 
+
     @Query(value = "select p from Post p inner join p.userPosts up on (up.receiver.id=:userId and up.isReport=false AND up.isLike=true )")
     Page<Post> findLikedPost(@Param("userId") Integer userId, Pageable pageable);
-
-    @Query(value = "select * from Post p where p.sender_id=:userId and p.id=:postId",nativeQuery = true)
-    List<Post> test(@Param("userId") Integer userId, @Param("postId") Integer postId);
 
     @Query(value = "select p from Post p join p.userPosts up on up.isReport = false where p.group.id = :groupId and p.date >= :joinDate ")
     List<Post> findGroupPost(@org.springframework.data.repository.query.Param("groupId") Integer groupId, @org.springframework.data.repository.query.Param("joinDate")LocalDateTime joinDate);

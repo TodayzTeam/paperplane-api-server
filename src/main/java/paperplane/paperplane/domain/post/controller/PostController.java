@@ -112,6 +112,7 @@ public class PostController {
         return ResponseEntity.ok(postService.getLikedPost(pageRequest));
     }
 
+
     @ApiOperation("편지 신고, 5회 누적시 편지 삭제")
     @GetMapping("/report/{postId}")
     public ResponseEntity<Integer> reportPost(@PathVariable Integer postId) throws Exception {

@@ -84,12 +84,6 @@ public class UserPostService {
         if (userPostRepository.countUserPostBySenderIdAndOriginId(user.getId(),postId)!=null){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신을 했습니다.");
         }
-        if(userPostRepository.findPostOptionByPostId(user.getId(),postId).isPresent()){
-            UserPost userPost=userPostRepository.findPostOptionByPostId(user.getId(),postId).get();
-            if (userPost.getIsReply()){
-                return false;
-            }
-        }
         return true;
     }
 }
