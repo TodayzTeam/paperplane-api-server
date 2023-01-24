@@ -26,6 +26,7 @@ import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.dto.UserRequestDto;
 import paperplane.paperplane.domain.user.repository.UserRepository;
 import paperplane.paperplane.domain.userinterest.UserInterest;
+import paperplane.paperplane.domain.userinterest.repository.UserInterestRepository;
 import paperplane.paperplane.domain.userinterest.service.UserInterestService;
 import paperplane.paperplane.global.security.jwt.TokenService;
 
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final InterestRepository interestRepository;
-    private final UserInterestService userInterestService;
+    private final UserInterestRepository userInterestRepository;
     private final HttpServletRequest request;
     private final GroupService groupService;
     private final TokenService tokenService;
@@ -119,19 +120,22 @@ public class UserService {
         for(int i = 0; i < array.size(); i++){
             String kw = array.get(i).toString();
             if(kw.isEmpty()) continue;
+
             //키워드 없으면 추가
             Interest interest = interestRepository.findByKeyword(kw).orElseGet(()->
                     interestRepository.save(Interest.builder()
                             .keyword(kw)
                             .count(0)
                             .build()));
-
+            if(userInterestRepository.findByUserIdAndKeyword(userId, interest.getId()).isPresent()){
+                continue;
+            }
             UserInterest userInterest = UserInterest.builder()
                     .user(user)
                     .interest(interest)
                     .build();
 
-            userInterestService.addUserInterest(userInterest);
+            userInterestRepository.save(userInterest);
         }
     }
 
@@ -158,19 +162,23 @@ public class UserService {
 
         for(int i = 0; i < array.size(); i++){
             String keyword = array.get(i).toString();
-            if(keyword.isEmpty()) continue;
+            if(keyword.isEmpty())continue;
+
             Interest interest = interestRepository.findByKeyword(keyword).orElseGet(()->
                     interestRepository.save(Interest.builder()
                             .keyword(keyword)
                             .count(0)
                             .build()));
 
+            if(userInterestRepository.findByUserIdAndKeyword(userId, interest.getId()).isPresent()){
+                continue;
+            }
             UserInterest userInterest = UserInterest.builder()
                     .user(user)
                     .interest(interest)
                     .build();
 
-            userInterestService.addUserInterest(userInterest);
+            userInterestRepository.save(userInterest);
         }
 
         return user;
