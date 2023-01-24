@@ -348,6 +348,21 @@ public class PostService {
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
     }
+
+    public List<PostResponseDto.Simple> getSentRandomPost(Pageable pageable){
+        User user = userService.getUserById(userService.getLoginUser());
+        Page<Post> postPage = postRepository.findSentRandomPost(user.getId(),pageable);
+        List<Post> post=postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
+
+    public List<PostResponseDto.Simple> getSentGroupPost(Pageable pageable){
+        User user = userService.getUserById(userService.getLoginUser());
+        Page<Post> postPage = postRepository.findSentGroupPost(user.getId(),pageable);
+        List<Post> post = postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
+
     public List<PostResponseDto.Simple> getReceivedPost(Pageable pageable){
         User user= userService.getUserById(userService.getLoginUser());
         Page<Post> postPage= postRepository.findReceivedPost(user.getId(),pageable);

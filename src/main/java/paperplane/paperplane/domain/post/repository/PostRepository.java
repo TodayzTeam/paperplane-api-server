@@ -25,6 +25,11 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "select p from Post p inner join p.sender  s on s.id=:userId inner join p.userPosts up on up.isReport=false ")
     Page<Post> findSentPost(@Param("userId")Integer userId,Pageable pageable);
 
+    @Query(value = "select p from Post p where p.sender.id = :userId and p.group is null")
+    Page<Post> findSentRandomPost(@org.springframework.data.repository.query.Param("userId")Integer userId,Pageable pageable);
+
+    @Query(value = "select p from Post p where p.sender.id = :userId and p.group is not null")
+    Page<Post> findSentGroupPost(@org.springframework.data.repository.query.Param("userId")Integer userId,Pageable pageable);
 
     @Query(value = "select p from Post p inner join p.userPosts up on (up.receiver.id=:userId and up.isReport=false)")
     Page<Post> findReceivedPost(@Param("userId") Integer userId, Pageable pageable);

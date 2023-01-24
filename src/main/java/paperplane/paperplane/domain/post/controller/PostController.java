@@ -62,6 +62,20 @@ public class PostController {
         return ResponseEntity.ok(postService.getSentPost(pageRequest));
     }
 
+    @ApiOperation("보낸 편지 중 랜덤 편지")
+    @GetMapping("/sent/random")
+    public ResponseEntity<List<PostResponseDto.Simple>> sentRandomPost(@RequestParam("page") Integer page) {
+        PageRequest pageRequest= PageRequest.of(page,4);
+        return ResponseEntity.ok(postService.getSentRandomPost(pageRequest));
+    }
+
+    @ApiOperation("보낸 편지 중 그룹 편지")
+    @GetMapping("/sent/group")
+    public ResponseEntity<List<PostResponseDto.Simple>> sentGroupPost(@RequestParam("page") Integer page) {
+        PageRequest pageRequest= PageRequest.of(page,4);
+        return ResponseEntity.ok(postService.getSentGroupPost(pageRequest));
+    }
+
 
     @ApiOperation("인기편지 리스트 8개 전송")
     @GetMapping("/popular")
