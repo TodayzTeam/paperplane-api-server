@@ -112,6 +112,10 @@ public class PostService {
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신한 편지입니다.");
                 }
                 post.setOriginId(getByPostId(data.getOriginId()).getId());
+                Post lastPost=getByPostId(data.getOriginId());
+                lastPost.setOriginId(post.getId());
+                postRepository.save(lastPost);
+
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
                         .isReply(true)
@@ -292,7 +296,7 @@ public class PostService {
             infos.add(PostResponseDto.Info.of(post));
         }
 
-        if(userPost.getIsReply()!=null&& userPost.getIsReply()) {
+        if(getByPostId(postId).getOriginId()!=null) {
             post=getByPostId(getByPostId(postId).getOriginId());
             if(post.getGroup()==null){
                 infos.add(PostResponseDto.Info.of(Post.builder()
