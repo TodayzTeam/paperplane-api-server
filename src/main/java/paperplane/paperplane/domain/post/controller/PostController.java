@@ -131,7 +131,7 @@ public class PostController {
     public ResponseEntity<Integer> tempPost(){
         return ResponseEntity.ok(postService.checkingTempPost());
     }
-    @ApiOperation("편지 자세한 정보 postId 필요, 첫번째 - post id에 해당하는 편지, 두번째 - 원본 편지 ")
+    @ApiOperation("편지 자세한 정보 postId 필요")
     @GetMapping("/info/{postId}")
     public ResponseEntity<List<PostResponseDto.Info>> postInfo(@PathVariable Integer postId) {
         return ResponseEntity.ok(postService.PostInfoById(postId));
