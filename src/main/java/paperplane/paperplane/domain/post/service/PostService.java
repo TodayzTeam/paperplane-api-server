@@ -101,6 +101,7 @@ public class PostService {
 
         while(randUser.isEmpty()){
             randUser=userService.getRandUser(data.getReceiveGroup());
+
         }
         for(User receive: randUser){
             if(data.getIsReply() ) {
@@ -111,10 +112,12 @@ public class PostService {
                     postRepository.delete(post);
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신한 편지입니다.");
                 }
+
                 post.setOriginId(getByPostId(data.getOriginId()).getId());
                 Post lastPost=getByPostId(data.getOriginId());
                 lastPost.setOriginId(post.getId());
                 postRepository.save(lastPost);
+
 
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
@@ -126,6 +129,7 @@ public class PostService {
                         .build());
 
             }else{
+
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
                         .isReply(false)
@@ -136,6 +140,17 @@ public class PostService {
                         .build());
             }
         }
+        if(userPostService.getByReceiverIdAndPostId(user.getId(),post.getId()).getId()==null){
+            userPostService.addUserPost(UserPost.builder()
+                    .post(post)
+                    .isReply(false)
+                    .isRead(false)
+                    .isReport(false)
+                    .isLike(false)
+                    .receiver(user)
+                    .build());
+        }
+
 
         //save Interest
         if(data.getKeyword()!=null) {
@@ -243,6 +258,14 @@ public class PostService {
                         .build());
             }
         }
+        userPostService.addUserPost(UserPost.builder()
+                .post(post)
+                .isReply(false)
+                .isRead(false)
+                .isReport(false)
+                .isLike(false)
+                .receiver(user)
+                .build());
 
         //save Interest
         if(data.getKeyword()!=null) {
@@ -399,6 +422,12 @@ public class PostService {
     public List<PostResponseDto.Simple> getLikedPost(Pageable pageable){
         User user= userService.getUserById(userService.getLoginUser());
         Page<Post> postPage= postRepository.findLikedPost(user.getId(),pageable);
+        List<Post> post=postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
+    public List<PostResponseDto.Simple> getLikedSentPost(Pageable pageable){
+        User user= userService.getUserById(userService.getLoginUser());
+        Page<Post> postPage= postRepository.findLikedSentPost(user.getId(),pageable);
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
     }

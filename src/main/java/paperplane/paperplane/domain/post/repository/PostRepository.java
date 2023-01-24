@@ -32,6 +32,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "select p from Post p inner join p.userPosts up on (up.receiver.id=:userId and up.isReport=false AND up.isLike=true )")
     Page<Post> findLikedPost(@Param("userId") Integer userId, Pageable pageable);
 
+    @Query(value = "select p from Post p inner join p.userPosts up on (p.sender.id=:userId and up.isReport=false AND up.isLike=true )")
+    Page<Post> findLikedSentPost(@Param("userId") Integer userId, Pageable pageable);
     @Query(value = "select * from Post p where p.sender_id=:userId and p.id=:postId",nativeQuery = true)
     List<Post> test(@Param("userId") Integer userId, @Param("postId") Integer postId);
 

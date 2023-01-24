@@ -76,11 +76,18 @@ public class PostController {
         PageRequest pageRequest= PageRequest.of(page,8);
         return ResponseEntity.ok(postService.getReceivedPost(pageRequest));
     }
-    @ApiOperation("좋아요 누른 편지")
-    @GetMapping("/liked")
+    @ApiOperation("좋아요 누른 편지- 받은편지")
+    @GetMapping("/liked/received")
     public ResponseEntity<List<PostResponseDto.Simple>> likedPostList(@RequestParam("page") Integer page){
         PageRequest pageRequest= PageRequest.of(page,8);
         return ResponseEntity.ok(postService.getLikedPost(pageRequest));
+    }
+
+    @ApiOperation("좋아요 누른 편지- 보낸편지")
+    @GetMapping("/liked/sent")
+    public ResponseEntity<List<PostResponseDto.Simple>> likedSentPostList(@RequestParam("page") Integer page){
+        PageRequest pageRequest= PageRequest.of(page,8);
+        return ResponseEntity.ok(postService.getLikedSentPost(pageRequest));
     }
 
     @ApiOperation("편지 신고, 5회 누적시 편지 삭제")
