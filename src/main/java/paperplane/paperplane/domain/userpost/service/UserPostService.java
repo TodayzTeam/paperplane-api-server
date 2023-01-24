@@ -14,6 +14,7 @@ import paperplane.paperplane.domain.userpost.repository.UserPostRepository;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,13 @@ public class UserPostService {
     }
 
     public UserPost getByReceiverIdAndPostId(Integer userId,Integer postId){
-        return userPostRepository.findByReceiverIdAndPostId(userId,postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
+        Optional<UserPost> userPostOptional =userPostRepository.findByReceiverIdAndPostId(userId,postId);
+        if(userPostOptional.isPresent()){
+            return userPostRepository.findByReceiverIdAndPostId(userId,postId).get();
+        }else {
+            return new UserPost();
+        }
+
     }
     public void checkLike(UserPost userPost){
         if(userPost.getIsLike()){
@@ -64,7 +71,9 @@ public class UserPostService {
         List<UserPostResponseDto.Option> options=new ArrayList<>();
         for(Integer postId: postIdList){
             UserPost userPost = getByReceiverIdAndPostId(user.getId(), postId);
-            options.add(UserPostResponseDto.Option.of(userPost));
+            if(userPost.getId()!=null){
+                options.add(UserPostResponseDto.Option.of(userPost));
+            }
         }
 
         return options;

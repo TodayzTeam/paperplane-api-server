@@ -89,5 +89,36 @@ public class PostResponseDto implements Serializable {
         }
 
     }
+    @ApiModel(value = "편지 요약 정보+유저 정보")
+    @Builder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Data{
+        private Integer id;
+        private String title;
+        private String content;
+        private Integer likeCount;
+        private PostColor postColor;
+        private LocalDateTime date;
+        private Boolean isReply;
+
+        public static Simple of(Post post){
+            return Simple.builder()
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .likeCount(post.getLikeCount())
+                    .postColor(post.getPostColor())
+                    .date(post.getDate())
+                    .build();
+        }
+
+        public static List<PostResponseDto.Simple> of(List<Post> posts){
+            return posts.stream().map(PostResponseDto.Simple::of).collect(Collectors.toList());
+        }
+
+    }
 
 }
