@@ -272,12 +272,12 @@ public class PostService {
         return post.getId();
     }
     public List<PostResponseDto.Info> PostInfoById(Integer postId){
+        Post post=getByPostId(postId);
+
         User user= userService.getUserById(userService.getLoginUser());
-        UserPost userPost=userPostRepository.findByReceiverIdAndPostId(user.getId(),postId).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"편지 소유/존재 여부 확인"));
+        Optional<UserPost> userPost=userPostRepository.findByReceiverIdAndPostId(user.getId(),postId);
 
         List<PostResponseDto.Info> infos= new ArrayList<>();
-        Post post=userPost.getPost();
-
         if(post.getGroup()==null){
             infos.add(PostResponseDto.Info.of(Post.builder()
                     .id(post.getId())
@@ -316,8 +316,10 @@ public class PostService {
                 infos.add(PostResponseDto.Info.of(post));
             }
         }
-        userPost.setIsRead(true);
-        userPostRepository.save(userPost);
+        if(userPost.isPresent()){
+            userPost.get().setIsRead(true);
+            userPostRepository.save(userPost.get());
+        }
         return infos;
     }
     public Integer checkingTempPost(){
