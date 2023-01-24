@@ -387,20 +387,28 @@ public class PostService {
         Post post=getByPostId(id);
         User user= userService.getUserById(userService.getLoginUser());
         UserPost userPost=userPostService.getByReceiverIdAndPostId(user.getId(),post.getId());
-        userPostService.checkLike(userPost);
-        post.setLikeCount(post.getLikeCount()+1);
-        postRepository.save(post);
-        return post.getLikeCount();
+        if(userPost.getId()!=null){
+            userPostService.checkLike(userPost);
+            post.setLikeCount(post.getLikeCount()+1);
+            postRepository.save(post);
+            return post.getLikeCount();
+        }
+        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"해당 편지를 소유하고 있지 않습니다");
+
     }
 
     public Integer decreasePostLikeCount (Integer id) throws Exception{
         Post post = getByPostId(id);
         User user = userService.getUserById(userService.getLoginUser());
         UserPost userPost=userPostService.getByReceiverIdAndPostId(user.getId(),post.getId());
-        userPostService.cancelLike(userPost);
-        post.setLikeCount(post.getLikeCount()-1);
-        postRepository.save(post);
-        return post.getLikeCount();
+        if(userPost.getId()!=null){
+            userPostService.cancelLike(userPost);
+            post.setLikeCount(post.getLikeCount()-1);
+            postRepository.save(post);
+            return post.getLikeCount();
+        }
+        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"해당 편지를 소유하고 있지 않습니다");
+
     }
 
     public Integer increasePostReportCount(Integer id)throws Exception{
@@ -421,15 +429,12 @@ public class PostService {
 
     public List<PostResponseDto.Simple> getLikedPost(Pageable pageable){
         User user= userService.getUserById(userService.getLoginUser());
-        Page<Post> postPage= postRepository.findLikedPost(user.getId(),pageable);
-        List<Post> post=postPage.stream().collect(Collectors.toList());
-        return PostResponseDto.Simple.of(post);
-    }
-    public List<PostResponseDto.Simple> getLikedSentPost(Pageable pageable){
-        User user= userService.getUserById(userService.getLoginUser());
-        Page<Post> postPage= postRepository.findLikedSentPost(user.getId(),pageable);
-        List<Post> post=postPage.stream().collect(Collectors.toList());
-        return PostResponseDto.Simple.of(post);
+        log.info("test");
+        if(postRepository.findLikedPost(user.getId(),pageable).isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"해당편지 소유자가 아닙니다.");
+        else {
+            return PostResponseDto.Simple.of(postRepository.findLikedPost(user.getId(),pageable).stream().collect(Collectors.toList()));
+        }
     }
 
     public List<PostResponseDto.Simple> searchGroupPostByWord(Integer groupId,String word,Pageable pageable){
