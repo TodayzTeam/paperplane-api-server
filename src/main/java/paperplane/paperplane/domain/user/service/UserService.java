@@ -96,7 +96,7 @@ public class UserService {
             }
             return users;
         } else if (randUser.equals(groupService.getGroupByCode(randUser).getCode())) {
-            return groupService.getGroupUserByCode(randUser);
+            return groupService.getGroupUserByCodeExceptMe(randUser);
         } else{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"잘못된 수신자그룹입니다.");
         }
