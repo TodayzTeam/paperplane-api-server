@@ -37,12 +37,11 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "select p from Post p inner join p.userPosts up on (up.receiver.id=:userId and up.isReport=false)")
     Page<Post> findReceivedPost(@Param("userId") Integer userId, Pageable pageable);
 
-    @Query(value = "select p from Post p join p.userPosts up on (up.receiver.id = :userId and up.isReport = false and up.isRead = true)")
+    @Query(value = "select p from Post p join p.userPosts up on (up.receiver.id = :userId and  p.sender.id <> :userId and up.isReport = false and up.isRead = true)")
     Page<Post> findReceivedReadPost(@org.springframework.data.repository.query.Param("userId") Integer userId, Pageable pageable);
 
-    @Query(value = "select p from Post p join p.userPosts up on (up.receiver.id = :userId and up.isReport = false and up.isRead = false)")
+    @Query(value = "select p from Post p join p.userPosts up on (up.receiver.id = :userId and p.sender.id <> :userId and up.isReport = false and up.isRead = false)")
     Page<Post> findReceivedUnreadPost(@org.springframework.data.repository.query.Param("userId") Integer userId, Pageable pageable);
-
 
     @Query(value = "select p from Post p inner join p.userPosts up on (up.receiver.id=:userId and up.isReport=false AND up.isLike=true )")
     Page<Post> findLikedPost(@Param("userId") Integer userId, Pageable pageable);
