@@ -129,16 +129,6 @@ public class PostService {
                 userPost.setIsReply("RECEIVED");
                 userPostRepository.save(userPost);
 
-                if(userPostService.getByReceiverIdAndPostId(user.getId(),post.getId()).getId()==null){
-                    userPostService.addUserPost(UserPost.builder()
-                            .post(post)
-                            .isReply("SENT")
-                            .isRead(false)
-                            .isReport(false)
-                            .isLike(false)
-                            .receiver(user)
-                            .build());
-                }
                 break;
 
             }else{
@@ -151,16 +141,21 @@ public class PostService {
                         .receiver(receive)
                         .build());
             }
-            if(userPostService.getByReceiverIdAndPostId(user.getId(),post.getId()).getId()==null){
-                userPostService.addUserPost(UserPost.builder()
-                        .post(post)
-                        .isReply("SENT")
-                        .isRead(false)
-                        .isReport(false)
-                        .isLike(false)
-                        .receiver(user)
-                        .build());
+        }
+        if(userPostService.getByReceiverIdAndPostId(user.getId(),post.getId()).getId()==null){
+            UserPost userPost=UserPost.builder()
+                    .post(post)
+                    .isReply("NONE")
+                    .isRead(false)
+                    .isReport(false)
+                    .isLike(false)
+                    .receiver(user)
+                    .build();
+            if(data.getIsReply()) {
+                userPost.setIsReply("SENT");
             }
+            userPostService.addUserPost(userPost);
+
         }
 
 
@@ -316,6 +311,9 @@ public class PostService {
 
         User user= userService.getUserById(userService.getLoginUser());
         Optional<UserPost> userPost=userPostRepository.findByReceiverIdAndPostId(user.getId(),postId);
+        if(!userPost.isPresent()) {
+            userPost=userPostRepository.findByReceiverIdAndPostId(post.getSender().getId(),postId);
+        }
 
         List<PostResponseDto.Info> infos= new ArrayList<>();
         if(post.getGroup()==null){
@@ -336,31 +334,33 @@ public class PostService {
             infos.add(PostResponseDto.Info.of(post));
         }
         log.info("test");
-
-        if(userPost.isPresent() && userPost.get().getReplyId()!=null) {
-            post=getByPostId(userPost.get().getReplyId());
-            if(post.getGroup()==null){
-                infos.add(PostResponseDto.Info.of(Post.builder()
-                        .id(post.getId())
-                        .title(post.getTitle())
-                        .postInterests(post.getPostInterests())
-                        .postColor(post.getPostColor())
-                        .likeCount(post.getLikeCount())
-                        .sender(post.getSender())
-                        .reportCount(post.getReportCount())
-                        .date(post.getDate())
-                        .content(post.getContent())
-                        .userPosts(post.getUserPosts())
-                        .group(new Group())
-                        .build()));
-            }else {
-                infos.add(PostResponseDto.Info.of(post));
+        if(userPost.isPresent())
+        {
+            UserPost up=userPost.get();
+            if(up.getReplyId()!=null) {
+                post=getByPostId(userPost.get().getReplyId());
+                if(post.getGroup()==null){
+                    infos.add(PostResponseDto.Info.of(Post.builder()
+                            .id(post.getId())
+                            .title(post.getTitle())
+                            .postInterests(post.getPostInterests())
+                            .postColor(post.getPostColor())
+                            .likeCount(post.getLikeCount())
+                            .sender(post.getSender())
+                            .reportCount(post.getReportCount())
+                            .date(post.getDate())
+                            .content(post.getContent())
+                            .userPosts(post.getUserPosts())
+                            .group(new Group())
+                            .build()));
+                }else {
+                    infos.add(PostResponseDto.Info.of(post));
+                }
             }
+            up.setIsRead(true);
+            userPostRepository.save(up);
         }
-        if(userPost.isPresent()){
-            userPost.get().setIsRead(true);
-            userPostRepository.save(userPost.get());
-        }
+
         return infos;
     }
     public Integer checkingTempPost(){
