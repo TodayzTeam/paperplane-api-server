@@ -45,8 +45,9 @@ public class UserPost {
     private Boolean isLike;
 
     @Column
-    private String isReply;
-
+    private Boolean sentReply;
+    @Column
+    private Boolean receivedReply;
 
     @Column
     private Integer replyId;

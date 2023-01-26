@@ -19,11 +19,5 @@ public interface UserPostRepository extends JpaRepository<UserPost,Integer> {
     @Query(value = "select count(*)from  UserPost  up join Post p on up.post=p where (up.replyId=:originId and p.sender.id=:userId) group by up.replyId,p.sender.id")
     Integer countUserPostBySenderIdAndOriginId(@Param("userId") Integer userId, @Param("originId") Integer originId);
 
-    @Query(value = "select p from UserPost up join Post p on up.post=p where up.receiver.id=:userId and up.isReply = 'RECEIVED' ")
-    List<Post> findReplyReceivedPost(@Param("userId") Integer userId);
-
-    @Query(value = "select p from UserPost up join Post p on up.post=p where p.sender.id=:userId and up.isReply = 'SENT' ")
-    List<Post> findReplySentPost(@Param("userId") Integer userId);
-
     Optional<UserPost> findByReceiverIdAndPostId(Integer receiverId,Integer postId);
 }
