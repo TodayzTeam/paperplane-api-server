@@ -88,11 +88,4 @@ public class UserPostService {
         return true;
     }
 
-    public List<Post> getReplyReceivedPost(Integer userId){
-        return userPostRepository.findReplyReceivedPost(userId);
-    }
-    public List<Post> getReplySentPost(Integer userId){
-        return userPostRepository.findReplySentPost(userId);
-    }
-
 }
