@@ -430,8 +430,11 @@ public class PostService {
     public List<PostResponseDto.Simple> getLikedPost(Pageable pageable){
         User user= userService.getUserById(userService.getLoginUser());
         log.info("test");
-        if(postRepository.findLikedPost(user.getId(),pageable).isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"해당편지 소유자가 아닙니다.");
+        if(postRepository.findLikedPost(user.getId(),pageable).isEmpty()){
+            List<PostResponseDto.Simple> simpleList=new ArrayList<>();
+            simpleList.add(PostResponseDto.Simple.of(new Post()));
+            return simpleList;
+        }
         else {
             return PostResponseDto.Simple.of(postRepository.findLikedPost(user.getId(),pageable).stream().collect(Collectors.toList()));
         }
