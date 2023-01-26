@@ -19,6 +19,10 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
     @Query(value = "select gu.user from Group g join g.userGroups gu where g.id = :groupId")
     List<User> getGroupMemberListByGroupId(@org.springframework.data.repository.query.Param("groupId") Integer groupId);
 
+    @Query(value = "select gu.user from Group g join g.userGroups gu where g.id = :groupId and gu.user.id <> :userId")
+    List<User> findGroupUserExceptMe(@org.springframework.data.repository.query.Param("userId") Integer userId,
+                                     @org.springframework.data.repository.query.Param("groupId") Integer groupId);
+
 
     @Query(value = "select distinct u from User u join UserGroup ug on u.id=:userId join Group g on g.id=:groupId")
     public List<User> findGroupUser(@Param("userId") Integer userId,@Param("groupId") Integer groupId);

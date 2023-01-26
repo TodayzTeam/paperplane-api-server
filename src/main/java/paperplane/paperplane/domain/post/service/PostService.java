@@ -353,9 +353,38 @@ public class PostService {
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
     }
+
+    public List<PostResponseDto.Simple> getSentRandomPost(Pageable pageable){
+        User user = userService.getUserById(userService.getLoginUser());
+        Page<Post> postPage = postRepository.findSentRandomPost(user.getId(),pageable);
+        List<Post> post=postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
+
+    public List<PostResponseDto.Simple> getSentGroupPost(Pageable pageable){
+        User user = userService.getUserById(userService.getLoginUser());
+        Page<Post> postPage = postRepository.findSentGroupPost(user.getId(),pageable);
+        List<Post> post = postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
+
     public List<PostResponseDto.Simple> getReceivedPost(Pageable pageable){
         User user= userService.getUserById(userService.getLoginUser());
         Page<Post> postPage= postRepository.findReceivedPost(user.getId(),pageable);
+        List<Post> post=postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
+
+    public List<PostResponseDto.Simple> getReceivedUnreadPost(Pageable pageable){
+        User user= userService.getUserById(userService.getLoginUser());
+        Page<Post> postPage= postRepository.findReceivedUnreadPost(user.getId(),pageable);
+        List<Post> post=postPage.stream().collect(Collectors.toList());
+        return PostResponseDto.Simple.of(post);
+    }
+
+    public List<PostResponseDto.Simple> getReceivedReadPost(Pageable pageable){
+        User user= userService.getUserById(userService.getLoginUser());
+        Page<Post> postPage= postRepository.findReceivedReadPost(user.getId(),pageable);
         List<Post> post=postPage.stream().collect(Collectors.toList());
         return PostResponseDto.Simple.of(post);
     }
@@ -423,9 +452,16 @@ public class PostService {
 
     public List<PostResponseDto.Simple> searchGroupPostByWord(Integer groupId,String word,Pageable pageable){
         User user= userService.getUserById(userService.getLoginUser());
-        Page<Post> postPage =postRepository.findGroupPostByWord(groupId,word,pageable);
-        List<Post> post=postPage.stream().collect(Collectors.toList());
-        return PostResponseDto.Simple.of(post);
+        Optional<UserGroup> userGroupOptional = userGroupRepository.findByCodeAndUserId(groupId, user.getId());
+
+        if(userGroupOptional.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가입하지 않은 그룹입니다.");
+        }
+        UserGroup userGroup = userGroupOptional.get();
+        LocalDateTime joinDate = userGroup.getJoinDate();
+
+        List<Post> postList = postRepository.findGroupPostByWord(groupId, user.getId(), word);
+        return PostResponseDto.Simple.of(postList);
     }
 
     public List<PostResponseDto.Simple> getGroupPost(Integer groupId){
@@ -441,7 +477,7 @@ public class PostService {
         UserGroup userGroup = userGroupOptional.get();
         LocalDateTime joinDate = userGroup.getJoinDate();
 
-        List<Post> groupPost = postRepository.findGroupPost(groupId, joinDate);
+        List<Post> groupPost = postRepository.findGroupPost(groupId, user.getId());
 
         return PostResponseDto.Simple.of(groupPost);
     }

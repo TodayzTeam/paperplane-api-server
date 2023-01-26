@@ -27,16 +27,30 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "select p from Post p inner join p.sender  s on s.id=:userId inner join p.userPosts up on up.isReport=false ")
     Page<Post> findSentPost(@Param("userId")Integer userId,Pageable pageable);
 
+
+    @Query(value = "select p from Post p where p.sender.id = :userId and p.group is null")
+    Page<Post> findSentRandomPost(@org.springframework.data.repository.query.Param("userId")Integer userId,Pageable pageable);
+
+    @Query(value = "select p from Post p where p.sender.id = :userId and p.group is not null")
+    Page<Post> findSentGroupPost(@org.springframework.data.repository.query.Param("userId")Integer userId,Pageable pageable);
+
     @Query(value = "select p from Post p inner join p.userPosts up on (up.receiver.id=:userId and up.isReport=false)")
     Page<Post> findReceivedPost(@Param("userId") Integer userId, Pageable pageable);
 
-    @NotFound(action = NotFoundAction.IGNORE)
+    @Query(value = "select p from Post p join p.userPosts up on (up.receiver.id = :userId and  p.sender.id <> :userId and up.isReport = false and up.isRead = true)")
+    Page<Post> findReceivedReadPost(@org.springframework.data.repository.query.Param("userId") Integer userId, Pageable pageable);
+
+    @Query(value = "select p from Post p join p.userPosts up on (up.receiver.id = :userId and p.sender.id <> :userId and up.isReport = false and up.isRead = false)")
+    Page<Post> findReceivedUnreadPost(@org.springframework.data.repository.query.Param("userId") Integer userId, Pageable pageable);
+
     @Query(value = "select p from Post p inner join p.userPosts up on (up.receiver.id=:userId and up.isReport=false AND up.isLike=true )")
     Page<Post> findLikedPost(@Param("userId") Integer userId, Pageable pageable);
 
-    @Query(value = "select p from Post p join p.userPosts up on up.isReport = false where p.group.id = :groupId and p.date >= :joinDate ")
-    List<Post> findGroupPost(@org.springframework.data.repository.query.Param("groupId") Integer groupId, @org.springframework.data.repository.query.Param("joinDate")LocalDateTime joinDate);
+    @Query(value = "select distinct p from Post p join p.userPosts up on (up.receiver.id = :userId and up.isReport = false) where p.group.id = :groupId order by p.date desc")
+    List<Post> findGroupPost(@org.springframework.data.repository.query.Param("groupId") Integer groupId,
+                             @org.springframework.data.repository.query.Param("userId") Integer userId);
 
-    @Query(value = "SELECT p FROM Post p inner join Group g on g.id=:groupId inner join p.userPosts up on up.isReport=false where((p.content like CONCAT('%',:word,'%')) or (p.title like CONCAT('%',:word,'%')) ) ")
-    Page<Post> findGroupPostByWord(@Param("groupId")Integer groupId,@Param("word") String word, Pageable pageable);
+    @Query(value = "select distinct p from Post p join p.userPosts up on (up.receiver.id = :userId and up.isReport = false) " +
+            "where p.group.id = :groupId and ((p.content like CONCAT('%',:word,'%')) or (p.title like CONCAT('%',:word,'%')) ) order by p.date desc")
+    List<Post> findGroupPostByWord(@Param("groupId")Integer groupId, @Param("userId") Integer userId, @Param("word") String word);
 }

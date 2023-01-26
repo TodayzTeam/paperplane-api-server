@@ -62,6 +62,20 @@ public class PostController {
         return ResponseEntity.ok(postService.getSentPost(pageRequest));
     }
 
+    @ApiOperation("보낸 편지 중 랜덤 편지")
+    @GetMapping("/sent/random")
+    public ResponseEntity<List<PostResponseDto.Simple>> sentRandomPost(@RequestParam("page") Integer page) {
+        PageRequest pageRequest= PageRequest.of(page,4);
+        return ResponseEntity.ok(postService.getSentRandomPost(pageRequest));
+    }
+
+    @ApiOperation("보낸 편지 중 그룹 편지")
+    @GetMapping("/sent/group")
+    public ResponseEntity<List<PostResponseDto.Simple>> sentGroupPost(@RequestParam("page") Integer page) {
+        PageRequest pageRequest= PageRequest.of(page,4);
+        return ResponseEntity.ok(postService.getSentGroupPost(pageRequest));
+    }
+    
     @ApiOperation("인기편지 리스트 8개 전송")
     @GetMapping("/popular")
     public ResponseEntity<List<PostResponseDto.Simple>> popularPost() {
@@ -74,6 +88,21 @@ public class PostController {
         PageRequest pageRequest= PageRequest.of(page,8);
         return ResponseEntity.ok(postService.getReceivedPost(pageRequest));
     }
+
+    @ApiOperation("받은 편지 중 읽은 편지")
+    @GetMapping("/received/read")
+    public ResponseEntity<List<PostResponseDto.Simple>> receivedReadPost(@RequestParam("page") Integer page) {
+        PageRequest pageRequest= PageRequest.of(page,4);
+        return ResponseEntity.ok(postService.getReceivedReadPost(pageRequest));
+    }
+
+    @ApiOperation("받은 편지 중 안 읽은 편지")
+    @GetMapping("/received/unread")
+    public ResponseEntity<List<PostResponseDto.Simple>> receivedUnreadPost(@RequestParam("page") Integer page) {
+        PageRequest pageRequest= PageRequest.of(page,4);
+        return ResponseEntity.ok(postService.getReceivedUnreadPost(pageRequest));
+    }
+
     @ApiOperation("좋아요 누른 편지")
     @GetMapping("/liked")
     public ResponseEntity<List<PostResponseDto.Simple>> likedPostList(@RequestParam("page") Integer page){
