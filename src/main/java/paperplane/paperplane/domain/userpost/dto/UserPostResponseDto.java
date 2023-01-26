@@ -20,7 +20,9 @@ public class UserPostResponseDto {
         private Boolean isReport;
         private Boolean isRead;
         private Boolean isLike;
-        private String isReply;
+        private Boolean sentReply;
+        private Boolean receivedReply;
+
 
         public static UserPostResponseDto.Option of(UserPost userPost) {
             return Option.builder()
@@ -28,7 +30,8 @@ public class UserPostResponseDto {
                     .isReport(userPost.getIsReport())
                     .isRead(userPost.getIsRead())
                     .isLike(userPost.getIsLike())
-                    .isReply(userPost.getIsReply()).build();
+                    .sentReply(userPost.getSentReply())
+                    .receivedReply(userPost.getReceivedReply()).build();
 
         }
 

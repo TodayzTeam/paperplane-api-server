@@ -91,7 +91,7 @@ public class UserService {
         //편지 제약조건에 따라 추후 수정
         if(randUser.equals("RAND")){
             List<User> users =userRepository.findRandUserList();
-            while (users.isEmpty()){
+            while (users.isEmpty()||(users.size()==1 && users.get(0).getId().equals(getLoginUser()))){
                 users =userRepository.findRandUserList();
             }
             return users;

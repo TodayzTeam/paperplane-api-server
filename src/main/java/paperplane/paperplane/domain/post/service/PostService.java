@@ -117,24 +117,33 @@ public class PostService {
 
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
-                        .isReply("SENT")
+                        .sentReply(false)
+                        .receivedReply(true)
                         .isRead(false)
                         .isReport(false)
                         .isLike(false)
                         .receiver(getByPostId(data.getOriginId()).getSender())
                         .replyId(data.getOriginId())
                         .build());
-                UserPost userPost=userPostService.getByReceiverIdAndPostId(post.getSender().getId(),data.getOriginId());
-                userPost.setReplyId(post.getId());
-                userPost.setIsReply("RECEIVED");
-                userPostRepository.save(userPost);
+                UserPost userPostByReceiver=userPostService.getByReceiverIdAndPostId(post.getSender().getId(),data.getOriginId());
+                userPostByReceiver.setReplyId(post.getId());
+                userPostByReceiver.setReceivedReply(false);
+                userPostByReceiver.setSentReply(false);
+                userPostRepository.save(userPostByReceiver);
+
+                UserPost userPostBySender=userPostService.getByReceiverIdAndPostId(receive.getId(),data.getOriginId());
+                userPostBySender.setReplyId(post.getId());
+                userPostBySender.setReceivedReply(false);
+                userPostBySender.setSentReply(false);
+                userPostRepository.save(userPostBySender);
 
                 break;
 
             }else{
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
-                        .isReply("NONE")
+                        .sentReply(false)
+                        .receivedReply(false)
                         .isRead(false)
                         .isReport(false)
                         .isLike(false)
@@ -143,22 +152,32 @@ public class PostService {
             }
         }
         if(userPostService.getByReceiverIdAndPostId(user.getId(),post.getId()).getId()==null){
-            UserPost userPost=UserPost.builder()
-                    .post(post)
-                    .isReply("NONE")
-                    .isRead(false)
-                    .isReport(false)
-                    .isLike(false)
-                    .receiver(user)
-                    .build();
             if(data.getIsReply()) {
-                userPost.setIsReply("SENT");
+                UserPost userPost=UserPost.builder()
+                        .post(post)
+                        .sentReply(true)
+                        .receivedReply(false)
+                        .isRead(false)
+                        .isReport(false)
+                        .isLike(false)
+                        .replyId(data.getOriginId())
+                        .receiver(user)
+                        .build();
+                userPostService.addUserPost(userPost);
             }
-            userPostService.addUserPost(userPost);
-
+            else {
+                UserPost userPost=UserPost.builder()
+                        .post(post)
+                        .sentReply(false)
+                        .receivedReply(false)
+                        .isRead(false)
+                        .isReport(false)
+                        .isLike(false)
+                        .receiver(user)
+                        .build();
+                userPostService.addUserPost(userPost);
+            }
         }
-
-
 
 
         //save Interest
@@ -253,7 +272,8 @@ public class PostService {
 
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
-                        .isReply("SENT")
+                        .sentReply(true)
+                        .receivedReply(false)
                         .isRead(false)
                         .isReport(false)
                         .isLike(false)
@@ -262,13 +282,17 @@ public class PostService {
                         .build());
                 UserPost userPost=userPostService.getByReceiverIdAndPostId(post.getSender().getId(),data.getOriginId());
                 userPost.setReplyId(post.getId());
-                userPost.setIsReply("RECEIVED");
+                userPost.setReceivedReply(true);
+                userPost.setSentReply(false);
                 userPostRepository.save(userPost);
+
                 break;
+
             }else{
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
-                        .isReply("NONE")
+                        .sentReply(false)
+                        .receivedReply(false)
                         .isRead(false)
                         .isReport(false)
                         .isLike(false)
@@ -276,6 +300,20 @@ public class PostService {
                         .build());
             }
         }
+        if(userPostService.getByReceiverIdAndPostId(user.getId(),post.getId()).getId()==null){
+            UserPost userPost=UserPost.builder()
+                    .post(post)
+                    .sentReply(false)
+                    .receivedReply(false)
+                    .isRead(false)
+                    .isReport(false)
+                    .isLike(false)
+                    .receiver(user)
+                    .build();
+            userPostService.addUserPost(userPost);
+
+        }
+
 
 
 
@@ -310,9 +348,18 @@ public class PostService {
         Post post=getByPostId(postId);
 
         User user= userService.getUserById(userService.getLoginUser());
-        Optional<UserPost> userPost=userPostRepository.findByReceiverIdAndPostId(user.getId(),postId);
-        if(!userPost.isPresent()) {
-            userPost=userPostRepository.findByReceiverIdAndPostId(post.getSender().getId(),postId);
+        log.info("{}",user.getId());
+        log.info("{}",post.getSender().getId());
+
+        Optional<UserPost> userPostByReceiver=userPostRepository.findByReceiverIdAndPostId(user.getId(),postId);
+        Optional<UserPost> userPostBySender=userPostRepository.findByReceiverIdAndPostId(post.getSender().getId(),postId);
+
+        log.info("{}",userPostBySender.get().getId());
+        log.info("{}",userPostByReceiver.get().getId());
+        if(userPostBySender.isPresent()){
+            if(userPostBySender.get().getSentReply()||userPostBySender.get().getReceivedReply()){
+                userPostByReceiver=userPostBySender;
+            }
         }
 
         List<PostResponseDto.Info> infos= new ArrayList<>();
@@ -333,12 +380,9 @@ public class PostService {
         }else {
             infos.add(PostResponseDto.Info.of(post));
         }
-        log.info("test");
-        if(userPost.isPresent())
-        {
-            UserPost up=userPost.get();
+            UserPost up=userPostByReceiver.get();
             if(up.getReplyId()!=null) {
-                post=getByPostId(userPost.get().getReplyId());
+                post=getByPostId(userPostByReceiver.get().getReplyId());
                 if(post.getGroup()==null){
                     infos.add(PostResponseDto.Info.of(Post.builder()
                             .id(post.getId())
@@ -359,7 +403,7 @@ public class PostService {
             }
             up.setIsRead(true);
             userPostRepository.save(up);
-        }
+
 
         return infos;
     }
@@ -447,7 +491,6 @@ public class PostService {
 
     public List<PostResponseDto.Simple> getLikedPost(Pageable pageable){
         User user= userService.getUserById(userService.getLoginUser());
-        log.info("test");
         if(postRepository.findLikedPost(user.getId(),pageable).isEmpty()){
             List<PostResponseDto.Simple> simpleList=new ArrayList<>();
             return simpleList;
@@ -482,12 +525,6 @@ public class PostService {
         return PostResponseDto.Simple.of(groupPost);
     }
 
-    public List<PostResponseDto.Simple> replyReceivedPost(){
-        return PostResponseDto.Simple.of(userPostService.getReplyReceivedPost(userService.getLoginUser()));
-    }
-    public List<PostResponseDto.Simple> replySentPost(){
-        return PostResponseDto.Simple.of(userPostService.getReplySentPost(userService.getLoginUser()));
-    }
     /*public Page<PostDocument> searchPost(PostRequestDto.Search search,Pageable pageable){
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
 
