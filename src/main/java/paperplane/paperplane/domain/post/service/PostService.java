@@ -128,7 +128,19 @@ public class PostService {
                 userPost.setReplyId(post.getId());
                 userPost.setIsReply("RECEIVED");
                 userPostRepository.save(userPost);
+
+                if(userPostService.getByReceiverIdAndPostId(user.getId(),post.getId()).getId()==null){
+                    userPostService.addUserPost(UserPost.builder()
+                            .post(post)
+                            .isReply("SENT")
+                            .isRead(false)
+                            .isReport(false)
+                            .isLike(false)
+                            .receiver(user)
+                            .build());
+                }
                 break;
+
             }else{
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
@@ -139,17 +151,18 @@ public class PostService {
                         .receiver(receive)
                         .build());
             }
+            if(userPostService.getByReceiverIdAndPostId(user.getId(),post.getId()).getId()==null){
+                userPostService.addUserPost(UserPost.builder()
+                        .post(post)
+                        .isReply("SENT")
+                        .isRead(false)
+                        .isReport(false)
+                        .isLike(false)
+                        .receiver(user)
+                        .build());
+            }
         }
-        if(userPostService.getByReceiverIdAndPostId(user.getId(),post.getId()).getId()==null){
-            userPostService.addUserPost(UserPost.builder()
-                    .post(post)
-                    .isReply("NONE")
-                    .isRead(false)
-                    .isReport(false)
-                    .isLike(false)
-                    .receiver(user)
-                    .build());
-        }
+
 
 
 
