@@ -12,16 +12,18 @@ import java.util.Optional;
 
 @Repository
 public interface UserPostRepository extends JpaRepository<UserPost,Integer> {
-    @Query(value = "select up from UserPost up where  (up.post.id=:postId and up.receiver.id=:userId)")
-    Optional<UserPost> findByReceiverIdAndPostId(@org.springframework.data.repository.query.Param("userId")Integer userId,
-                                                 @org.springframework.data.repository.query.Param("postId") Integer postId);
-
-    //@Query(value = "select up from UserPost up left join Post p on p.id=:postId where p.sender.id=:userId")
-
 
     @Query(value = "select up from  UserPost  up join Post p on up.post.id=p.id where (p.id=:postId and p.sender.id=:userId)")
     List<UserPost> findPostOptionByPostId(@Param("userId") Integer userId, @Param("postId") Integer postId);
 
-    @Query(value = "select count(*)from  UserPost  up join Post p on up.post=p where (p.originId=:originId and p.sender.id=:userId) group by p.originId,p.sender.id")
+    @Query(value = "select count(*)from  UserPost  up join Post p on up.post=p where (up.replyId=:originId and p.sender.id=:userId) group by up.replyId,p.sender.id")
     Integer countUserPostBySenderIdAndOriginId(@Param("userId") Integer userId, @Param("originId") Integer originId);
+
+    @Query(value = "select p from UserPost up join Post p on up.post=p where up.receiver.id=:userId and up.isReply = true ")
+    List<Post> findReplyReceivedPost(@Param("userId") Integer userId);
+
+    @Query(value = "select p from UserPost up join Post p on up.post=p where p.sender.id=:userId and up.isReply = true ")
+    List<Post> findReplySentPost(@Param("userId") Integer userId);
+
+    Optional<UserPost> findByReceiverIdAndPostId(Integer receiverId,Integer postId);
 }
