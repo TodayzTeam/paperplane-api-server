@@ -134,8 +134,8 @@ public class PostController {
     public ResponseEntity<List<PostResponseDto.Info>> postInfo(@PathVariable Integer postId) {
         return ResponseEntity.ok(postService.PostInfoById(postId));
     }
-    @ApiOperation("답장편지 - 받은편지")
-    @GetMapping("/reply/received")
+/*    @ApiOperation("답장편지 - 받은편지")
+    @GetMapping("/reply/received}")
     public ResponseEntity<List<PostResponseDto.Simple>> getReplyReceivedPost() {
         return ResponseEntity.ok(postService.replyReceivedPost());
     }
@@ -144,7 +144,7 @@ public class PostController {
     @GetMapping("/reply/sent")
     public ResponseEntity<List<PostResponseDto.Simple>> getReplySentPost() {
         return ResponseEntity.ok(postService.replySentPost());
-    }
+    }*/
 
     /*@ApiOperation("음식 검색. 제목과 내용, 카테고리를 이용 -es search")
     @GetMapping("/search")

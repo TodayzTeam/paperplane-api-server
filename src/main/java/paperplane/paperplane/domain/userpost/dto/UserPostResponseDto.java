@@ -20,7 +20,7 @@ public class UserPostResponseDto {
         private Boolean isReport;
         private Boolean isRead;
         private Boolean isLike;
-        private Boolean isReply;
+        private String isReply;
 
         public static UserPostResponseDto.Option of(UserPost userPost) {
             return Option.builder()

@@ -104,7 +104,6 @@ public class PostService {
 
         while(randUser.isEmpty()){
             randUser=userService.getRandUser(data.getReceiveGroup());
-
         }
         for(User receive: randUser){
             if(data.getIsReply()) {
@@ -118,7 +117,7 @@ public class PostService {
 
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
-                        .isReply(true)
+                        .isReply("SENT")
                         .isRead(false)
                         .isReport(false)
                         .isLike(false)
@@ -127,12 +126,13 @@ public class PostService {
                         .build());
                 UserPost userPost=userPostService.getByReceiverIdAndPostId(post.getSender().getId(),data.getOriginId());
                 userPost.setReplyId(post.getId());
+                userPost.setIsReply("RECEIVED");
                 userPostRepository.save(userPost);
                 break;
             }else{
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
-                        .isReply(false)
+                        .isReply("NONE")
                         .isRead(false)
                         .isReport(false)
                         .isLike(false)
@@ -177,6 +177,9 @@ public class PostService {
     public Integer interStorePost(PostRequestDto.Create data)throws Exception{
         Post post= new Post();
         User user= userService.getUserById(userService.getLoginUser());
+        if(data.getIsReply()){
+            getByPostId(data.getOriginId());
+        }
 
         if(groupRepository.findByCode(data.getGroupCode()).isPresent()) {
             post= Post.builder()
@@ -221,16 +224,7 @@ public class PostService {
             randUser=userService.getRandUser(data.getReceiveGroup());
         }
         for(User receive: randUser){
-            if(data.getIsReply()==null || !data.getIsReply() ) {
-                userPostService.addUserPost(UserPost.builder()
-                        .post(post)
-                        .isReply(false)
-                        .isRead(false)
-                        .isReport(false)
-                        .isLike(false)
-                        .receiver(receive)
-                        .build());
-            }else{
+            if(data.getIsReply()) {
                 if(data.getOriginId()==null){
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"originId -원본편지의 id를 추가 필요");
                 }
@@ -238,9 +232,25 @@ public class PostService {
                     postRepository.delete(post);
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신한 편지입니다.");
                 }
+
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
-                        .isReply(true)
+                        .isReply("SENT")
+                        .isRead(false)
+                        .isReport(false)
+                        .isLike(false)
+                        .receiver(getByPostId(data.getOriginId()).getSender())
+                        .replyId(data.getOriginId())
+                        .build());
+                UserPost userPost=userPostService.getByReceiverIdAndPostId(post.getSender().getId(),data.getOriginId());
+                userPost.setReplyId(post.getId());
+                userPost.setIsReply("RECEIVED");
+                userPostRepository.save(userPost);
+                break;
+            }else{
+                userPostService.addUserPost(UserPost.builder()
+                        .post(post)
+                        .isReply("NONE")
                         .isRead(false)
                         .isReport(false)
                         .isLike(false)
@@ -248,6 +258,8 @@ public class PostService {
                         .build());
             }
         }
+
+
 
         //save Interest
         if(data.getKeyword()!=null) {
@@ -300,8 +312,9 @@ public class PostService {
         }else {
             infos.add(PostResponseDto.Info.of(post));
         }
+        log.info("test");
 
-        if(userPost.isPresent()) {
+        if(userPost.isPresent() && userPost.get().getReplyId()!=null) {
             post=getByPostId(userPost.get().getReplyId());
             if(post.getGroup()==null){
                 infos.add(PostResponseDto.Info.of(Post.builder()
