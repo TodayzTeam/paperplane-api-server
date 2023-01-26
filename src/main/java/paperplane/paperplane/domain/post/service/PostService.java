@@ -59,6 +59,9 @@ public class PostService {
     public Integer addPost(PostRequestDto.Create data) throws Exception{
         Post post= new Post();
         User user= userService.getUserById(userService.getLoginUser());
+        if(data.getIsReply()){
+            getByPostId(data.getOriginId());
+        }
 
         if(groupRepository.findByCode(data.getGroupCode()).isPresent()) {
             post= Post.builder()
@@ -104,7 +107,7 @@ public class PostService {
 
         }
         for(User receive: randUser){
-            if(data.getIsReply() ) {
+            if(data.getIsReply()) {
                 if(data.getOriginId()==null){
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"originId -원본편지의 id를 추가 필요");
                 }
@@ -113,23 +116,20 @@ public class PostService {
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신한 편지입니다.");
                 }
 
-                post.setOriginId(getByPostId(data.getOriginId()).getId());
-                Post lastPost=getByPostId(data.getOriginId());
-                lastPost.setOriginId(post.getId());
-                postRepository.save(lastPost);
-
-
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
                         .isReply(true)
                         .isRead(false)
                         .isReport(false)
                         .isLike(false)
-                        .receiver(receive)
+                        .receiver(getByPostId(data.getOriginId()).getSender())
+                        .replyId(data.getOriginId())
                         .build());
-
+                UserPost userPost=userPostService.getByReceiverIdAndPostId(post.getSender().getId(),data.getOriginId());
+                userPost.setReplyId(post.getId());
+                userPostRepository.save(userPost);
+                break;
             }else{
-
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
                         .isReply(false)
@@ -140,16 +140,7 @@ public class PostService {
                         .build());
             }
         }
-        if(userPostService.getByReceiverIdAndPostId(user.getId(),post.getId()).getId()==null){
-            userPostService.addUserPost(UserPost.builder()
-                    .post(post)
-                    .isReply(false)
-                    .isRead(false)
-                    .isReport(false)
-                    .isLike(false)
-                    .receiver(user)
-                    .build());
-        }
+
 
 
         //save Interest
@@ -247,7 +238,6 @@ public class PostService {
                     postRepository.delete(post);
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN,"이미 회신한 편지입니다.");
                 }
-                post.setOriginId(getByPostId(data.getOriginId()).getId());
                 userPostService.addUserPost(UserPost.builder()
                         .post(post)
                         .isReply(true)
@@ -258,14 +248,6 @@ public class PostService {
                         .build());
             }
         }
-        userPostService.addUserPost(UserPost.builder()
-                .post(post)
-                .isReply(false)
-                .isRead(false)
-                .isReport(false)
-                .isLike(false)
-                .receiver(user)
-                .build());
 
         //save Interest
         if(data.getKeyword()!=null) {
@@ -319,8 +301,8 @@ public class PostService {
             infos.add(PostResponseDto.Info.of(post));
         }
 
-        if(getByPostId(postId).getOriginId()!=null) {
-            post=getByPostId(getByPostId(postId).getOriginId());
+        if(userPost.isPresent()) {
+            post=getByPostId(userPost.get().getReplyId());
             if(post.getGroup()==null){
                 infos.add(PostResponseDto.Info.of(Post.builder()
                         .id(post.getId())
@@ -470,9 +452,16 @@ public class PostService {
 
     public List<PostResponseDto.Simple> searchGroupPostByWord(Integer groupId,String word,Pageable pageable){
         User user= userService.getUserById(userService.getLoginUser());
-        Page<Post> postPage =postRepository.findGroupPostByWord(groupId,word,pageable);
-        List<Post> post=postPage.stream().collect(Collectors.toList());
-        return PostResponseDto.Simple.of(post);
+        Optional<UserGroup> userGroupOptional = userGroupRepository.findByCodeAndUserId(groupId, user.getId());
+
+        if(userGroupOptional.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가입하지 않은 그룹입니다.");
+        }
+        UserGroup userGroup = userGroupOptional.get();
+        LocalDateTime joinDate = userGroup.getJoinDate();
+
+        List<Post> postList = postRepository.findGroupPostByWord(groupId, user.getId(), word);
+        return PostResponseDto.Simple.of(postList);
     }
 
     public List<PostResponseDto.Simple> getGroupPost(Integer groupId){
@@ -488,11 +477,17 @@ public class PostService {
         UserGroup userGroup = userGroupOptional.get();
         LocalDateTime joinDate = userGroup.getJoinDate();
 
-        List<Post> groupPost = postRepository.findGroupPost(groupId, user.getId(), joinDate);
+        List<Post> groupPost = postRepository.findGroupPost(groupId, user.getId());
 
         return PostResponseDto.Simple.of(groupPost);
     }
 
+    public List<PostResponseDto.Simple> replyReceivedPost(){
+        return PostResponseDto.Simple.of(userPostService.getReplyReceivedPost(userService.getLoginUser()));
+    }
+    public List<PostResponseDto.Simple> replySentPost(){
+        return PostResponseDto.Simple.of(userPostService.getReplySentPost(userService.getLoginUser()));
+    }
     /*public Page<PostDocument> searchPost(PostRequestDto.Search search,Pageable pageable){
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
 
