@@ -432,7 +432,6 @@ public class PostService {
         log.info("test");
         if(postRepository.findLikedPost(user.getId(),pageable).isEmpty()){
             List<PostResponseDto.Simple> simpleList=new ArrayList<>();
-            simpleList.add(PostResponseDto.Simple.of(new Post()));
             return simpleList;
         }
         else {
