@@ -140,6 +140,16 @@ public class PostService {
                         .build());
             }
         }
+        if(userPostService.getByReceiverIdAndPostId(user.getId(),post.getId()).getId()==null){
+            userPostService.addUserPost(UserPost.builder()
+                    .post(post)
+                    .isReply("NONE")
+                    .isRead(false)
+                    .isReport(false)
+                    .isLike(false)
+                    .receiver(user)
+                    .build());
+        }
 
 
 
