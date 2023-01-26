@@ -486,7 +486,7 @@ public class PostService {
         UserGroup userGroup = userGroupOptional.get();
         LocalDateTime joinDate = userGroup.getJoinDate();
 
-        List<Post> groupPost = postRepository.findGroupPost(groupId, joinDate);
+        List<Post> groupPost = postRepository.findGroupPost(groupId, user.getId(), joinDate);
 
         return PostResponseDto.Simple.of(groupPost);
     }
