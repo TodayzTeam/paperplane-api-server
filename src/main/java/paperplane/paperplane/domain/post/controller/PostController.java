@@ -62,13 +62,11 @@ public class PostController {
         return ResponseEntity.ok(postService.getSentPost(pageRequest));
     }
 
-
     @ApiOperation("인기편지 리스트 8개 전송")
     @GetMapping("/popular")
     public ResponseEntity<List<PostResponseDto.Simple>> popularPost() {
         return ResponseEntity.ok(postService.getPopularPost());
     }
-
 
     @ApiOperation("받은 편지, 헤더에")
     @GetMapping("/received")
@@ -82,7 +80,6 @@ public class PostController {
         PageRequest pageRequest= PageRequest.of(page,8);
         return ResponseEntity.ok(postService.getLikedPost(pageRequest));
     }
-
 
     @ApiOperation("편지 신고, 5회 누적시 편지 삭제")
     @GetMapping("/report/{postId}")
@@ -137,6 +134,18 @@ public class PostController {
     public ResponseEntity<List<PostResponseDto.Info>> postInfo(@PathVariable Integer postId) {
         return ResponseEntity.ok(postService.PostInfoById(postId));
     }
+    @ApiOperation("답장편지 - 받은편지")
+    @GetMapping("/reply/received")
+    public ResponseEntity<List<PostResponseDto.Simple>> getReplyReceivedPost() {
+        return ResponseEntity.ok(postService.replyReceivedPost());
+    }
+
+    @ApiOperation("답장편지 - 보낸편지")
+    @GetMapping("/reply/sent")
+    public ResponseEntity<List<PostResponseDto.Simple>> getReplySentPost() {
+        return ResponseEntity.ok(postService.replySentPost());
+    }
+
     /*@ApiOperation("음식 검색. 제목과 내용, 카테고리를 이용 -es search")
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import paperplane.paperplane.domain.post.Post;
 import paperplane.paperplane.domain.user.User;
 import paperplane.paperplane.domain.user.service.UserService;
 import paperplane.paperplane.domain.userpost.UserPost;
@@ -86,4 +87,12 @@ public class UserPostService {
         }
         return true;
     }
+
+    public List<Post> getReplyReceivedPost(Integer userId){
+        return userPostRepository.findReplyReceivedPost(userId);
+    }
+    public List<Post> getReplySentPost(Integer userId){
+        return userPostRepository.findReplySentPost(userId);
+    }
+
 }

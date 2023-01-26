@@ -46,4 +46,7 @@ public class UserPost {
 
     @Column
     private Boolean isReply;
+
+    @Column
+    private Integer replyId;
 }
