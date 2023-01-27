@@ -27,23 +27,22 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "select p from Post p inner join p.sender  s on s.id=:userId inner join p.userPosts up on up.isReport=false ")
     Page<Post> findSentPost(@Param("userId")Integer userId,Pageable pageable);
 
-
-    @Query(value = "select p from Post p where p.sender.id = :userId and p.group is null")
+    @Query(value = "select p from Post p where p.sender.id = :userId and p.group is null order by p.date desc")
     Page<Post> findSentRandomPost(@org.springframework.data.repository.query.Param("userId")Integer userId,Pageable pageable);
 
-    @Query(value = "select p from Post p where p.sender.id = :userId and p.group is not null")
+    @Query(value = "select p from Post p where p.sender.id = :userId and p.group is not null order by p.date desc")
     Page<Post> findSentGroupPost(@org.springframework.data.repository.query.Param("userId")Integer userId,Pageable pageable);
 
     @Query(value = "select p from Post p inner join p.userPosts up on (up.receiver.id=:userId and up.isReport=false)")
     Page<Post> findReceivedPost(@Param("userId") Integer userId, Pageable pageable);
 
-    @Query(value = "select p from Post p join p.userPosts up on (up.receiver.id = :userId and  p.sender.id <> :userId and up.isReport = false and up.isRead = true)")
+    @Query(value = "select p from Post p join p.userPosts up on (up.receiver.id = :userId and  p.sender.id <> :userId and up.isReport = false and up.isRead = true) order by p.date desc")
     Page<Post> findReceivedReadPost(@org.springframework.data.repository.query.Param("userId") Integer userId, Pageable pageable);
 
-    @Query(value = "select p from Post p join p.userPosts up on (up.receiver.id = :userId and p.sender.id <> :userId and up.isReport = false and up.isRead = false)")
+    @Query(value = "select p from Post p join p.userPosts up on (up.receiver.id = :userId and p.sender.id <> :userId and up.isReport = false and up.isRead = false) order by p.date desc" )
     Page<Post> findReceivedUnreadPost(@org.springframework.data.repository.query.Param("userId") Integer userId, Pageable pageable);
 
-    @Query(value = "select p from Post p inner join p.userPosts up on (up.receiver.id=:userId and up.isReport=false AND up.isLike=true )")
+    @Query(value = "select p from Post p inner join p.userPosts up on (up.receiver.id=:userId and up.isReport=false AND up.isLike=true ) order by p.date desc")
     Page<Post> findLikedPost(@Param("userId") Integer userId, Pageable pageable);
 
     @Query(value = "select distinct p from Post p join p.userPosts up on (up.receiver.id = :userId and up.isReport = false) where p.group.id = :groupId order by p.date desc")
