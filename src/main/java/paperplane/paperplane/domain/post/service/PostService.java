@@ -412,6 +412,10 @@ public class PostService {
         return user.getTempPost();
     }
     public void removePost(Integer id){
+        Integer userId= userService.getLoginUser();
+        if(!getByPostId(id).getSender().getId().equals(userId)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"해당 글을 작성한 유저가 아닙니다.");
+        }
         postRepository.delete(getByPostId(id));
         //postDocumentRepository.delete(postDocumentRepository.findById(id).get());
     }
