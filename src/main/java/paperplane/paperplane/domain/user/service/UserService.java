@@ -102,6 +102,9 @@ public class UserService {
         }
 
     }
+    public List<User> getRandUserByInterest(Integer id){
+        return userRepository.findRandUserByInterest(id);
+    }
 
     public User getUserById(Integer id){
         return userRepository.findById(id).orElseThrow(()->
