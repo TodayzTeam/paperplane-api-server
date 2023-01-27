@@ -89,12 +89,40 @@ public class PostService {
         }
         postRepository.save(post);
 
+        //save Interest
+        Set<PostInterest> postInterestSet = new HashSet<>();
+        if(data.getKeyword()!=null) {
+            JSONParser parser = new JSONParser();
+            JSONArray keywordArray = (JSONArray) parser.parse(data.getKeyword()); //keyword parsing objcet
+            for (int i = 0; i < keywordArray.size(); i++) {
+                if (keywordArray.get(i) != null) {
+                    String keyword = keywordArray.get(i).toString();
+                    Interest interest = interestService.addInterest(keyword);
+                    PostInterest postInterest = PostInterest.builder()
+                            .post(post)
+                            .interest(interest)
+                            .build();
+                    postInterestService.addPostInterest(postInterest);
+                    postInterestSet.add(postInterest);
+                }
+            }
+        }
 
         //user api 추가 후 변경예정
         List<User> randUser= new ArrayList<>();
+        randUser.add(user);
         //user api 추가 후 변경예정
         if(Objects.equals(data.getReceiveGroup(), "RAND")) {
-            randUser = userService.getRandUser(data.getReceiveGroup());
+            if(!postInterestSet.isEmpty()) {
+                for(PostInterest postInterest:postInterestSet) {
+                    Interest interest=postInterest.getInterest();
+                    randUser.addAll(userService.getRandUserByInterest(interest.getId()));
+                }
+            }
+            if(randUser.isEmpty()){
+                randUser=userService.getRandUser(data.getReceiveGroup());
+            }
+
         } else if (Objects.equals(data.getReceiveGroup(),"GROUP")) {
             if(data.getGroupCode()==null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"group code를 넣어주세요");
@@ -105,6 +133,7 @@ public class PostService {
         while(randUser.isEmpty()){
             randUser=userService.getRandUser(data.getReceiveGroup());
         }
+        randUser= new ArrayList<>(new HashSet<>(randUser));
         for(User receive: randUser){
             if(data.getIsReply()) {
                 if(data.getOriginId()==null){
@@ -176,27 +205,6 @@ public class PostService {
                         .receiver(user)
                         .build();
                 userPostService.addUserPost(userPost);
-            }
-        }
-
-
-        //save Interest
-        if(data.getKeyword()!=null) {
-            JSONParser parser = new JSONParser();
-            JSONArray keywordArray = (JSONArray) parser.parse(data.getKeyword()); //keyword parsing objcet
-
-            Set<PostInterest> postInterestSet = new HashSet<>();
-            for (int i = 0; i < keywordArray.size(); i++) {
-                if (keywordArray.get(i) != null) {
-                    String keyword = keywordArray.get(i).toString();
-                    Interest interest = interestService.addInterest(keyword);
-                    PostInterest postInterest = PostInterest.builder()
-                            .post(post)
-                            .interest(interest)
-                            .build();
-                    postInterestService.addPostInterest(postInterest);
-                    postInterestSet.add(postInterest);
-                }
             }
         }
 

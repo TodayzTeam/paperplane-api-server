@@ -16,4 +16,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query(value = "SELECT distinct * FROM User u where u.randId>FLOOR((RAND()*100000000)) ORDER BY u.randId limit 5 ", nativeQuery = true)
     List<User>findRandUserList();
+
+
+    /*@Query(value = "SELECT distinct * FROM User u join Interest i on i.id=:interestId where u.randId>FLOOR((RAND()*100000000)) ORDER BY u.randId ", nativeQuery = true)
+    List<User>findRandUserByInterest(@Param("interestId") Integer interestId);*/
+
+    @Query(value = "select * from User u ,Interest i,UserInterest ui where (u.id=ui.user_id and ui.interest_id=i.id) and i.id=:interestId and u.randId>FLOOR((RAND()*100000000)) ORDER BY u.randId limit 5", nativeQuery = true)
+    List<User>findRandUserByInterest(@Param("interestId") Integer interestId);
 }

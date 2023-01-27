@@ -29,7 +29,7 @@ public class Post implements Serializable {
     @Column
     private  String title;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Column
